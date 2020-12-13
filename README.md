@@ -5,7 +5,7 @@
 
 Clone this repository
 ```sh
-$ git clone repo_url --depth=1
+$ git clone git@gitlab.com:awemulya/backend-template.git --depth=1
 ```
 ## Docker
 Install [docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/install/) in your system.
