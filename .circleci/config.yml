@@ -1,0 +1,140 @@
+version: 2.1
+
+### Define these in circleci project settings or in context.
+# GIT_USER                    ## User used to access git repository & package.
+# GIT_TOKEN                   ## Token from github. see: https://github.com/settings/tokens
+# CIRCLE_PROJECT_USERNAME     ## CircleCI default env-variable. see: https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
+# CIRCLE_PROJECT_REPONAME     ## CircleCI default env-variable. see: https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
+# SERVER_IP                   ## IP Address of Server to deploy. 
+# SSH_USER                    ## User in server that executes deployment commands. default: cicduser
+
+orbs:
+  slack: circleci/slack@3.4.2
+
+jobs:
+  test:
+    working_directory: ~/project
+    docker:
+      - image: python:3.6-buster #Using python:3.6-buster since, -slim lacks many packages
+        environment:
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
+          POSTGRES_DB: test
+
+      - image: mdillon/postgis:11-alpine
+        environment:
+          POSTGRES_USER: test
+          POSTGRES_DB: test
+          POSTGRES_PASSWORD: test
+    steps:
+      - checkout:
+          path: ~/project
+      - restore_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+      - run:
+          name: Installing Project Dependencies (Python)
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install --upgrade pip
+            pip install -r requirements.txt
+      - run:
+          name: Installing Project Dependencies (APT)
+          command: |
+            apt-get clean
+            rm -rf /var/lib/apt/lists/*
+            apt-get update
+            apt-get install -y $(cat ./dependencies/apt_requirements.txt)
+            apt-get clean
+      - save_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+          paths:
+            - "venv"
+      - run:
+          name: Run Tests
+          command: |
+            . venv/bin/activate
+            python3 manage.py test > /tmp/test_result
+
+      - store_test_results:     #Tests needs some work.
+          path: /tmp/test_result      
+
+      - run:
+          name: Test Collect Static & Migrations
+          command: |
+            . venv/bin/activate
+            python3 manage.py collectstatic --noinput
+            python manage.py makemigrations --merge --noinput
+            python manage.py migrate
+      - slack/status:
+          fail_only: true
+          only_for_branches: master, production
+          webhook: $SLACK_WEBHOOK      
+  build:
+    working_directory: ~/project
+    docker:
+      - image: debian:buster # primary container for the build job
+    steps:
+      - checkout:
+          path: ~/project
+      - run:
+          name: Install Docker
+          command:
+            apt update && apt install -y docker.io
+      - setup_remote_docker:
+          version: 19.03.13
+      - run: 
+          name: Docker Login
+          command: |
+            docker login -u $GIT_USER -p $GIT_TOKEN docker.pkg.github.com # Login to github package repository, build & push image.
+      - run:
+          name: Docker Image Build & Push
+          command: |
+            docker build -t docker.pkg.github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$CIRCLE_PROJECT_REPONAME:latest .
+            docker push docker.pkg.github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$CIRCLE_PROJECT_REPONAME:latest   #Naming is like : /naxa-developers/project-name/project-name:tag
+  deploy:
+    docker:
+      - image: debian:buster # Using Debian base image for deployment.
+    steps:
+      - run:
+          name: Install OpenSSH
+          command: apt update && apt install -y ssh
+      - add_ssh_keys:
+          fingerprints:
+            - "e9:7e:ec:c8:f8:7a:59:3f:17:bb:7a:83:45:bb:9e:1c" #Defiined in SSH-Vars in circleci/project-settings/ssh
+      - run:
+          name:  Deploy to Server
+          command: |
+            ssh -o "StrictHostKeyChecking=no" $SSH_USER@$SERVER_139 sh $PROJECT_ROOT_DIR/deploy.sh $GIT_USER $GIT_TOKEN $CIRCLE_PROJECT_USERNAME $CIRCLE_PROJECT_REPONAME $PROJECT_ROOT_DIR master
+      - run:
+          name: Install CURL
+          command: apt update && apt install -y curl
+      - slack/notify:   # Used to push notification to Slack channel. Needs more of these. 
+          color: '#42e2f4'
+          message: $CIRCLE_PROJECT_REPONAME Deployment Successful on $SERVER_139
+          webhook: $SLACK_WEBHOOK
+
+# Test is done in all branch, But Build and Push only for Master
+workflows:
+  cicd:
+    jobs:
+      - test
+      - build:
+          context: global
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - master
+                - production
+      - deploy:
+          context: global
+          requires:
+            - test
+            - build
+          filters:
+            branches:
+              only:
+                - master
+                - production
