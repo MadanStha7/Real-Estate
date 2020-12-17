@@ -106,7 +106,7 @@ env.bak/
 venv.bak/
 
 #vscode extensions
-.vscodels
+.vscode
 
 # Spyder project settings
 .spyderproject
