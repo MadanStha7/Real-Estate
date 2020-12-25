@@ -7,6 +7,9 @@ class SocietyAmenities(models.Model):
     title = models.CharField(max_length=32)
     style_class = models.CharField(max_length=32, null=True, blank=True)
 
+    class Meta:
+        db_table = "property_society_amenities"
+
 
 class Property(models.Model):
     MEMBERSHIP_PLAN_CHOICES = (
@@ -47,7 +50,7 @@ class Property(models.Model):
     build_up_area = models.FloatField(default=0.00)
     address = models.TextField()
     uid = models.UUIDField(unique=True, auto_created=True)
-    price = models.DecimalField(default=0.00)
+    price = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
     condition_type = models.CharField(max_length=1, choices=CONDITION_CHOICES)
     bedrooms = models.IntegerField(default=0)
     bathrooms = models.IntegerField(default=0)
@@ -65,7 +68,7 @@ class Property(models.Model):
     viewed_count = models.IntegerField(default=0)
     updated_at = models.DateTimeField(auto_now=True)
     description = models.TextField()
-    society_amenities = models.ManyToManyField()
+    society_amenities = models.ManyToManyField(SocietyAmenities)
     location = models.PointField(null=True, blank=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
@@ -101,5 +104,8 @@ class Property(models.Model):
 
 
 class PropertyGallery(models.Model):
-    image = models.ImageField(upload_to="/property/images")
-    property = models.ForeignKey(Property, related_name="gallery")
+    image = models.ImageField(upload_to="property/images")
+    property = models.ForeignKey(Property, related_name="gallery", on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "property_property_gallery"
