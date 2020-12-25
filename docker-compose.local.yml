@@ -4,9 +4,10 @@ version: '3'
 services:
   server:
     env_file: .env
-    build:
-      context: .
-      dockerfile: Dockerfile
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+    image: realstate/api:0.0.1
     volumes:
       - .:/code
     ports:
