@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
+from django.contrib.postgres.fields import ArrayField
 
 
 class SocietyAmenities(models.Model):
@@ -109,3 +110,23 @@ class PropertyGallery(models.Model):
 
     class Meta:
         db_table = "property_property_gallery"
+
+
+class PropertyDiscussionBoard(models.Model):
+    DISCUSSION_CHOICES = (
+        ('Q', 'Query'),
+        ('R', 'Review'),
+        ('S', 'Suggestion'),
+        ('C', 'Complaint'),
+    )
+    discussion = models.CharField(max_length=1, choices=DISCUSSION_CHOICES)
+    title = models.CharField(max_length=32, blank=True, null=True)
+    tags = ArrayField(models.CharField(max_length=32), blank=True)
+    comments = models.TextField()
+    property = models.ForeignKey(Property, related_name="discussion", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        db_table = "property_property_discussion"
