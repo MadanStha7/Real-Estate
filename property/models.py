@@ -109,3 +109,18 @@ class PropertyGallery(models.Model):
 
     class Meta:
         db_table = "property_property_gallery"
+
+
+class FieldVisit(models.Model):
+    name = models.CharField(max_length=64, blank=False, null=False)
+    email = models.CharField(max_length=16, blank=False)
+    phone = models.CharField(max_length=16)
+    property = models.ForeignKey(Property, related_name="field_visits", on_delete=models.CASCADE )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+        db_table = 'property_field_visit'
+
