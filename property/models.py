@@ -76,16 +76,13 @@ class Property(models.Model):
 
     def __str__(self):
         return self.property_type
-    
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+
+    def save(self, *args, **kwargs):
         if self.location:
-            self.latitude = self.location.x
-            self.longitude = self.location.y
-        elif self.longitude and self.latitude:
-            self.location = Point(self.longitude, self.latitude, srid=4326)
-        super(Property, self).save(force_insert=False,
-                                   force_update=False, using=None, update_fields=None)
+            self.lat = self.location.y
+            self.long = self.location.x
+        elif self.lat and self.long:
+            self.location = Point(x=self.long, y=self.lat, srid=4326)
 
     class Meta:
         db_table = "property_property"
@@ -112,21 +109,16 @@ class PropertyGallery(models.Model):
         db_table = "property_property_gallery"
 
 
-class PropertyDiscussionBoard(models.Model):
-    DISCUSSION_CHOICES = (
-        ('Q', 'Query'),
-        ('R', 'Review'),
-        ('S', 'Suggestion'),
-        ('C', 'Complaint'),
-    )
-    discussion = models.CharField(max_length=1, choices=DISCUSSION_CHOICES)
-    title = models.CharField(max_length=32, blank=True, null=True)
-    tags = ArrayField(models.CharField(max_length=32), blank=True)
-    comments = models.TextField()
-    property = models.ForeignKey(Property, related_name="discussion", on_delete=models.CASCADE)
+class FieldVisit(models.Model):
+    name = models.CharField(max_length=64, blank=False, null=False)
+    email = models.CharField(max_length=16, blank=False)
+    phone = models.CharField(max_length=16)
+    property = models.ForeignKey(Property, related_name="field_visits", on_delete=models.CASCADE )
 
     def __str__(self):
-        return self.title
+        return self.name
 
     class Meta:
-        db_table = "property_property_discussion"
+        ordering = ['name']
+        db_table = 'property_field_visit'
+
