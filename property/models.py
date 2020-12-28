@@ -122,3 +122,22 @@ class FieldVisit(models.Model):
         ordering = ['name']
         db_table = 'property_field_visit'
 
+
+class PropertyDiscussionBoard(models.Model):
+    DISCUSSION_CHOICES = (
+        ('Q', 'Query'),
+        ('R', 'Review'),
+        ('S', 'Suggestion'),
+        ('C', 'Complaint'),
+    )
+    discussion = models.CharField(max_length=1, choices=DISCUSSION_CHOICES)
+    title = models.CharField(max_length=32, blank=True, null=True)
+    tags = ArrayField(models.CharField(max_length=32), blank=True)
+    comments = models.TextField()
+    property = models.ForeignKey(Property, related_name="discussion", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        db_table = "property_property_discussion"
