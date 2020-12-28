@@ -75,16 +75,13 @@ class Property(models.Model):
 
     def __str__(self):
         return self.property_type
-    
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+
+    def save(self, *args, **kwargs):
         if self.location:
-            self.latitude = self.location.x
-            self.longitude = self.location.y
-        elif self.longitude and self.latitude:
-            self.location = Point(self.longitude, self.latitude, srid=4326)
-        super(Property, self).save(force_insert=False,
-                                   force_update=False, using=None, update_fields=None)
+            self.lat = self.location.y
+            self.long = self.location.x
+        elif self.lat and self.long:
+            self.location = Point(x=self.long, y=self.lat, srid=4326)
 
     class Meta:
         db_table = "property_property"
