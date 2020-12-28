@@ -28,6 +28,12 @@ Also make a copy of `.env_sample` to `.env` and use it for setting environment v
 ```sh
 $ docker-compose -f external_services.yml up -d
 ```
+## copy dockerfile sample to dockerfile
+$ cp Dockerfile.sample Dockerfile
+
+## create image
+$ docker build -t realstate/api:0.0.1 .
+
 To run the project in docker
 
     $ docker-compose up -d			#  Will create all necessary services

@@ -3,3 +3,5 @@ djangorestframework==3.9.1
 psycopg2-binary==2.8.3
 celery==5.0.1
 Pillow
+markdown
+django-filter
