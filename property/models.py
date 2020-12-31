@@ -40,7 +40,7 @@ class Property(models.Model):
     )
     AVAILABLE_FOR_CHOICES = (
         ('R', 'Rent'),
-        ('s', 'Sale'),
+        ('S', 'Sale'),
     )
     owner = models.ForeignKey(User, related_name="properties", on_delete=models.CASCADE)
     agent = models.ForeignKey(User, related_name="agent_properties", on_delete=models.CASCADE)
@@ -79,10 +79,11 @@ class Property(models.Model):
 
     def save(self, *args, **kwargs):
         if self.location:
-            self.lat = self.location.y
-            self.long = self.location.x
-        elif self.lat and self.long:
-            self.location = Point(x=self.long, y=self.lat, srid=4326)
+            self.latitude = self.location.y
+            self.longitude = self.location.x
+
+        elif self.latitude and self.longitude:
+            self.location = Point(x=self.longitude, y=self.latitude, srid=4326)
 
     class Meta:
         db_table = "property_property"
