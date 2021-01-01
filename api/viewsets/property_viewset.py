@@ -17,7 +17,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
     queryset = Property.objects.all()
     serializer_class = PropertySerializer
-    filterset_fields = ['bedrooms', 'storey' , 'membership_plan']
+    filterset_fields = ['bedrooms', 'storey', 'membership_plan']
 
     def get_queryset(self):
         # params = self.request.query_params
