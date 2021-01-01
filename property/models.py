@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import User
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
@@ -10,6 +12,9 @@ class SocietyAmenities(models.Model):
 
     class Meta:
         db_table = "property_society_amenities"
+
+    def __str__(self):
+        return self.title
 
 
 class Property(models.Model):
@@ -50,7 +55,7 @@ class Property(models.Model):
     land_area = models.FloatField(default=0.00)
     build_up_area = models.FloatField(default=0.00)
     address = models.TextField()
-    uid = models.UUIDField(unique=True, auto_created=True)
+    uid = models.UUIDField(unique=True, auto_created=True, null=True, blank=True)
     price = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
     condition_type = models.CharField(max_length=1, choices=CONDITION_CHOICES)
     bedrooms = models.IntegerField(default=0)
@@ -78,11 +83,14 @@ class Property(models.Model):
         return self.property_type
 
     def save(self, *args, **kwargs):
+        if not self.uid:
+            self.uid = uuid.uuid4()
         if self.location:
-            self.lat = self.location.y
-            self.long = self.location.x
-        elif self.lat and self.long:
-            self.location = Point(x=self.long, y=self.lat, srid=4326)
+            self.latitude = self.location.y
+            self.longitude = self.location.x
+        elif self.latitude and self.longitude:
+            self.location = Point(x=self.longitude, y=self.latitude, srid=4326)
+        super(Property, self).save(*args, **kwargs)
 
     class Meta:
         db_table = "property_property"

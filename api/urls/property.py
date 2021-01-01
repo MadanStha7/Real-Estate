@@ -4,13 +4,13 @@ from api.viewsets.property_viewset import AmenitiesViewSet, PropertyViewSet, Pro
     PropertyDiscussionViewSet
 
 router = routers.DefaultRouter()
-router.register(r'Amenities', AmenitiesViewSet)
-router.register(r'Property', PropertyViewSet)
-router.register(r'PropertyGallery', PropertyGalleryViewSet)
-router.register(r'FieldVisit', FieldVisitViewSet)
-router.register(r'PropertyDiscussion', PropertyDiscussionViewSet)
+router.register(r'amenities', AmenitiesViewSet)
+router.register(r'property', PropertyViewSet)
+router.register(r'property_gallery', PropertyGalleryViewSet)
+router.register(r'field_visit', FieldVisitViewSet)
+router.register(r'property_discussion', PropertyDiscussionViewSet)
 
 
 urlpatterns = [
-    path('Property', include(router.urls)),
+    path('property', include(router.urls)),
 ]
