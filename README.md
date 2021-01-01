@@ -52,7 +52,7 @@ To stop all running containers
 Once you have created all necessary services. You may want to perform some tasks on Django server like `migrations`, `collectstatic` & `createsuperuser`.
 Use these commands respectively.
 
-    $ docker exec -it -u 0 web bash		# Get a shell on container
+    $ docker exec -it backend-template_server_1 bash		# Get a shell on container
 
     # python3 manage.py collectstatic 	# Collecting static files 
     # python3 manage.py migrate		# Database migrate
@@ -103,7 +103,7 @@ For creating a postgresql `role` , `database` & enabling `extensions`.
 
 For viewing logs of your docker services.
 
-    $ docker-compose logs -f  --tail 1000 web
+    $ docker-compose logs -f  --tail 1000 backend-template_server_1
      Apply all migrations: account, admin, auth, authtoken, contenttypes, core, sessions, sites, socialaccount, user
     Running migrations:
       Applying contenttypes.0001_initial... OK
