@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import User
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
@@ -11,12 +13,20 @@ class SocietyAmenities(models.Model):
     class Meta:
         db_table = "property_society_amenities"
 
+    def __str__(self):
+        return self.title
+
 
 class Property(models.Model):
     MEMBERSHIP_PLAN_CHOICES = (
         ('S', 'Silver'),
         ('G', 'Gold'),
         ('P', 'Platinum'),
+    )
+    LISTING_TYPE_CHOICES = (
+        ('T', 'Top'),
+        ('P', 'Premium'),
+        ('F', 'Featured'),
     )
     CONDITION_CHOICES = (
         ('N', 'New'),
@@ -44,13 +54,14 @@ class Property(models.Model):
     )
     owner = models.ForeignKey(User, related_name="properties", on_delete=models.CASCADE)
     agent = models.ForeignKey(User, related_name="agent_properties", on_delete=models.CASCADE)
+    listing_type = models.CharField(max_length=1, choices=LISTING_TYPE_CHOICES)
     membership_plan = models.CharField(max_length=1, choices=MEMBERSHIP_PLAN_CHOICES)
     development_progress_status = models.CharField(max_length=1, choices=DEVELOPMENT_PROGRESS_STATUS)
     bedroom_hall_kitchen = models.IntegerField(default=0)
     land_area = models.FloatField(default=0.00)
     build_up_area = models.FloatField(default=0.00)
     address = models.TextField()
-    uid = models.UUIDField(unique=True, auto_created=True)
+    uid = models.UUIDField(unique=True, auto_created=True, null=True, blank=True)
     price = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
     condition_type = models.CharField(max_length=1, choices=CONDITION_CHOICES)
     bedrooms = models.IntegerField(default=0)
@@ -69,7 +80,7 @@ class Property(models.Model):
     viewed_count = models.IntegerField(default=0)
     updated_at = models.DateTimeField(auto_now=True)
     description = models.TextField()
-    society_amenities = models.ManyToManyField(SocietyAmenities)
+    society_amenities = models.ManyToManyField(SocietyAmenities, related_name="amenities")
     location = models.PointField(null=True, blank=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
@@ -78,12 +89,16 @@ class Property(models.Model):
         return self.property_type
 
     def save(self, *args, **kwargs):
+        if not self.uid:
+            self.uid = uuid.uuid4()
         if self.location:
             self.latitude = self.location.y
             self.longitude = self.location.x
 
         elif self.latitude and self.longitude:
             self.location = Point(x=self.longitude, y=self.latitude, srid=4326)
+
+        super(Property, self).save(*args, **kwargs)
 
     class Meta:
         db_table = "property_property"
