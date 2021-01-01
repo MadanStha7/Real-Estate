@@ -12,5 +12,5 @@ router.register(r'property_discussion', PropertyDiscussionViewSet)
 
 
 urlpatterns = [
-    path('property', include(router.urls)),
+    path('', include(router.urls)),
 ]

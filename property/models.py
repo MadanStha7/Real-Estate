@@ -74,7 +74,7 @@ class Property(models.Model):
     viewed_count = models.IntegerField(default=0)
     updated_at = models.DateTimeField(auto_now=True)
     description = models.TextField()
-    society_amenities = models.ManyToManyField(SocietyAmenities)
+    society_amenities = models.ManyToManyField(SocietyAmenities, related_name="amenities")
     location = models.PointField(null=True, blank=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)

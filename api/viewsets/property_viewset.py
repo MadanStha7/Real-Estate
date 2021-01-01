@@ -1,8 +1,10 @@
 from django.db.models import Q
 from rest_framework import viewsets
+from rest_framework.response import Response
+
 from property.models import SocietyAmenities, Property, PropertyGallery, FieldVisit, PropertyDiscussionBoard
 from api.serializers.property_serializer import PropertySerializer, AmenitiesSerializer, PropertyGallerySerializer, \
-    FieldVisitSerializer, PropertyDiscussionSerializer
+    FieldVisitSerializer, PropertyDiscussionSerializer, PropertyDetailSerializer
 
 
 class AmenitiesViewSet(viewsets.ModelViewSet):
@@ -26,6 +28,19 @@ class PropertyViewSet(viewsets.ModelViewSet):
             self.queryset = self.queryset.filter(
                 Q(owner=self.request.user) | Q(agent=self.request.user))
         return self.queryset
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = PropertySerializer(instance)
+        amenities = []
+        field_visits = []
+        params = self.request.query_params
+        tab = params.get("tab")
+        if tab == "amenities":
+            amenities = AmenitiesSerializer(instance.society_amenities.all(), many=True).data
+        return Response(
+            dict(data=serializer.data,
+                 amenities=amenities, field_visits=field_visits))
 
 
 class PropertyGalleryViewSet(viewsets.ModelViewSet):
