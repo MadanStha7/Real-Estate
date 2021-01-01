@@ -23,6 +23,11 @@ class Property(models.Model):
         ('G', 'Gold'),
         ('P', 'Platinum'),
     )
+    LISTING_TYPE_CHOICES = (
+        ('T', 'Top'),
+        ('P', 'Premium'),
+        ('F', 'Featured'),
+    )
     CONDITION_CHOICES = (
         ('N', 'New'),
         ('U', 'Used'),
@@ -49,6 +54,7 @@ class Property(models.Model):
     )
     owner = models.ForeignKey(User, related_name="properties", on_delete=models.CASCADE)
     agent = models.ForeignKey(User, related_name="agent_properties", on_delete=models.CASCADE)
+    listing_type = models.CharField(max_length=1, choices=LISTING_TYPE_CHOICES)
     membership_plan = models.CharField(max_length=1, choices=MEMBERSHIP_PLAN_CHOICES)
     development_progress_status = models.CharField(max_length=1, choices=DEVELOPMENT_PROGRESS_STATUS)
     bedroom_hall_kitchen = models.IntegerField(default=0)
