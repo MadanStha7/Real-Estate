@@ -7,7 +7,7 @@ router = routers.DefaultRouter()
 router.register(r'amenities', AmenitiesViewSet)
 router.register(r'property', PropertyViewSet)
 router.register(r'property_gallery', PropertyGalleryViewSet)
-router.register(r'field_visit', FieldVisitViewSet)
+router.register(r'field_visits', FieldVisitViewSet)
 router.register(r'property_discussion', PropertyDiscussionViewSet)
 
 
