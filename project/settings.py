@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     # local apps
     'property',
     'user',
+    'service_provider',
     'core',
     'api',
     'rest_framework',
