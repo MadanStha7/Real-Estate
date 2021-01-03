@@ -8,7 +8,9 @@ class ServiceProvider(models.Model):
     """
     model for service provider
     """
-    user = models.ForeignKey(User, related_name='user_service', help_text="User listed service as provider")
+    user = models.ForeignKey(User, related_name='user_service',
+                             help_text="User listed service as provider",
+                             on_delete=models.CASCADE)
     service_name = models.CharField(max_length=100)
     company_name = models.CharField(max_length=100)
     location = models.TextField()
