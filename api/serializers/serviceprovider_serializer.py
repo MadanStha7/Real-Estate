@@ -10,7 +10,8 @@ class ServiceProviderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ServiceProvider
-        fields = ("user_name", "service_name", "company_name",
+
+        fields = ("user","username", "service_name", "company_name",
                   "location", "price", "contact_number",
                   "description", "photos_or_videos",
                   "added_at", "custom_field")
