@@ -5,6 +5,8 @@ from api.serializers.user_serializer import UserProfileSerializer
 from service_provider.models import ServiceProvider
 
 
+
+
 class ServiceProviderSerializer(serializers.ModelSerializer):
 
     username = serializers.CharField(source='user.username', read_only=True)
@@ -13,7 +15,7 @@ class ServiceProviderSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceProvider
 
-        fields = ("user", "users", "username", "service_name", "company_name",
+        fields = ("user", "username", "service_name", "company_name",
                   "location", "price", "contact_number",
                   "description", "photos_or_videos",
                   "added_at", "custom_field")
