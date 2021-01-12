@@ -5,3 +5,4 @@ celery==5.0.1
 Pillow
 markdown
 django-filter
+ipdb
