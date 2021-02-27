@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   pgdb:
-    container_name: psql-11-backend_db
+    container_name: realstate_database
     image: mdillon/postgis:11-alpine
     volumes:
       - ../postgres-data:/var/lib/postgresql/data

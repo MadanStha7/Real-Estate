@@ -6,7 +6,7 @@
 # COMPOSE_PROJECT_NAME=backend-templete
 # POSTGRES_USER=postgres
 # POSTGRES_DB=postgres
-POSTGRES_HOST=psql-11-backend_db
+POSTGRES_HOST=realstate_database
 # POSTGRES_PORT=5432
 # EMAIL_HOST_USER=backend.project@gmail.com
 # EMAIL_HOST_PASSWORD=project@123

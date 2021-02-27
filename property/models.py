@@ -1,9 +1,11 @@
 import uuid
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
 from django.contrib.postgres.fields import ArrayField
+
+User = get_user_model()
 
 
 class SocietyAmenities(models.Model):
@@ -19,44 +21,48 @@ class SocietyAmenities(models.Model):
 
 class Property(models.Model):
     MEMBERSHIP_PLAN_CHOICES = (
-        ('S', 'Silver'),
-        ('G', 'Gold'),
-        ('P', 'Platinum'),
+        ("S", "Silver"),
+        ("G", "Gold"),
+        ("P", "Platinum"),
     )
     LISTING_TYPE_CHOICES = (
-        ('T', 'Top'),
-        ('P', 'Premium'),
-        ('F', 'Featured'),
+        ("T", "Top"),
+        ("P", "Premium"),
+        ("F", "Featured"),
     )
     CONDITION_CHOICES = (
-        ('N', 'New'),
-        ('U', 'Used'),
+        ("N", "New"),
+        ("U", "Used"),
     )
     PROPERTY_TYPE_CHOICES = (
-        ('H', 'House'),
-        ('L', 'Land'),
-        ('F', 'Flat'),
+        ("H", "House"),
+        ("L", "Land"),
+        ("F", "Flat"),
     )
     FACING_CHOICES = (
-        ('E', 'EAST'),
-        ('W', 'WEST'),
-        ('N', 'North'),
-        ('S', 'South'),
+        ("E", "EAST"),
+        ("W", "WEST"),
+        ("N", "North"),
+        ("S", "South"),
     )
     DEVELOPMENT_PROGRESS_STATUS = (
-        ('N', 'Initial State'),
-        ('I', 'In Progress'),
-        ('R', 'Ready'),
+        ("N", "Initial State"),
+        ("I", "In Progress"),
+        ("R", "Ready"),
     )
     AVAILABLE_FOR_CHOICES = (
-        ('R', 'Rent'),
-        ('S', 'Sale'),
+        ("R", "Rent"),
+        ("S", "Sale"),
     )
     owner = models.ForeignKey(User, related_name="properties", on_delete=models.CASCADE)
-    agent = models.ForeignKey(User, related_name="agent_properties", on_delete=models.CASCADE)
+    agent = models.ForeignKey(
+        User, related_name="agent_properties", on_delete=models.CASCADE
+    )
     listing_type = models.CharField(max_length=1, choices=LISTING_TYPE_CHOICES)
     membership_plan = models.CharField(max_length=1, choices=MEMBERSHIP_PLAN_CHOICES)
-    development_progress_status = models.CharField(max_length=1, choices=DEVELOPMENT_PROGRESS_STATUS)
+    development_progress_status = models.CharField(
+        max_length=1, choices=DEVELOPMENT_PROGRESS_STATUS
+    )
     bedroom_hall_kitchen = models.IntegerField(default=0)
     land_area = models.FloatField(default=0.00)
     build_up_area = models.FloatField(default=0.00)
@@ -80,7 +86,9 @@ class Property(models.Model):
     viewed_count = models.IntegerField(default=0)
     updated_at = models.DateTimeField(auto_now=True)
     description = models.TextField()
-    society_amenities = models.ManyToManyField(SocietyAmenities, related_name="amenities")
+    society_amenities = models.ManyToManyField(
+        SocietyAmenities, related_name="amenities"
+    )
     location = models.PointField(null=True, blank=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
@@ -102,24 +110,26 @@ class Property(models.Model):
 
     class Meta:
         db_table = "property_property"
-        get_latest_by = ['-membership_plan', '-added_at']
-        ordering = ['-membership_plan', '-added_at']
-        permissions = [('has_agent_permission', 'Can Show Property')]
+        get_latest_by = ["-membership_plan", "-added_at"]
+        ordering = ["-membership_plan", "-added_at"]
+        permissions = [("has_agent_permission", "Can Show Property")]
 
         indexes = [
-            models.Index(fields=['city', 'condition_type']),
-            models.Index(fields=['city', 'available_for', 'condition_type']),
-            models.Index(fields=['available_for', 'condition_type']),
-            models.Index(fields=['city', 'available_for']),
-            models.Index(fields=['storey'], name='storey_idx'),
-            models.Index(fields=['parking'], name='parking_idx'),
-            models.Index(fields=['facing'], name='facing_idx'),
+            models.Index(fields=["city", "condition_type"]),
+            models.Index(fields=["city", "available_for", "condition_type"]),
+            models.Index(fields=["available_for", "condition_type"]),
+            models.Index(fields=["city", "available_for"]),
+            models.Index(fields=["storey"], name="storey_idx"),
+            models.Index(fields=["parking"], name="parking_idx"),
+            models.Index(fields=["facing"], name="facing_idx"),
         ]
 
 
 class PropertyGallery(models.Model):
     image = models.ImageField(upload_to="property/images")
-    property = models.ForeignKey(Property, related_name="gallery", on_delete=models.CASCADE)
+    property = models.ForeignKey(
+        Property, related_name="gallery", on_delete=models.CASCADE
+    )
 
     class Meta:
         db_table = "property_property_gallery"
@@ -129,28 +139,32 @@ class FieldVisit(models.Model):
     name = models.CharField(max_length=64, blank=False, null=False)
     email = models.CharField(max_length=16, blank=False)
     phone = models.CharField(max_length=16)
-    property = models.ForeignKey(Property, related_name="field_visits", on_delete=models.CASCADE )
+    property = models.ForeignKey(
+        Property, related_name="field_visits", on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return self.name
 
     class Meta:
-        ordering = ['name']
-        db_table = 'property_field_visit'
+        ordering = ["name"]
+        db_table = "property_field_visit"
 
 
 class PropertyDiscussionBoard(models.Model):
     DISCUSSION_CHOICES = (
-        ('Q', 'Query'),
-        ('R', 'Review'),
-        ('S', 'Suggestion'),
-        ('C', 'Complaint'),
+        ("Q", "Query"),
+        ("R", "Review"),
+        ("S", "Suggestion"),
+        ("C", "Complaint"),
     )
     discussion = models.CharField(max_length=1, choices=DISCUSSION_CHOICES)
     title = models.CharField(max_length=32, blank=True, null=True)
     tags = ArrayField(models.CharField(max_length=32), blank=True)
     comments = models.TextField()
-    property = models.ForeignKey(Property, related_name="discussion", on_delete=models.CASCADE)
+    property = models.ForeignKey(
+        Property, related_name="discussion", on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return self.title
