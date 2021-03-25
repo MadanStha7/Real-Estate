@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from common.models import CommonInfo
 
 User = get_user_model()
 
@@ -10,12 +11,12 @@ IDENTIFICATION_TYPE = (
 )
 
 
-class UserProfile(models.Model):
+class UserProfile(CommonInfo):
     """
     user profile
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_profile')
-    profile_picture = models.ImageField(upload_to='user/profile')
+    profile_picture = models.ImageField(upload_to='user/profile', blank=True, null=True)
     phone_number = models.CharField(max_length=15)
     address = models.TextField()
     added_at = models.DateTimeField(auto_now_add=True)
@@ -28,7 +29,7 @@ class UserProfile(models.Model):
         db_table = 'user_profile'
 
 
-class AgentDetail(models.Model):
+class AgentDetail(CommonInfo):
     """
     agent detail
     """
@@ -37,7 +38,7 @@ class AgentDetail(models.Model):
     location = models.TextField()
     identification_type = models.CharField(choices=IDENTIFICATION_TYPE, max_length=20)
     identification_number = models.CharField(max_length=20)
-    identification_file = models.FileField(upload_to='agent/identification')
+    identification_file = models.FileField(upload_to='agent/identification', blank=True, null=True)
     accept_terms_and_condition = models.BooleanField(default=False)
     added_at = models.DateTimeField(auto_now_add=True)
 
