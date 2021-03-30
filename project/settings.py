@@ -128,10 +128,6 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
-<<<<<<< HEAD
-
-=======
->>>>>>> ca6542c0c2b43777234cb2a08d3b5bbff8644362
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
 
