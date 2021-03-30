@@ -1,12 +1,14 @@
 from django.db.models import QuerySet
 from rest_framework import viewsets
+
 from rest_framework.response import Response
 from property.models import \
-    (SocietyAmenities, Property, PropertyGallery,
-     FieldVisit, PropertyDiscussionBoard)
+    (SocietyAmenities, Property, Gallery,
+     FieldVisit, PropertyDiscussionBoard, PropertyRequest)
 from api.serializers.property_serializer import \
-    (PropertySerializer, AmenitiesSerializer, PropertyGallerySerializer,
-     FieldVisitSerializer, PropertyDiscussionSerializer, PropertyDetailSerializer)
+    (PropertySerializer, AmenitiesSerializer, GallerySerializer,
+     FieldVisitSerializer, PropertyDiscussionSerializer,
+     PropertyDetailSerializer, PropertyRequestSerializer)
 
 
 class AmenitiesViewSet(viewsets.ModelViewSet):
@@ -14,21 +16,27 @@ class AmenitiesViewSet(viewsets.ModelViewSet):
     serializer_class = AmenitiesSerializer
 
 
+class GalleryViewSet(viewsets.ModelViewSet):
+    queryset = Gallery.objects.all()
+    serializer_class = GallerySerializer
+
+
 class PropertyViewSet(viewsets.ModelViewSet):
     queryset = Property.objects.all()
     serializer_class = PropertySerializer
-    filterset_fields = ['bedrooms', 'storey', 'membership_plan', 'listing_type']
-    """
+    filter_fields = ['bedrooms', 'storey', 'membership_plan', 'listing_type']
+
     def get_queryset(self):
         # params = self.request.query_params
         # bedrooms = params.get("bedrooms")
         # if bedrooms:
         #     self.queryset = self.queryset.filter(bedrooms=bedrooms)
-        if self.request.user and not self.request.user.is_superuser:
-            self.queryset = self.queryset.filter(
-                Q(owner=self.request.user) | Q(agent=self.request.user))
-        return self.queryset
-    """
+        queryset = self.queryset
+        if self.request.user.is_authenticated:
+            if self.request.user and not self.request.user.is_superuser:
+                queryset = self.queryset.filter(
+                    Q(owner=self.request.user) | Q(agent=self.request.user))
+        return queryset
 
     def get_queryset(self):
 
@@ -38,10 +46,20 @@ class PropertyViewSet(viewsets.ModelViewSet):
                 % self.__class__.__name__
         )
 
+    queryset = Property.objects.all()
+    serializer_class = PropertySerializer
+    filterset_fields = ['bedrooms', 'storey', 'membership_plan', 'listing_type']
+
+    def get_queryset(self):
+        # params = self.request.query_params
+        # bedrooms = params.get("bedrooms")
+        # if bedrooms:
+        #     self.queryset = self.queryset.filter(bedrooms=bedrooms)
         queryset = self.queryset
-        if isinstance(queryset, QuerySet):
-            # Ensure queryset is re-evaluated on each request.
-            queryset = queryset.all()
+        if self.request.user.is_authenticated:
+            if self.request.user and not self.request.user.is_superuser:
+                queryset = self.queryset.filter(
+                    Q(owner=self.request.user) | Q(agent=self.request.user))
         return queryset
 
     def retrieve(self, request, *args, **kwargs):
@@ -64,11 +82,6 @@ class PropertyViewSet(viewsets.ModelViewSet):
                  discussion=discussion))
 
 
-class PropertyGalleryViewSet(viewsets.ModelViewSet):
-    queryset = PropertyGallery.objects.all()
-    serializer_class = PropertyGallerySerializer
-
-
 class FieldVisitViewSet(viewsets.ModelViewSet):
     queryset = FieldVisit.objects.all()
     serializer_class = FieldVisitSerializer
@@ -79,3 +92,9 @@ class PropertyDiscussionViewSet(viewsets.ModelViewSet):
     queryset = PropertyDiscussionBoard.objects.all()
     serializer_class = PropertyDiscussionSerializer
     filterset_fields = ['discussion']
+
+
+class PropertyRequestViewSet(viewsets.ModelViewSet):
+    queryset = PropertyRequest.objects.all()
+    serializer_class = PropertyRequestSerializer
+    filterset_fields = ['name', 'price', 'property_address']
