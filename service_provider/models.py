@@ -25,9 +25,13 @@ class ServiceProvider(CommonInfo):
     """
     model for service provider
     """
-    user = models.ForeignKey(User, related_name='user_service',
-                             help_text="User listed service as provider",
-                             on_delete=models.CASCADE)
+
+    user = models.ForeignKey(
+        User,
+        related_name="user_service",
+        help_text="User listed service as provider",
+        on_delete=models.CASCADE,
+    )
     uid = models.UUIDField(unique=True, auto_created=True, null=True, blank=True)
     service_name = models.CharField(max_length=100)
     company_name = models.CharField(max_length=100)
@@ -35,7 +39,7 @@ class ServiceProvider(CommonInfo):
     price = models.FloatField()
     contact_number = models.CharField(max_length=15)
     description = models.TextField()
-    photos_or_videos = models.FileField(upload_to='user_service/')
+    photos_or_videos = models.FileField(upload_to="user_service/")
     added_at = models.DateTimeField(auto_now_add=True)
     location = models.PointField(null=True, blank=True)
     latitude = models.FloatField(blank=True, null=True)
@@ -60,8 +64,8 @@ class ServiceProvider(CommonInfo):
         super(ServiceProvider, self).save(*args, **kwargs)
 
     class Meta:
-        db_table = 'service_provider'
-        ordering = ['-added_at']
+        db_table = "service_provider"
+        ordering = ["-added_at"]
 
 
 class Review(CommonInfo):
@@ -76,9 +80,12 @@ class Review(CommonInfo):
         ("4", "4"),
         ("5", "5"),
     )
-    user = models.ForeignKey(User, related_name='review_user',
-                             help_text="User listed service as provider",
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User,
+        related_name="review_user",
+        help_text="User listed service as provider",
+        on_delete=models.CASCADE,
+    )
     service_provider = models.ForeignKey(
         ServiceProvider, related_name="review", on_delete=models.CASCADE,
     )
@@ -92,7 +99,5 @@ class Review(CommonInfo):
 
     class Meta:
         db_table = "service_review"
-        ordering = ['-rating']
-
-
+        ordering = ["-rating"]
 
