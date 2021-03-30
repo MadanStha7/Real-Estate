@@ -26,3 +26,36 @@ class ServiceProvider(models.Model):
     class Meta:
         db_table = 'service_provider'
         ordering = ['-added_at']
+
+
+class BusinessHour(models.Model):
+    """
+    model for business hour
+    """
+    WEEKDAYS = [
+        (1, "Monday"),
+        (2, "Tuesday"),
+        (3, "Wednesday"),
+        (4, "Thursday"),
+        (5, "Friday"),
+        (6, "Saturday"),
+        (7, "Sunday"),
+    ]
+
+    STATUS = [
+        ('O', 'OPEN'),
+        ('C', 'CLOSE')
+    ]
+    service_provider = models.ForeignKey(ServiceProvider, related_name="service_business_hour",
+                                         on_delete=models.CASCADE)
+    day = models.IntegerField(choices=WEEKDAYS)
+    opening_time = models.TimeField()
+    closing_time = models.TimeField()
+    status = models.CharField(max_length=6, choices=STATUS)
+
+    def __str__(self):
+        return f"{self.service_provider}"
+
+    class Meta:
+        db_table = "business_hours"
+        ordering = ["day"]

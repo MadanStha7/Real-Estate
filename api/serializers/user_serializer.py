@@ -10,15 +10,17 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = UserProfile
-        fields = ['id','profile_picture ','phone_number','address']
+        fields = ['id', 'profile_picture', 'phone_number', 'address']
 
 
 class AgentDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = AgentDetail
-        fields = ['id','location','identification_type','identification_number','identification_file','accept_terms_and_condition ']
+        fields = ['id', 'location', 'identification_type', 'identification_number', 'identification_file',
+                  'accept_terms_and_condition']
 
 
 class ChangePasswordSerializer(serializers.ModelSerializer):

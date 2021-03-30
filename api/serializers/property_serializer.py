@@ -3,30 +3,27 @@ from property.models import SocietyAmenities, Property, PropertyGallery, FieldVi
 
 
 class AmenitiesSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = SocietyAmenities
         fields = ['id', 'title', 'style_class']
 
 
 class PropertyGallerySerializer(serializers.ModelSerializer):
-    property = serializers.RelatedField(source='property', read_only=True)
-
     class Meta:
         model = PropertyGallery
         fields = ['id', 'image', 'property']
 
 
 class PropertySerializer(serializers.ModelSerializer):
-    society_amenities = AmenitiesSerializer(read_only=True, many=True)
-    property_type = serializers.CharField(source='get_property_type_display')
-    owner_name = serializers.CharField(source='owner.username')
-    custom_field = serializers.SerializerMethodField()
-    gallery = PropertyGallerySerializer(many=True, read_only=True)
+    # society_amenities = AmenitiesSerializer(read_only=True, many=True)
+    # property_type = serializers.CharField(source='get_property_type_display')
+    # owner_name = serializers.CharField(source='owner.username')
+    # custom_field = serializers.SerializerMethodField()
+    # gallery = PropertyGallerySerializer(many=True, read_only=True)
 
     class Meta:
         model = Property
-        fields = ('owner', 'property_type', 'owner_name',
+        fields = ('owner', "agent",
                   'membership_plan', 'development_progress_status',
                   'bedroom_hall_kitchen', 'land_area',
                   'build_up_area', 'address',
@@ -36,8 +33,8 @@ class PropertySerializer(serializers.ModelSerializer):
                   'attached_bathroom', 'facing', 'property_type',
                   'furnished', 'available', 'added_at',
                   'viewed_count', 'updated_at', 'description',
-                  'society_amenities', 'location', 'latitude',
-                  'longitude', 'gallery', 'custom_field'
+                  'location', 'latitude',
+                  'longitude'
                   )
 
     def get_custom_field(self, obj):
@@ -62,7 +59,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
 
 
 class FieldVisitSerializer(serializers.ModelSerializer):
-    property = serializers.RelatedField(source='property', read_only=True)
+    # property = serializers.RelatedField(source='property', read_only=True)
 
     class Meta:
         model = FieldVisit
@@ -71,7 +68,8 @@ class FieldVisitSerializer(serializers.ModelSerializer):
 
 class PropertyDiscussionSerializer(serializers.ModelSerializer):
     tags = serializers.ListField(child=serializers.CharField())
-    property = serializers.RelatedField(source='property', read_only=True)
+
+    # property = serializers.RelatedField(source='property', read_only=True)
 
     class Meta:
         model = PropertyDiscussionBoard

@@ -2,14 +2,37 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from api.serializers.user_serializer import UserSerializer
-from service_provider.models import ServiceProvider
+from service_provider.models import ServiceProvider, BusinessHour
+
+
+class BusinessHourSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessHour
+        fields = ('id', 'service_provider', 'day', 'opening_time', 'closing_time', 'status')
+
+    def create(self, validated_data):
+        business_hour = BusinessHour.objects.create(**validated_data)
+        return business_hour
+
+    def update(self, instance, validated_data):
+        instance.day = validated_data.get(
+            'day', instance.day)
+        instance.opening_time = validated_data.get(
+            'opening_time', instance.opening_time)
+        instance.closing_time = validated_data.get(
+            'closing_time', instance.closing_time)
+        instance.status = validated_data.get(
+            'status', instance.status)
+
+        instance.save()
+        return instance
 
 
 class ServiceProviderSerializer(serializers.ModelSerializer):
-
     username = serializers.CharField(source='user.username', read_only=True)
     custom_field = serializers.SerializerMethodField()
     user = UserSerializer()
+    service_business_hour = BusinessHourSerializer(many=True, read_only=True)
 
     class Meta:
         model = ServiceProvider
@@ -18,7 +41,7 @@ class ServiceProviderSerializer(serializers.ModelSerializer):
         fields = ("user", "username", "service_name", "company_name",
                   "location", "price", "contact_number",
                   "description", "photos_or_videos",
-                  "added_at", "custom_field")
+                  "added_at", "service_business_hour", "custom_field")
 
     def get_custom_field(self, obj):
         return dict(a=1, b=3)
@@ -31,10 +54,8 @@ class ServiceProviderSerializer(serializers.ModelSerializer):
         return serviceprovider
 
     def update(self, instance, validated_data):
-
         user_data = validated_data.pop('user')
         user = instance.user
-
 
         instance.service_name = validated_data.get(
             'service_name', instance.service_name)
@@ -44,7 +65,7 @@ class ServiceProviderSerializer(serializers.ModelSerializer):
             'location', instance.location)
         instance.price = validated_data.get(
             'price', instance.price)
-        instance.contact_number= validated_data.get(
+        instance.contact_number = validated_data.get(
             'contact_number', instance.contact_number)
         instance.description = validated_data.get(
             'description', instance.description)
@@ -54,7 +75,7 @@ class ServiceProviderSerializer(serializers.ModelSerializer):
             'added_at ', instance.added_at)
 
         user.id = user_data.get(
-            'id',user.id)
+            'id', user.id)
         user.username = user_data.get(
             'username', user.username)
         user.first_name = user_data.get(
