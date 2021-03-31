@@ -7,7 +7,7 @@ from django.contrib.postgres.fields import ArrayField
 from common.models import CommonInfo
 
 User = get_user_model()
-
+    
 
 class SocietyAmenities(CommonInfo):
     title = models.CharField(max_length=32)
@@ -111,7 +111,7 @@ class Property(CommonInfo):
         ("1", "1 to 3 year"),
         ("3", "3 to 5 year"),
         ("5", "5 to 10 year"),
-        ("M", "More than 10 year")
+        ("M", "More than 10 year")          
     )
     AVAILABLE_FOR_CHOICES = (
         ("R", "Only Rent"),
@@ -167,53 +167,62 @@ class Property(CommonInfo):
     )
     commercial = models.CharField(max_length=1, choices=COMMERCIAL_CHOICES, blank=True, null=True)
     residential = models.CharField(max_length=1, choices=RESIDENTIAL_CHOICES, blank=True, null=True)
-    apartment = models.CharField(max_length=1, choices=APARTMENT_CHOICES, default="A")
+    
+    apartment_type = models.CharField(max_length=1, choices=APARTMENT_CHOICES, default="A")
     apartment_name = models.CharField(max_length=63, blank=True, null=True)
+    bhk_type = models.IntegerField(default=0)# choice field
     floor = models.CharField(max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G")
-    storey = models.CharField(max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G")
-    age = models.CharField(max_length=1, choices=AGE_CHOICES, default="U")
-    listing_type = models.CharField(max_length=1, choices=LISTING_TYPE_CHOICES, default="T")
-    membership_plan = models.CharField(max_length=1, choices=MEMBERSHIP_PLAN_CHOICES,
-                                       default="S")
-    development_progress_status = models.CharField(
-        max_length=1, choices=DEVELOPMENT_PROGRESS_STATUS, default="N"
-    )
-    bedroom_hall_kitchen = models.IntegerField(default=0)
-    land_area = models.FloatField(default=0.00)
-    build_up_area = models.FloatField(default=0.00)
+    total_floor = models.CharField(max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G")# total floor
+    property_age = models.CharField(max_length=1, choices=AGE_CHOICES, default="U")
+    facing = models.CharField(max_length=2, choices=FACING_CHOICES)
+    property_size = models.FloatField(default=0.00) #property size
+
     city = models.CharField(max_length=63, blank=True, null=True)
-    address = models.TextField()
     locality = models.CharField(max_length=63)
-    uid = models.UUIDField(unique=True, auto_created=True, null=True, blank=True)
-    price = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
-    condition_type = models.CharField(max_length=1, choices=CONDITION_CHOICES)
+    street_area = models.TextField()#street/area
+    
     available_for = models.CharField(max_length=1, choices=AVAILABLE_FOR_CHOICES)
     expected_rent = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
     expected_deposit = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
     negotiable = models.BooleanField(default=False)
     maintenance = models.CharField(max_length=1, choices=MAINTENANCE_CHOICES, default="I")
     available_from = models.DateField()
-    tenants = models.CharField(max_length=1, choices=TENANTS_CHOICES, default="D")
+    preferred_tenants = models.CharField(max_length=1, choices=TENANTS_CHOICES, default="D")
     furnishing = models.CharField(max_length=1, choices=FURNISHING_CHOICES, default="F")
+    listing_type = models.CharField(max_length=1, choices=LISTING_TYPE_CHOICES, default="T")
     parking = models.CharField(max_length=1, choices=PARKING_CHOICES)
     description = models.TextField()
-    bedrooms = models.IntegerField(default=0)
+    
+    gallery = models.ManyToManyField(Gallery, related_name="property_gallerys"
+    )
+    membership_plan = models.CharField(max_length=1, choices=MEMBERSHIP_PLAN_CHOICES,
+                                       default="S")
+    
     bathrooms = models.IntegerField(default=0)
     balcony = models.CharField(max_length=63, choices=YES_NO_CHOICES, default="Y")
     water_supply = models.CharField(max_length=1, choices=WATER_SUPPLY_CHOICES, default="C")
     gym = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
     non_veg = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
-    security = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
+    gated_security = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
     viewer = models.CharField(max_length=1, choices=VIEWER_CHOICES, default="H")
     secondary_number = models.IntegerField(default=1)
-    attached_bathroom = models.IntegerField(default=0)
-    facing = models.CharField(max_length=2, choices=FACING_CHOICES)
+
     paint = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
-    cleaned = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
-    available_days = models.CharField(max_length=1, choices=AVAILABLE_DAY_CHOICES,
-                                      default="E")
+    attached_bathroom = models.IntegerField(default=0)
+    available_days = models.CharField(max_length=1, choices=AVAILABLE_DAY_CHOICES,default="E")
     start_time = models.TimeField()
     end_time = models.TimeField()
+    
+    development_progress_status = models.CharField(
+        max_length=1, choices=DEVELOPMENT_PROGRESS_STATUS, default="N"
+    )
+    
+    land_area = models.FloatField(default=0.00)
+    uid = models.UUIDField(unique=True, auto_created=True, null=True, blank=True)
+    price = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
+    condition_type = models.CharField(max_length=1, choices=CONDITION_CHOICES)
+    #bedrooms = models.IntegerField(default=0)
+    cleaned = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
     property_type = models.CharField(max_length=1, choices=PROPERTY_TYPE_CHOICES)
     furnished = models.BooleanField(default=False)
     available = models.BooleanField(default=False)
@@ -223,9 +232,7 @@ class Property(CommonInfo):
     society_amenities = models.ManyToManyField(
         SocietyAmenities, related_name="amenities",
     )
-    gallery = models.ManyToManyField(
-        Gallery, related_name="property_gallerys"
-    )
+        
     location = models.PointField(null=True, blank=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
