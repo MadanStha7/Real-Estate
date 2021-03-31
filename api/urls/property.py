@@ -1,11 +1,10 @@
 from django.urls import include, path
 from rest_framework import routers
-from api.viewsets.property_viewset import AmenitiesViewSet, PropertyViewSet, \
+from api.viewsets.property_viewset import  PropertyViewSet, \
     GalleryViewSet, FieldVisitViewSet, \
     PropertyDiscussionViewSet, PropertyRequestViewSet
 
 router = routers.DefaultRouter()
-router.register(r'amenities', AmenitiesViewSet)
 router.register(r'property', PropertyViewSet)
 router.register(r'gallery', GalleryViewSet)
 router.register(r'field_visits', FieldVisitViewSet)

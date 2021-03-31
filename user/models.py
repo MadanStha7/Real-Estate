@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from common.models import CommonInfo
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from django.contrib.auth.models import  Group 
+from django.contrib.auth.models import Group
 
 User = get_user_model()
 
@@ -31,6 +31,7 @@ class AgentDetail(CommonInfo):
 
     def save(self, *args, **kwargs):
         group, created = Group.objects.get_or_create(name="Agent")
+        print("group",group)
         self.user.groups.add(group)
         super().save(*args, **kwargs)
 

@@ -69,8 +69,10 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(write_only=True)
-    password = serializers.CharField(write_only=True, required=True)
-    password2 = serializers.CharField(write_only=True, required=True)
+    username = serializers.CharField(write_only=True, required=True)
+    email = serializers.CharField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
 
 
     class Meta:
@@ -78,11 +80,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "full_name",
+            # "user",
             "email",
             "username",
             "password",
             "password2",
-            "is_active",
+            # "is_active",
         )
 
     def create(self, validated_data):
@@ -93,19 +96,38 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         username = validated_data.pop("username")
         email = validated_data.pop("email")
         password = validated_data.pop("password")
+        print("email", email)
+        print("username", username)
+        print("password", password)
+        print("password", full_name)
+
         user = User.objects.create_user(
             username=username, email=email, password=password
         )
+        print("user", user.id)
         profile = UserProfile.objects.create(user_id=user.id, full_name=full_name)
-        return user
+        return profile
 
     def validate(self, attrs):
+        print(attrs, "===attrs")
         if attrs["password"] != attrs["password2"]:
             raise serializers.ValidationError(
                 {"password": "Password fields didn't match."}
             )
 
         return attrs
+
+    def validate_username(self, username):
+        user_old = User.objects.filter(username=username).exists()
+        if user_old:
+            raise serializers.ValidationError("User already exists")
+        return username
+    
+    def validate_email(self, email):
+        email_old = User.objects.filter(email=email).exists()
+        if email_old:
+            raise serializers.ValidationError("Email already exists")
+        return email
 
     def update(self, instance, validated_data):
         instance.set_password(validated_data["password"])

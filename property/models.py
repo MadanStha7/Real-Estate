@@ -5,19 +5,18 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
 from django.contrib.postgres.fields import ArrayField
 from common.models import CommonInfo
+from user.models import UserProfile,AgentDetail,StaffDetail
 
-User = get_user_model()
-    
 
-class SocietyAmenities(CommonInfo):
-    title = models.CharField(max_length=32)
-    style_class = models.CharField(max_length=32, null=True, blank=True)
+# class SocietyAmenities(CommonInfo):
+#     title = models.CharField(max_length=32)
+#     style_class = models.CharField(max_length=32, null=True, blank=True)
 
-    class Meta:
-        db_table = "property_society_amenities"
+#     class Meta:
+#         db_table = "property_society_amenities"
 
-    def __str__(self):
-        return self.title
+#     def __str__(self):
+#         return self.title
 
 
 class Gallery(CommonInfo):
@@ -31,7 +30,23 @@ class Gallery(CommonInfo):
         return self.image
 
 
+class CityCategory(models.Model):
+    name = models.CharField(max_length=60)
+
+    def __str__(self):
+        return self.name
+
+class ListingCategory(models.Model):
+    name = models.CharField(max_length=60)
+
+    def __str__(self):
+        return self.name
+
+
 class Property(CommonInfo):
+    """
+    post a property
+    """
     MEMBERSHIP_PLAN_CHOICES = (
         ("S", "Silver"),
         ("G", "Gold"),
@@ -45,11 +60,6 @@ class Property(CommonInfo):
     CONDITION_CHOICES = (
         ("N", "New"),
         ("U", "Used"),
-    )
-    PROPERTY_TYPE_CHOICES = (
-        ("H", "House"),
-        ("L", "Land"),
-        ("F", "Flat"),
     )
     FACING_CHOICES = (
         ("E", "EAST"),
@@ -156,31 +166,47 @@ class Property(CommonInfo):
         ("T", "Tenants"),
         ("O", "Others")
     )
+    BHK_CHOICES = (
+        ("1 RK", "1 RK"),
+        ("1 BHK", "1 BHK"),
+        ("2 BHK", "2 BHK"),
+        ("3 BHK", "3 BHK"),
+        ("4 BHK", "4 BHK"),
+        ("4+ BHK", "4+ BHK"),
+
+    )
+
     AVAILABLE_DAY_CHOICES = (
         ("E", "Everyday(Sunday - Saturday)"),
         ("W", "Weekdays(Sunday - Friday)"),
         ("S", "Weekend(Saturday)")
     )
-    owner = models.ForeignKey(User, related_name="properties", on_delete=models.CASCADE)
+    owner = models.ForeignKey(UserProfile, related_name="userprofile", on_delete=models.CASCADE)
     agent = models.ForeignKey(
-        User, related_name="agent_properties", on_delete=models.CASCADE
+        AgentDetail, related_name="agentdetail", on_delete=models.CASCADE
+    )
+    staff = models.ForeignKey(
+        StaffDetail, related_name="staffdetail", on_delete=models.CASCADE
     )
     commercial = models.CharField(max_length=1, choices=COMMERCIAL_CHOICES, blank=True, null=True)
     residential = models.CharField(max_length=1, choices=RESIDENTIAL_CHOICES, blank=True, null=True)
-    
-    apartment_type = models.CharField(max_length=1, choices=APARTMENT_CHOICES, default="A")
+    #property page info
+    apartment = models.CharField(max_length=1, choices=APARTMENT_CHOICES, default="A")
     apartment_name = models.CharField(max_length=63, blank=True, null=True)
-    bhk_type = models.IntegerField(default=0)# choice field
+    bhk_type = models.CharField(max_length=20, choices=BHK_CHOICES, default="F") #bedroom hall kitchen 
     floor = models.CharField(max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G")
-    total_floor = models.CharField(max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G")# total floor
-    property_age = models.CharField(max_length=1, choices=AGE_CHOICES, default="U")
+    total_floor = models.CharField(max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G")
+    age = models.CharField(max_length=1, choices=AGE_CHOICES, default="U") #propertu age
     facing = models.CharField(max_length=2, choices=FACING_CHOICES)
-    property_size = models.FloatField(default=0.00) #property size
+    property_size = models.FloatField(default=0.00)
 
-    city = models.CharField(max_length=63, blank=True, null=True)
+    listing = models.ForeignKey(ListingCategory,on_delete=models.CASCADE,related_name = 'listing')
+    #city
+    city = models.ForeignKey(CityCategory,on_delete=models.CASCADE,related_name = 'city')
     locality = models.CharField(max_length=63)
-    street_area = models.TextField()#street/area
-    
+    address = models.CharField(max_length=60)
+
+    #rental info
     available_for = models.CharField(max_length=1, choices=AVAILABLE_FOR_CHOICES)
     expected_rent = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
     expected_deposit = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
@@ -192,12 +218,25 @@ class Property(CommonInfo):
     listing_type = models.CharField(max_length=1, choices=LISTING_TYPE_CHOICES, default="T")
     parking = models.CharField(max_length=1, choices=PARKING_CHOICES)
     description = models.TextField()
-    
-    gallery = models.ManyToManyField(Gallery, related_name="property_gallerys"
+
+    #gallery
+    gallery = models.ManyToManyField(
+        Gallery, related_name="property_gallerys"
     )
+    
+    listing_type = models.CharField(max_length=1, choices=LISTING_TYPE_CHOICES, default="T")
     membership_plan = models.CharField(max_length=1, choices=MEMBERSHIP_PLAN_CHOICES,
                                        default="S")
+    development_progress_status = models.CharField(
+        max_length=1, choices=DEVELOPMENT_PROGRESS_STATUS, default="N"
+    )
+    build_up_area = models.FloatField(default=0.00)
+    uid = models.UUIDField(unique=True, auto_created=True, null=True, blank=True)
+    price = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
+    condition_type = models.CharField(max_length=1, choices=CONDITION_CHOICES)
     
+    bedrooms = models.IntegerField(default=0)
+    #amenities
     bathrooms = models.IntegerField(default=0)
     balcony = models.CharField(max_length=63, choices=YES_NO_CHOICES, default="Y")
     water_supply = models.CharField(max_length=1, choices=WATER_SUPPLY_CHOICES, default="C")
@@ -207,32 +246,23 @@ class Property(CommonInfo):
     viewer = models.CharField(max_length=1, choices=VIEWER_CHOICES, default="H")
     secondary_number = models.IntegerField(default=1)
 
-    paint = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
-    attached_bathroom = models.IntegerField(default=0)
-    available_days = models.CharField(max_length=1, choices=AVAILABLE_DAY_CHOICES,default="E")
+    #scheldule
+    paint = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y") #i want my house painted
+    cleaned = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y") #i want to get my house cleaned
+    available_days = models.CharField(max_length=1, choices=AVAILABLE_DAY_CHOICES,
+                                      default="E")
     start_time = models.TimeField()
     end_time = models.TimeField()
-    
-    development_progress_status = models.CharField(
-        max_length=1, choices=DEVELOPMENT_PROGRESS_STATUS, default="N"
-    )
-    
-    land_area = models.FloatField(default=0.00)
-    uid = models.UUIDField(unique=True, auto_created=True, null=True, blank=True)
-    price = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
-    condition_type = models.CharField(max_length=1, choices=CONDITION_CHOICES)
-    #bedrooms = models.IntegerField(default=0)
-    cleaned = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
-    property_type = models.CharField(max_length=1, choices=PROPERTY_TYPE_CHOICES)
-    furnished = models.BooleanField(default=False)
+
+    # furnished = models.BooleanField(default=False)
     available = models.BooleanField(default=False)
     added_at = models.DateTimeField(auto_now_add=True)
     viewed_count = models.IntegerField(default=0)
     updated_at = models.DateTimeField(auto_now=True)
-    society_amenities = models.ManyToManyField(
-        SocietyAmenities, related_name="amenities",
-    )
-        
+    # society_amenities = models.ManyToManyField(
+    #     SocietyAmenities, related_name="amenities",
+    # )
+    
     location = models.PointField(null=True, blank=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
@@ -262,7 +292,6 @@ class Property(CommonInfo):
             models.Index(fields=["city", "condition_type"]),
             models.Index(fields=["city", "commercial", "condition_type"]),
             models.Index(fields=["city", "residential", "condition_type"]),
-            models.Index(fields=["storey"], name="storey_idx"),
             models.Index(fields=["parking"], name="parking_idx"),
             models.Index(fields=["facing"], name="facing_idx"),
         ]
