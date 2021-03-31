@@ -31,5 +31,5 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class UserRegisterViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = UserProfile.objects.all()
     serializer_class = UserRegisterSerializer

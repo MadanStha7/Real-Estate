@@ -1,12 +1,7 @@
 from rest_framework import serializers
-from property.models import SocietyAmenities, Property, Gallery, FieldVisit, PropertyDiscussionBoard, PropertyRequest
+from property.models import Property, Gallery, FieldVisit, PropertyDiscussionBoard, PropertyRequest
 
 
-class AmenitiesSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = SocietyAmenities
-        fields = ('id', 'title', 'style_class')
 
 
 class GallerySerializer(serializers.ModelSerializer):
@@ -17,7 +12,6 @@ class GallerySerializer(serializers.ModelSerializer):
 
 
 class PropertySerializer(serializers.ModelSerializer):
-    society_amenities = AmenitiesSerializer(read_only=True, many=True)
     property_type = serializers.CharField(source='get_property_type_display', read_only=True)
     owner_name = serializers.CharField(source='owner.username', read_only=True)
     custom_field = serializers.SerializerMethodField()
@@ -53,7 +47,6 @@ class PropertySerializer(serializers.ModelSerializer):
 
 
 class PropertyDetailSerializer(serializers.ModelSerializer):
-    society_amenities = AmenitiesSerializer(read_only=True, many=True)
     property_type = serializers.CharField(source='get_property_type_display')
     owner_name = serializers.CharField(source='owner.username')
     custom_field = serializers.SerializerMethodField()

@@ -3,20 +3,13 @@ from rest_framework import viewsets
 
 from rest_framework.response import Response
 from property.models import \
-    (SocietyAmenities, Property, Gallery,
+    (Property, Gallery,
      FieldVisit, PropertyDiscussionBoard, PropertyRequest)
 from api.serializers.property_serializer import \
-    (PropertySerializer, AmenitiesSerializer, GallerySerializer,
+    (PropertySerializer, GallerySerializer,
      FieldVisitSerializer, PropertyDiscussionSerializer,
      PropertyDetailSerializer, PropertyRequestSerializer)
-
-
-class AmenitiesViewSet(viewsets.ModelViewSet):
-
-    queryset = SocietyAmenities.objects.all()
-    serializer_class = AmenitiesSerializer
-
-
+     
 class GalleryViewSet(viewsets.ModelViewSet):
     queryset = Gallery.objects.all()
     serializer_class = GallerySerializer
