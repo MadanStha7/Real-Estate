@@ -223,7 +223,6 @@ class Property(CommonInfo):
         Gallery, related_name="property_gallerys"
     )
     
-    listing_type = models.CharField(max_length=1, choices=LISTING_TYPE_CHOICES, default="T")
     membership_plan = models.CharField(max_length=1, choices=MEMBERSHIP_PLAN_CHOICES,
                                        default="S")
     development_progress_status = models.CharField(
