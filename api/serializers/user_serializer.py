@@ -67,6 +67,9 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
+    """
+    created when user register
+    """
     full_name = serializers.CharField(write_only=True)
     username = serializers.CharField(write_only=True, required=True)
     email = serializers.CharField(write_only=True, required=True)
