@@ -27,7 +27,7 @@ class Gallery(CommonInfo):
         db_table = "property_gallery"
 
     def __str__(self):
-        return self.image
+        return str(self.id)
 
 
 class CityCategory(models.Model):
@@ -224,7 +224,6 @@ class Property(CommonInfo):
         Gallery, related_name="property_gallerys"
     )
     
-    listing_type = models.CharField(max_length=1, choices=LISTING_TYPE_CHOICES, default="T")
     membership_plan = models.CharField(max_length=1, choices=MEMBERSHIP_PLAN_CHOICES,
                                        default="S")
     development_progress_status = models.CharField(
@@ -268,7 +267,7 @@ class Property(CommonInfo):
     longitude = models.FloatField(blank=True, null=True)
 
     def __str__(self):
-        return self.property_type
+        return str(self.owner.id)
 
     def save(self, *args, **kwargs):
         if not self.uid:

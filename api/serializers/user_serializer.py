@@ -17,7 +17,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    user=UserSerializer()
+    #user_name=serializers.CharField(source="user.full_name")
+    #user=UserSerializer(read_only=True)
     class Meta:
         model = UserProfile
         fields = ["id", "user", "profile_picture", "phone_number", "address"]
@@ -36,35 +37,34 @@ class AgentDetailSerializer(serializers.ModelSerializer):
             "accept_terms_and_condition",
         ]
 
-
-class ChangePasswordSerializer(serializers.Serializer):
+class ChangePasswordSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
     password2 = serializers.CharField(write_only=True, required=True)
     old_password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
-        fields = ("old_password", "password", "password2")
+        fields = ('old_password', 'password', 'password2')
 
     def validate(self, attrs):
-        if attrs["password"] != attrs["password2"]:
-            raise serializers.ValidationError(
-                {"password": "Password fields didn't match."}
-            )
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({"password": "Password fields didn't match."})
 
         return attrs
 
     def validate_old_password(self, value):
-        user = self.context["request"].user
+        user = self.context['request'].user
+        print(user)
         if not user.check_password(value):
-            raise serializers.ValidationError(
-                {"old_password": "Old password is not correct"}
-            )
+            raise serializers.ValidationError({"old_password": "Old password is not correct"})
         return value
 
     def update(self, instance, validated_data):
-        instance.set_password(validated_data["password"])
+
+        instance.set_password(validated_data['password'])
         instance.save()
+
+        return instance
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -80,18 +80,14 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "full_name",
-            # "user",
             "email",
             "username",
             "password",
             "password2",
-            # "is_active",
         )
 
     def create(self, validated_data):
-        # user = get_user_model(**validated_data)
-        # user.set_password(validated_data['password'])
-        # user.save()
+      
         full_name = validated_data.pop("full_name")
         username = validated_data.pop("username")
         email = validated_data.pop("email")
@@ -99,7 +95,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         print("email", email)
         print("username", username)
         print("password", password)
-        print("password", full_name)
+        print("password2", password)
 
         user = User.objects.create_user(
             username=username, email=email, password=password

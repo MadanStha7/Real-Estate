@@ -1,7 +1,5 @@
 from rest_framework import serializers
-from property.models import Property, Gallery, FieldVisit, PropertyDiscussionBoard, PropertyRequest
-
-
+from property.models import Property, Gallery, FieldVisit, PropertyDiscussionBoard, PropertyRequest, CityCategory, ListingCategory
 
 
 class GallerySerializer(serializers.ModelSerializer):
@@ -11,35 +9,48 @@ class GallerySerializer(serializers.ModelSerializer):
         fields = ('id', 'image', 'video')
 
 
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CityCategory
+        fields = ('name')
+
+
+class ListingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ListingCategory
+        fields = ('name')
+
+
 class PropertySerializer(serializers.ModelSerializer):
-    property_type = serializers.CharField(source='get_property_type_display', read_only=True)
+    #property_type = serializers.CharField(source='get_property_type_display', read_only=True)
     owner_name = serializers.CharField(source='owner.username', read_only=True)
     custom_field = serializers.SerializerMethodField()
     gallery = GallerySerializer(many=True, read_only=True)
+    city = CitySerializer(many=True, read_only=True)
+    listing = ListingSerializer(many=True)
 
     class Meta:
         model = Property
-        fields = ('owner', 'property_type', 'owner_name',
-                  'agent', 'commercial', 'residential',
-                  'apartment', 'apartment_name', 'floor',
-                  'storey', 'age', 'listing_type',
-                  'membership_plan', 'development_progress_status',
-                  'bedroom_hall_kitchen', 'land_area',
-                  'build_up_area', 'city', 'address', 'locality',
-                  'price', 'condition_type', 'available_for',
+        fields = ('owner_name', 'agent', 'staff',
+                  'commercial', 'residential',
+                  'apartment', 'apartment_name', 'bhk_type', 'floor',
+                  'total_floor', 'age', 'facing', 'property_size',
+                  'listing',
+                  'city', 'address', 'locality',
+                  'available_for',
                   'expected_rent', 'expected_deposit',
                   'negotiable', 'maintenance', 'available_from',
-                  'tenants', 'furnishing', 'parking',
-                  'description', 'bedrooms', 'bathrooms',
-                  'balcony', 'water_supply', 'non_veg', 'gym',
-                  'security', 'viewer', 'secondary_number',
-                  'attached_bathroom', 'facing', 'paint',
-                  'cleaned', 'available_days', 'start_time',
-                  'end_time', 'property_type',
-                  'furnished', 'available', 'added_at',
-                  'viewed_count', 'updated_at',
-                  'society_amenities', 'location', 'latitude',
-                  'longitude', 'gallery', 'custom_field'
+                  'preferred_tenants', 'furnishing', 'parking',
+                  'description', 'gallery', 'membership_plan', 'development_progress_status',
+                  'build_up_area', 'uid', 'price', 'condition_type',
+                  'bedrooms', 'bathrooms', 'balcony',
+                  'water_supply', 'gym', 'non_veg',
+                  'gated_security', 'viewer', 'secondary_number',
+                  'paint', 'cleaned',
+                  'available_days', 'start_time', 'end_time',
+                  'available', 'added_at',
+                  'viewed_count', 'updated_at', 'location',
+                  'latitude', 'longitude', 'custom_field'
                   )
 
     def get_custom_field(self, obj):

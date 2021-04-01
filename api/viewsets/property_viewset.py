@@ -18,7 +18,7 @@ class GalleryViewSet(viewsets.ModelViewSet):
 class PropertyViewSet(viewsets.ModelViewSet):
     queryset = Property.objects.all()
     serializer_class = PropertySerializer
-    filter_fields = ['bedrooms', 'storey', 'membership_plan', 'listing_type']
+    #filter_fields = ['bedrooms', 'storey', 'membership_plan', 'listing_type']
 
     def get_queryset(self):
         # params = self.request.query_params
@@ -40,21 +40,6 @@ class PropertyViewSet(viewsets.ModelViewSet):
                 % self.__class__.__name__
         )
 
-    queryset = Property.objects.all()
-    serializer_class = PropertySerializer
-    filterset_fields = ['bedrooms', 'storey', 'membership_plan', 'listing_type']
-
-    def get_queryset(self):
-        # params = self.request.query_params
-        # bedrooms = params.get("bedrooms")
-        # if bedrooms:
-        #     self.queryset = self.queryset.filter(bedrooms=bedrooms)
-        queryset = self.queryset
-        if self.request.user.is_authenticated:
-            if self.request.user and not self.request.user.is_superuser:
-                queryset = self.queryset.filter(
-                    Q(owner=self.request.user) | Q(agent=self.request.user))
-        return queryset
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()

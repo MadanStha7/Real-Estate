@@ -6,6 +6,8 @@ from .models import (
     PropertyDiscussionBoard,
     FieldVisit,
     PropertyRequest,
+    CityCategory,
+    ListingCategory
 )
 
 
@@ -20,4 +22,6 @@ admin.site.register(Gallery)
 admin.site.register(PropertyDiscussionBoard)
 admin.site.register(FieldVisit)
 admin.site.register(PropertyRequest)
+admin.site.register(CityCategory)
+admin.site.register(ListingCategory)
 
