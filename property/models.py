@@ -4,7 +4,6 @@ from django.contrib.postgres.fields import ArrayField
 from common.models import CommonInfo
 from user.models import UserProfile, AgentDetail, StaffDetail
 
-
 class RentalInfo(CommonInfo):
     """
     rental details about property
@@ -241,7 +240,7 @@ class PropertyInfo(CommonInfo):
         elif self.latitude and self.longitude:
             self.location = Point(x=self.longitude, y=self.latitude, srid=4326)
 
-        super(Property, self).save(*args, **kwargs)
+        super(PropertyInfo, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = "Property Info"

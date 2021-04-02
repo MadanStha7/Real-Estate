@@ -5,9 +5,9 @@ from api.viewsets.user_viewset import UserProfileViewSet, AgentDetailViewSet, \
     UserRegisterViewSet
 
 router = routers.DefaultRouter()
-router.register(r'user-profile', UserProfileViewSet)
+router.register(r'buyer_seller_profile', UserProfileViewSet)
 router.register(r'agent-detail', AgentDetailViewSet)
-router.register(r'users', UserViewSet)
+router.register(r'all_users', UserViewSet)
 router.register(r'register', UserRegisterViewSet)
 
 
