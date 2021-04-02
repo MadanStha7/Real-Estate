@@ -1,27 +1,7 @@
 from django.contrib import admin
+from django.apps import apps
 
-from .models import (
-    Property,
-    Gallery,
-    PropertyDiscussionBoard,
-    FieldVisit,
-    PropertyRequest,
-    CityCategory,
-    ListingCategory
-)
+from .models import *
+# Register your models here.
 
-
-class PropertyAdmin(admin.ModelAdmin):
-    list_display = ("uid", "owner", "agent", "bedrooms",)
-    list_filter = ("owner", "agent", "bedrooms")
-    # search_fields = ("storey",)
-
-
-admin.site.register(Property, PropertyAdmin)
-admin.site.register(Gallery)
-admin.site.register(PropertyDiscussionBoard)
-admin.site.register(FieldVisit)
-admin.site.register(PropertyRequest)
-admin.site.register(CityCategory)
-admin.site.register(ListingCategory)
-
+admin.site.register([PropertyInfo,RentalInfo,Gallery,Amenities,FieldVisit,PropertyDiscussionBoard])

@@ -3,20 +3,18 @@ from rest_framework import viewsets
 
 from rest_framework.response import Response
 from property.models import \
-    (Property, Gallery,
-     FieldVisit, PropertyDiscussionBoard, PropertyRequest)
+    (PropertyInfo, Gallery,
+     FieldVisit, PropertyDiscussionBoard, RentalInfo, Amenities)
 from api.serializers.property_serializer import \
-    (PropertySerializer, GallerySerializer,
-     FieldVisitSerializer, PropertyDiscussionSerializer,
-     PropertyDetailSerializer, PropertyRequestSerializer)
+    (PropertySerializer,
+     FieldVisitSerializer, PropertyDiscussionSerializer, RentalSerializer, 
+     GallerySerializer, AmenitiesSerializer
+    )
      
-class GalleryViewSet(viewsets.ModelViewSet):
-    queryset = Gallery.objects.all()
-    serializer_class = GallerySerializer
 
 
 class PropertyViewSet(viewsets.ModelViewSet):
-    queryset = Property.objects.all()
+    queryset = PropertyInfo.objects.all()
     serializer_class = PropertySerializer
     #filter_fields = ['bedrooms', 'storey', 'membership_plan', 'listing_type']
 
@@ -32,19 +30,19 @@ class PropertyViewSet(viewsets.ModelViewSet):
                     Q(owner=self.request.user) | Q(agent=self.request.user))
         return queryset
 
-    def get_queryset(self):
+    """def get_queryset(self):
 
         assert self.queryset is not None, (
                 "'%s' should either include a `queryset` attribute, "
                 "or override the `get_queryset()` method."
                 % self.__class__.__name__
         )
-
+"""
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = PropertySerializer(instance)
-        amenities = []
+        #amenities = []
         field_visits = []
         discussion = []
         params = self.request.query_params
@@ -60,7 +58,20 @@ class PropertyViewSet(viewsets.ModelViewSet):
                  amenities=amenities, field_visits=field_visits,
                  discussion=discussion))
 
+class RentalViewSet(viewsets.ModelViewSet):
+    queryset=RentalInfo.objects.all()
+    serializer_class=RentalSerializer
+    filterset_fields=['available_for','tenants','parking']
 
+class GalleryViewSet(viewsets.ModelViewSet):
+    queryset=Gallery.objects.all()
+    serializer_class=GallerySerializer
+    
+class AmentitesViewSet(viewsets.ModelViewSet):
+    queryset=Amenities.objects.all()
+    serializer_class=AmenitiesSerializer
+    #fieldset_fields=["bathrooms","balcony","gym"]
+    
 class FieldVisitViewSet(viewsets.ModelViewSet):
     queryset = FieldVisit.objects.all()
     serializer_class = FieldVisitSerializer
@@ -72,8 +83,3 @@ class PropertyDiscussionViewSet(viewsets.ModelViewSet):
     serializer_class = PropertyDiscussionSerializer
     filterset_fields = ['discussion']
 
-
-class PropertyRequestViewSet(viewsets.ModelViewSet):
-    queryset = PropertyRequest.objects.all()
-    serializer_class = PropertyRequestSerializer
-    filterset_fields = ['name', 'price', 'property_address']
