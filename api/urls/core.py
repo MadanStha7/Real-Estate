@@ -4,7 +4,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 
-# urlpatterns += user_routes
+urlpatterns += user_routes
 # # urlpatterns += property_routes
 # urlpatterns += serviceprovider_routes
 # urlpatterns += property_service_routes

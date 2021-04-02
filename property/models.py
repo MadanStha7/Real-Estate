@@ -233,8 +233,7 @@ class PropertyInfo(CommonInfo):
         return str(self.id)
 
     def save(self, *args, **kwargs):
-        if not self.uid:
-            self.uid = uuid.uuid4()
+        
         if self.location:
             self.latitude = self.location.y
             self.longitude = self.location.x
