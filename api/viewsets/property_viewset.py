@@ -1,6 +1,5 @@
 from django.db.models import QuerySet
 from rest_framework import viewsets
-
 from rest_framework.response import Response
 from property.models import \
     (PropertyInfo, Gallery,
@@ -38,11 +37,15 @@ class PropertyViewSet(viewsets.ModelViewSet):
                 % self.__class__.__name__
         )
 """
+    
+    def perform_create(self, serializer):
+        amenities=self.request.amenities
+        serializer.save(amenities=amenities)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = PropertySerializer(instance)
-        #amenities = []
+        amenities = []
         field_visits = []
         discussion = []
         params = self.request.query_params
@@ -57,6 +60,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
             dict(data=serializer.data,
                  amenities=amenities, field_visits=field_visits,
                  discussion=discussion))
+
 
 class RentalViewSet(viewsets.ModelViewSet):
     queryset=RentalInfo.objects.all()

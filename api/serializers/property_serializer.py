@@ -27,11 +27,11 @@ class RentalSerializer(serializers.ModelSerializer):
             "parking","description"
         )
 class PropertySerializer(serializers.ModelSerializer):
-    gallery= GallerySerializer(many=True, read_only=True)
-    rental=RentalSerializer(read_only=True)
-    amenities=AmenitiesSerializer(many=True, read_only=True)
-    owner= serializers.CharField(source="owner.user")
-    agent=serializers.CharField(source="agent.user")
+    #gallery= GallerySerializer(many=True, read_only=True)
+    #rental=RentalSerializer()
+    amenities=AmenitiesSerializer()
+    owner= serializers.CharField(source="owner.user", read_only=True)
+    agent=serializers.CharField(source="agent.user", read_only=True)
     class Meta:
         model = PropertyInfo
         fields = (
@@ -40,24 +40,29 @@ class PropertySerializer(serializers.ModelSerializer):
             "bhk_type","floor","total_floor",
             "age","facing","property_size",
             "city","locality","street","rental",
-            "gallery","amenities","owner", "agent",
+            "amenities","owner", "agent",
             "staff","location","latitude","longitude"
-                  )
+            )
 
+    
     def get_custom_field(self, obj):
         return dict(a=1, b=3, uid=obj.uid)
 
-
     def create(self, validated_data):
-        amenities_data=validated_data.pop("amenities")
-        amenities=Amenities.objects.create(**amenities_data)
-        validated_data['amenities']=amenities
-        property_info=PropertyInfo.objects.create(**validated_data)
-        return property_info
+        amenities_data = validated_data.pop('amenities')
+        property = PropertyInfo.objects.create(**validated_data)
+        amenities_serializer = self.fields['amenities']
+        for each in amenities_data:
+            each['property'] = property
+        amenities = amenities_serializer.create(amenities_data)
+        return property
+    
+    # def create(self, validated_data):
+    #     print(validated_data)
+    #     return PropertyInfo.objects.create(**validated_data)
 
 
 class FieldVisitSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = FieldVisit
         fields = ('id', 'name', 'email', 'phone', 'property_type')

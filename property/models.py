@@ -96,7 +96,7 @@ class Amenities(CommonInfo):
         db_table = "property_amenities"
 
     def __str__(self):
-        return str(self.bathrooms)
+        return str(self.id)
 
 
 class PropertyInfo(CommonInfo):
@@ -233,7 +233,7 @@ class PropertyInfo(CommonInfo):
         return str(self.id)
 
     def save(self, *args, **kwargs):
-    
+        self.city=self.city.lower()
         if self.location:
             self.latitude = self.location.y
             self.longitude = self.location.x
@@ -247,7 +247,7 @@ class PropertyInfo(CommonInfo):
         verbose_name_plural = "Property Info"
         db_table = "property"
         ordering = ["-created_on"]
-
+ 
 
 class FieldVisit(CommonInfo):
     """"

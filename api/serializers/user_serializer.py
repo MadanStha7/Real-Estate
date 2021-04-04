@@ -6,25 +6,28 @@ from user.models import AgentDetail, UserProfile, User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = (
+        fields = [
             "id",
             "username",
             "first_name",
             "last_name",
             "is_staff",
             "is_superuser",
-        )
+        ]
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
     #user_name=serializers.CharField(source="user.full_name")
-    #user=UserSerializer(read_only=True)
+    #user=UserSerializer()
     class Meta:
         model = UserProfile
         fields = ["id", "user", "profile_picture", "phone_number", "address"]
 
+    
+
 
 class AgentDetailSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = AgentDetail
         fields = [
