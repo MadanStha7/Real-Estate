@@ -4,7 +4,6 @@ from django.contrib.postgres.fields import ArrayField
 from common.models import CommonInfo
 from user.models import UserProfile, AgentDetail, StaffDetail
 
-
 class RentalInfo(CommonInfo):
     """
     rental details about property
@@ -97,7 +96,6 @@ class Amenities(CommonInfo):
 
     def __str__(self):
         return str(self.id)
-
 
 class PropertyInfo(CommonInfo):
     """
@@ -233,7 +231,7 @@ class PropertyInfo(CommonInfo):
         return str(self.id)
 
     def save(self, *args, **kwargs):
-        self.city=self.city.lower()
+        
         if self.location:
             self.latitude = self.location.y
             self.longitude = self.location.x
@@ -268,6 +266,36 @@ class FieldVisit(CommonInfo):
         verbose_name_plural = "Field Visit"
         ordering = ["-name"]
         db_table = "property_field_visit"
+
+
+
+class Schedule(models.Model):
+    YES_NO_CHOICES = (
+        ("Y", "Yes"),
+        ("N", "No")
+    )
+    AVAILABLE_DAY_CHOICES = (
+        ("E", "Everyday(Sunday - Saturday)"),
+        ("W", "Weekdays(Sunday - Friday)"),
+        ("S", "Weekend(Saturday)")
+    )
+    paint = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y",null=True,blank=True) #i want my house painted
+    cleaned = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y",null=True,blank=True) #i want to get my house cleaned
+    available_days = models.CharField(max_length=1, choices=AVAILABLE_DAY_CHOICES,
+                                      default="E",null=True,blank=True)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    property_type = models.ForeignKey(
+        PropertyInfo, related_name="property_schedule", on_delete=models.CASCADE
+    )
+
+
+    class Meta:
+        verbose_name_plural = "Schedule"
+        db_table = "property_schedule"
+
+    def __str__(self):
+        return self.paint
 
 
 class PropertyDiscussionBoard(CommonInfo):
