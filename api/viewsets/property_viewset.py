@@ -112,9 +112,6 @@ class ScheduleViewSet(viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
 
-    
-
-
 
 class ScheduleList(generics.ListCreateAPIView):
     queryset = Schedule.objects.all()

@@ -6,26 +6,26 @@ from user.models import AgentDetail, UserProfile, User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = (
+        fields = [
             "id",
             "username",
             "first_name",
             "last_name",
             "is_staff",
             "is_superuser",
-        )
+        ]
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
     #user_name=serializers.CharField(source="user.full_name")
-    #user=UserSerializer(read_only=True)
+    #user=UserSerializer()
     class Meta:
         model = UserProfile
         fields = ["id", "user", "profile_picture", "phone_number", "address"]
 
-
+    
 class AgentDetailSerializer(serializers.ModelSerializer):
-    user = UserSerializer(many=True, read_only=True)
+    #user = UserSerializer()
     
     class Meta:
         model = AgentDetail
@@ -39,11 +39,11 @@ class AgentDetailSerializer(serializers.ModelSerializer):
             "accept_terms_and_condition",
         ]
 
-    def create(self, validated_data):
-        profile_data = validated_data.pop('user')
-        user = User.objects.create(**validated_data)
-        Profile.objects.create(user=user, **profile_data)
-        return user
+    # def create(self, validated_data):
+    #     user_data = validated_data.pop('user')
+    #     instance = AgentDetail.objects.create(**validated_data)
+    #     instance.user_data = user_data
+    #     return instance
 
 class ChangePasswordSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)

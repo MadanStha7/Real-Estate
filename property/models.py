@@ -144,7 +144,7 @@ class PropertyInfo(CommonInfo):
         verbose_name_plural = "Property Info"
         db_table = "property"
         ordering = ["-created_on"]
-
+ 
 
 class Location(CommonInfo):
     """

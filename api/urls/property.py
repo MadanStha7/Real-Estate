@@ -2,6 +2,7 @@ from django.urls import include, path
 from rest_framework import routers
 from property.models import Schedule
 from api.viewsets.property_viewset import ScheduleList
+
 from api.viewsets.property_viewset import PropertyViewSet, \
      FieldVisitViewSet, \
          PropertyDiscussionViewSet,\
@@ -22,5 +23,4 @@ router.register(r'schedule', ScheduleViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-
 ]
