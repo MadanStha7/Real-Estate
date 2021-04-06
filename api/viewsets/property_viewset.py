@@ -12,6 +12,7 @@ from property.models import (
     RentalInfo,
     Amenities,
     Schedule,
+    Location,
 )
 from api.serializers.property_serializer import (
     PropertySerializer,
@@ -21,6 +22,7 @@ from api.serializers.property_serializer import (
     GallerySerializer,
     AmenitiesSerializer,
     ScheduleSerializer,
+    LocationSerializer,
 )
 
 
@@ -83,6 +85,10 @@ class RentalViewSet(viewsets.ModelViewSet):
     queryset = RentalInfo.objects.all()
     serializer_class = RentalSerializer
     filterset_fields = ["available_for", "tenants", "parking"]
+
+class LocationViewSet(viewsets.ModelViewSet):
+    queryset = Location.objects.all()
+    serializer_class = LocationSerializer
 
 
 class GalleryViewSet(viewsets.ModelViewSet):
