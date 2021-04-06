@@ -62,7 +62,6 @@ class GallerySerializer(serializers.ModelSerializer):
         fields = ("id", "image", "video")
 
 
-
 class AmenitiesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Amenities
@@ -96,9 +95,6 @@ class RentalSerializer(serializers.ModelSerializer):
             "description",
         )
 
-
-
-
 class FieldVisitSerializer(serializers.ModelSerializer):
     class Meta:
         model = FieldVisit
@@ -125,4 +121,3 @@ class ScheduleSerializer(serializers.ModelSerializer):
             "end_time",
             "property_type",
         )
-

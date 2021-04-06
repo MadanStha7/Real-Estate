@@ -79,7 +79,6 @@ class PropertyViewSet(viewsets.ModelViewSet):
         )
 
 
-
 class RentalViewSet(viewsets.ModelViewSet):
     queryset = RentalInfo.objects.all()
     serializer_class = RentalSerializer
@@ -112,9 +111,6 @@ class PropertyDiscussionViewSet(viewsets.ModelViewSet):
 class ScheduleViewSet(viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
-
-    
-
 
 
 class ScheduleList(generics.ListCreateAPIView):
