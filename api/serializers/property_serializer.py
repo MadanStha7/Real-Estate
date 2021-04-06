@@ -7,16 +7,15 @@ from property.models import (
     RentalInfo,
     Amenities,
     Schedule,
+    Location,
 )
 from user.models import UserProfile, AgentDetail
 
 
 class PropertySerializer(serializers.ModelSerializer):
-    # gallery = GallerySerializer(read_only=True)
-    # rental = RentalSerializer(read_only=True)
-    # amenities = AmenitiesSerializer(read_only=True)
-    # owner = serializers.CharField(source="owner.user", required=False)
-    # agent = serializers.CharField(source="agent.user", required=False)
+    """
+    return the property details
+    """
 
     class Meta:
         model = PropertyInfo
@@ -32,35 +31,33 @@ class PropertySerializer(serializers.ModelSerializer):
             "age",
             "facing",
             "property_size",
-            "city",
-            "locality",
-            "street",
-            "rental",
-            "gallery",
-            "amenities",
             "owner",
             "agent",
             "staff",
             "location",
             "latitude",
             "longitude",
+            "publish",
         )
 
-    def create(self, validated_data):
-        gallery = validated_data.pop('gallery')
-        rental = validated_data.pop('rental')
-        amenities = validated_data.pop('amenities')
-        property_info = PropertyInfo.objects.create(rental=rental,amenities=amenities, **validated_data)
-        for ga in gallery:
-            property_info.gallery.add(ga)
-        return property_info
-    
+
+class LocationSerializer(serializers.ModelSerializer):
+    """
+    Location of property info
+    """
+    class Meta:
+        model = Location
+        fields = ("id", "city", "locality","street","property_info")
+
+
 
 class GallerySerializer(serializers.ModelSerializer):
+    """
+    gallery of property info
+    """
     class Meta:
         model = Gallery
-        fields = ("id", "image", "video")
-
+        fields = ("id", "image", "video","property_info")
 
 
 class AmenitiesSerializer(serializers.ModelSerializer):
@@ -80,6 +77,9 @@ class AmenitiesSerializer(serializers.ModelSerializer):
 
 
 class RentalSerializer(serializers.ModelSerializer):
+    """
+    Rental
+    """
     class Meta:
         model = RentalInfo
         fields = (
@@ -94,9 +94,8 @@ class RentalSerializer(serializers.ModelSerializer):
             "furnishing",
             "parking",
             "description",
+            "property_info",
         )
-
-
 
 
 class FieldVisitSerializer(serializers.ModelSerializer):

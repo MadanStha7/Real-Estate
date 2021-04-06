@@ -25,7 +25,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class AgentDetailSerializer(serializers.ModelSerializer):
-    user = UserSerializer(many=True, read_only=True)
+    # user = UserSerializer(many=True, read_only=True)
     
     class Meta:
         model = AgentDetail
@@ -38,12 +38,6 @@ class AgentDetailSerializer(serializers.ModelSerializer):
             "identification_file",
             "accept_terms_and_condition",
         ]
-
-    def create(self, validated_data):
-        profile_data = validated_data.pop('user')
-        user = User.objects.create(**validated_data)
-        Profile.objects.create(user=user, **profile_data)
-        return user
 
 class ChangePasswordSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
