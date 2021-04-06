@@ -32,12 +32,6 @@ class PropertySerializer(serializers.ModelSerializer):
             "age",
             "facing",
             "property_size",
-            "city",
-            "locality",
-            "street",
-            "rental",
-            "gallery",
-            "amenities",
             "owner",
             "agent",
             "staff",
@@ -46,15 +40,6 @@ class PropertySerializer(serializers.ModelSerializer):
             "longitude",
         )
 
-    def create(self, validated_data):
-        gallery = validated_data.pop('gallery')
-        rental = validated_data.pop('rental')
-        amenities = validated_data.pop('amenities')
-        property_info = PropertyInfo.objects.create(rental=rental,amenities=amenities, **validated_data)
-        for ga in gallery:
-            property_info.gallery.add(ga)
-        return property_info
-    
 
 class GallerySerializer(serializers.ModelSerializer):
     class Meta:
@@ -75,6 +60,7 @@ class AmenitiesSerializer(serializers.ModelSerializer):
             "security",
             "viewer",
             "secondary_number",
+            "property_info"
         )
 
 
@@ -98,7 +84,13 @@ class RentalSerializer(serializers.ModelSerializer):
 class FieldVisitSerializer(serializers.ModelSerializer):
     class Meta:
         model = FieldVisit
-        fields = ("id", "name", "email", "phone", "property_type")
+        fields = (
+            "id", 
+            "name", 
+            "email", 
+            "phone", 
+            "property_type"
+            )
 
 
 class PropertyDiscussionSerializer(serializers.ModelSerializer):
@@ -106,7 +98,14 @@ class PropertyDiscussionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PropertyDiscussionBoard
-        fields = ("id", "discussion", "title", "tags", "comments", "property_type")
+        fields = (
+            "id", 
+            "discussion", 
+            "title", 
+            "tags", 
+            "comments", 
+            "property_type"
+            )
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
