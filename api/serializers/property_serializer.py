@@ -7,16 +7,15 @@ from property.models import (
     RentalInfo,
     Amenities,
     Schedule,
+    Location,
 )
 from user.models import UserProfile, AgentDetail
 
 
 class PropertySerializer(serializers.ModelSerializer):
-    # gallery = GallerySerializer(read_only=True)
-    # rental = RentalSerializer(read_only=True)
-    # amenities = AmenitiesSerializer(read_only=True)
-    # owner = serializers.CharField(source="owner.user", required=False)
-    # agent = serializers.CharField(source="agent.user", required=False)
+    """
+    return the property details
+    """
 
     class Meta:
         model = PropertyInfo
@@ -38,14 +37,27 @@ class PropertySerializer(serializers.ModelSerializer):
             "location",
             "latitude",
             "longitude",
+            "publish",
         )
 
 
+class LocationSerializer(serializers.ModelSerializer):
+    """
+    Location of property info
+    """
+    class Meta:
+        model = Location
+        fields = ("id", "city", "locality","street","property_info")
+
+
+
 class GallerySerializer(serializers.ModelSerializer):
+    """
+    gallery of property info
+    """
     class Meta:
         model = Gallery
-        fields = ("id", "image", "video")
-
+        fields = ("id", "image", "video","property_info")
 
 class AmenitiesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -65,6 +77,9 @@ class AmenitiesSerializer(serializers.ModelSerializer):
 
 
 class RentalSerializer(serializers.ModelSerializer):
+    """
+    Rental
+    """
     class Meta:
         model = RentalInfo
         fields = (
@@ -79,6 +94,7 @@ class RentalSerializer(serializers.ModelSerializer):
             "furnishing",
             "parking",
             "description",
+            "property_info",
         )
 
 class FieldVisitSerializer(serializers.ModelSerializer):
