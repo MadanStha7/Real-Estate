@@ -4,105 +4,6 @@ from django.contrib.postgres.fields import ArrayField
 from common.models import CommonInfo
 from user.models import UserProfile, AgentDetail, StaffDetail
 
-class RentalInfo(CommonInfo):
-    """
-    rental details about property
-    """
-
-    AVAILABLE_FOR_CHOICES = (("R", "Only Rent"), ("L", "Only Lease"))
-    MAINTENANCE_CHOICES = (("I", "Maintenance Included"), ("E", "Maintenance Extra"))
-    TENANTS_CHOICES = (
-        ("D", "Doesn't Matter"),
-        ("F", "Family"),
-        ("B", "Bachelor"),
-        ("C", "Company"),
-    )
-    FURNISHING_CHOICES = (
-        ("F", "Fully Furnishing"),
-        ("S", "Semi Furnishing"),
-        ("U", "Unfurnishing"),
-    )
-    PARKING_CHOICES = (("N", "None"), ("M", "Motorbike"), ("C", "Car"), ("B", "Both"))
-    available_for = models.CharField(max_length=1, choices=AVAILABLE_FOR_CHOICES)
-    expected_rent = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
-    expected_deposit = models.DecimalField(
-        default=0.00, decimal_places=2, max_digits=10
-    )
-    negotiable = models.BooleanField(default=False)
-    maintenance = models.CharField(
-        max_length=1, choices=MAINTENANCE_CHOICES, default="I", blank=True, null=True
-    )
-    available_from = models.DateField()
-    tenants = models.CharField(max_length=1, choices=TENANTS_CHOICES, default="D")
-    furnishing = models.CharField(max_length=1, choices=FURNISHING_CHOICES, default="F")
-    parking = models.CharField(max_length=1, choices=PARKING_CHOICES)
-    description = models.TextField()
-
-    def __str__(self):
-        return self.available_for
-
-    class Meta:
-        verbose_name_plural = "Rental Info"
-        db_table = "property_rental"
-        ordering = ["-created_on"]
-
-
-class Gallery(CommonInfo):
-    """
-    Gallery
-    """
-
-    image = models.ImageField(upload_to="property/images")
-    video = models.FileField(upload_to="property/videos")
-
-    class Meta:
-        verbose_name_plural = "Gallery"
-        db_table = "propertys_gallery"
-
-    def __str__(self):
-        return str(self.id)
-
-
-class Amenities(CommonInfo):
-    """
-    Amenities
-    """
-
-    YES_NO_CHOICES = (("Y", "Yes"), ("N", "No"))
-    WATER_SUPPLY_CHOICES = (("C", "Corporation"), ("W", "Borewell"), ("B", "Both"))
-    VIEWER_CHOICES = (
-        ("H", "Need Help"),
-        ("I", "I will show"),
-        ("N", "Neighbours"),
-        ("F", "Friends/Relatives"),
-        ("S", "Security"),
-        ("T", "Tenants"),
-        ("O", "Others"),
-    )
-    bathrooms = models.IntegerField(default=0)
-    balcony = models.CharField(max_length=63, choices=YES_NO_CHOICES, default="Y")
-    water_supply = models.CharField(
-        max_length=1, choices=WATER_SUPPLY_CHOICES, default="C"
-    )
-    gym = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
-    non_veg = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
-    security = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
-    viewer = models.CharField(max_length=1, choices=VIEWER_CHOICES, default="H")
-    secondary_number = models.IntegerField(default=1)
-
-    class Meta:
-        verbose_name_plural = "Amenities"
-        db_table = "property_amenities"
-
-    def __str__(self):
-        return str(self.id)
-
-
-
-
-
-
-
 
 class PropertyInfo(CommonInfo):
     """
@@ -197,16 +98,6 @@ class PropertyInfo(CommonInfo):
     )  # propertu age
     facing = models.CharField(max_length=2, choices=FACING_CHOICES)
     property_size = models.FloatField(default=0.00)
-    city = models.CharField(max_length=60)
-    locality = models.TextField()
-    street = models.TextField()
-    rental = models.ForeignKey(
-        RentalInfo, on_delete=models.CASCADE, related_name="rental_info"
-    )
-    gallery = models.ManyToManyField(Gallery, related_name="gallery",)
-    amenities = models.ForeignKey(
-        Amenities, on_delete=models.CASCADE, related_name="amenities"
-    )
     owner = models.ForeignKey(
         UserProfile,
         related_name="userprofile",
@@ -233,12 +124,13 @@ class PropertyInfo(CommonInfo):
     location = models.PointField(null=True, blank=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
+    publish = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)
 
     def save(self, *args, **kwargs):
-        
+
         if self.location:
             self.latitude = self.location.y
             self.longitude = self.location.x
@@ -252,6 +144,130 @@ class PropertyInfo(CommonInfo):
         verbose_name_plural = "Property Info"
         db_table = "property"
         ordering = ["-created_on"]
+
+
+class Location(CommonInfo):
+    """
+    Location of property
+    """
+
+    city = models.CharField(max_length=60)
+    locality = models.TextField()
+    street = models.TextField()
+    property_info = models.ForeignKey(
+        PropertyInfo, related_name="locations", on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return self.city
+
+    class Meta:
+        verbose_name_plural = "Property Location"
+        db_table = "property_location"
+        ordering = ["-created_on"]
+
+
+class RentalInfo(CommonInfo):
+    """
+    rental details about property
+    """
+
+    AVAILABLE_FOR_CHOICES = (("R", "Only Rent"), ("L", "Only Lease"))
+    MAINTENANCE_CHOICES = (("I", "Maintenance Included"), ("E", "Maintenance Extra"))
+    TENANTS_CHOICES = (
+        ("D", "Doesn't Matter"),
+        ("F", "Family"),
+        ("B", "Bachelor"),
+        ("C", "Company"),
+    )
+    FURNISHING_CHOICES = (
+        ("F", "Fully Furnishing"),
+        ("S", "Semi Furnishing"),
+        ("U", "Unfurnishing"),
+    )
+    PARKING_CHOICES = (("N", "None"), ("M", "Motorbike"), ("C", "Car"), ("B", "Both"))
+    available_for = models.CharField(max_length=1, choices=AVAILABLE_FOR_CHOICES)
+    expected_rent = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
+    expected_deposit = models.DecimalField(
+        default=0.00, decimal_places=2, max_digits=10
+    )
+    negotiable = models.BooleanField(default=False)
+    maintenance = models.CharField(
+        max_length=1, choices=MAINTENANCE_CHOICES, default="I", blank=True, null=True
+    )
+    available_from = models.DateField()
+    tenants = models.CharField(max_length=1, choices=TENANTS_CHOICES, default="D")
+    furnishing = models.CharField(max_length=1, choices=FURNISHING_CHOICES, default="F")
+    parking = models.CharField(max_length=1, choices=PARKING_CHOICES)
+    description = models.TextField()
+    property_info = models.ForeignKey(
+        PropertyInfo, related_name="rental_info", on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return self.available_for
+
+    class Meta:
+        verbose_name_plural = "Rental Info"
+        db_table = "property_rental"
+        ordering = ["-created_on"]
+
+
+class Gallery(CommonInfo):
+    """
+    property info Gallery
+    """
+
+    image = models.ImageField(upload_to="property/images")
+    video = models.FileField(upload_to="property/videos")
+    property_info = models.ForeignKey(
+        PropertyInfo, related_name="gallery", on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name_plural = "Gallery"
+        db_table = "propertys_gallery"
+
+    def __str__(self):
+        return str(self.id)
+
+
+class Amenities(CommonInfo):
+    """
+    Amenities
+    """
+
+    YES_NO_CHOICES = (("Y", "Yes"), ("N", "No"))
+    WATER_SUPPLY_CHOICES = (("C", "Corporation"), ("W", "Borewell"), ("B", "Both"))
+    VIEWER_CHOICES = (
+        ("H", "Need Help"),
+        ("I", "I will show"),
+        ("N", "Neighbours"),
+        ("F", "Friends/Relatives"),
+        ("S", "Security"),
+        ("T", "Tenants"),
+        ("O", "Others"),
+    )
+    bathrooms = models.IntegerField(default=0)
+    balcony = models.CharField(max_length=63, choices=YES_NO_CHOICES, default="Y")
+    water_supply = models.CharField(
+        max_length=1, choices=WATER_SUPPLY_CHOICES, default="C"
+    )
+    gym = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
+    non_veg = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
+    security = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
+    viewer = models.CharField(max_length=1, choices=VIEWER_CHOICES, default="H")
+    secondary_number = models.IntegerField(default=1)
+    property_info = models.ForeignKey(
+        PropertyInfo, related_name="amenities", on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name_plural = "Amenities"
+        db_table = "property_amenities"
+
+    def __str__(self):
+        return str(self.id)
 
 
 class FieldVisit(CommonInfo):
@@ -275,27 +291,27 @@ class FieldVisit(CommonInfo):
         db_table = "property_field_visit"
 
 
-
 class Schedule(models.Model):
-    YES_NO_CHOICES = (
-        ("Y", "Yes"),
-        ("N", "No")
-    )
+    YES_NO_CHOICES = (("Y", "Yes"), ("N", "No"))
     AVAILABLE_DAY_CHOICES = (
         ("E", "Everyday(Sunday - Saturday)"),
         ("W", "Weekdays(Sunday - Friday)"),
-        ("S", "Weekend(Saturday)")
+        ("S", "Weekend(Saturday)"),
     )
-    paint = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y",null=True,blank=True) #i want my house painted
-    cleaned = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y",null=True,blank=True) #i want to get my house cleaned
-    available_days = models.CharField(max_length=1, choices=AVAILABLE_DAY_CHOICES,
-                                      default="E",null=True,blank=True)
+    paint = models.CharField(
+        max_length=1, choices=YES_NO_CHOICES, default="Y", null=True, blank=True
+    )  # i want my house painted
+    cleaned = models.CharField(
+        max_length=1, choices=YES_NO_CHOICES, default="Y", null=True, blank=True
+    )  # i want to get my house cleaned
+    available_days = models.CharField(
+        max_length=1, choices=AVAILABLE_DAY_CHOICES, default="E", null=True, blank=True
+    )
     start_time = models.TimeField()
     end_time = models.TimeField()
     property_type = models.ForeignKey(
         PropertyInfo, related_name="property_schedule", on_delete=models.CASCADE
     )
-
 
     class Meta:
         verbose_name_plural = "Schedule"
@@ -309,6 +325,7 @@ class PropertyDiscussionBoard(CommonInfo):
     """
     Property discussion board
     """
+
     DISCUSSION_CHOICES = (
         ("Q", "Query"),
         ("R", "Review"),
