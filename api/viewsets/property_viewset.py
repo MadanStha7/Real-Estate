@@ -23,6 +23,7 @@ from api.serializers.property_serializer import (
     AmenitiesSerializer,
     ScheduleSerializer,
     LocationSerializer,
+    PropertyDetailSerializer,
 )
 
 
@@ -91,6 +92,15 @@ class PropertyList(generics.ListAPIView):
     #     """
     #     return PropertyInfo.objects.filter(publish=True)
 
+class PropertyCategoryList(generics.ListAPIView):
+    serializer_class=PropertySerializer
+
+    def get_queryset(self):
+        top_category= PropertyList.objects.filter(listing_type="T")
+        premium_category= PropertyList.objects.filter(listing_type="P")
+        featured_category= PropertyList.objects.filter(listing_type="F")
+        return queryset
+
 class RentalViewSet(viewsets.ModelViewSet):
     queryset = RentalInfo.objects.all()
     serializer_class = RentalSerializer
@@ -138,3 +148,9 @@ class ScheduleList(generics.ListCreateAPIView):
         queryset = self.get_queryset()
         serializer = ScheduleSerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class PropertyDetailsView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = PropertyInfo.objects.all()
+    serializer_class = PropertyDetailSerializer
+

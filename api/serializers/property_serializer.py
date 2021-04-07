@@ -15,8 +15,6 @@ class PropertySerializer(serializers.ModelSerializer):
     """
     return the property details
     """
-    property_type= serializers.CharField(source="get_property_type_display")
-    #property_type=ChoiceField(choices=PropertyInfo.PROPERTY_TYPE_CHOICES)
     class Meta:
         model = PropertyInfo
         fields = (
@@ -38,6 +36,11 @@ class PropertySerializer(serializers.ModelSerializer):
             "latitude",
             "longitude",
             "publish",
+            "views",
+            "listing_type",
+            "membership_plan",
+            "condition_type",
+            "description",
         )
 
 
@@ -45,19 +48,21 @@ class LocationSerializer(serializers.ModelSerializer):
     """
     Location of property info
     """
+
     class Meta:
         model = Location
-        fields = ("id", "city", "locality","street","property_info")
-
+        fields = ("id", "city", "locality", "street", "property_info")
 
 
 class GallerySerializer(serializers.ModelSerializer):
     """
     gallery of property info
     """
+
     class Meta:
         model = Gallery
-        fields = ("id", "image", "video","property_info")
+        fields = ("id", "image", "property_info")
+
 
 class AmenitiesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -72,7 +77,7 @@ class AmenitiesSerializer(serializers.ModelSerializer):
             "security",
             "viewer",
             "secondary_number",
-            "property_info"
+            "property_info",
         )
 
 
@@ -80,6 +85,7 @@ class RentalSerializer(serializers.ModelSerializer):
     """
     Rental
     """
+
     class Meta:
         model = RentalInfo
         fields = (
@@ -97,16 +103,11 @@ class RentalSerializer(serializers.ModelSerializer):
             "property_info",
         )
 
+
 class FieldVisitSerializer(serializers.ModelSerializer):
     class Meta:
         model = FieldVisit
-        fields = (
-            "id", 
-            "name", 
-            "email", 
-            "phone", 
-            "property_type"
-            )
+        fields = ("id", "name", "email", "phone", "property_type")
 
 
 class PropertyDiscussionSerializer(serializers.ModelSerializer):
@@ -114,14 +115,7 @@ class PropertyDiscussionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PropertyDiscussionBoard
-        fields = (
-            "id", 
-            "discussion", 
-            "title", 
-            "tags", 
-            "comments", 
-            "property_type"
-            )
+        fields = ("id", "discussion", "title", "tags", "comments", "property_type")
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -136,3 +130,45 @@ class ScheduleSerializer(serializers.ModelSerializer):
             "end_time",
             "property_type",
         )
+
+
+class PropertyDetailSerializer(serializers.ModelSerializer):
+    """
+    this view returns details of property
+    """
+    #choicefield
+    listing_type = serializers.CharField(source="get_listing_type_display")
+    
+    locations = LocationSerializer(read_only=True)
+    rental_info = RentalSerializer(read_only=True, many=True)
+    gallery = GallerySerializer(read_only=True, many=True)
+    amenities = AmenitiesSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = PropertyInfo
+        fields = (
+            "id",
+            "property_type",
+            "property_adtype",
+            "apartment_type",
+            "apartment_name",
+            "bhk_type",
+            "floor",
+            "total_floor",
+            "age",
+            "facing",
+            "property_size",
+            "owner",
+            "agent",
+            "staff",
+            "latitude",
+            "longitude",
+            "publish",
+            "locations",
+            "rental_info",
+            "gallery",
+            "amenities",
+            "listing_type",
+            
+        )
+
