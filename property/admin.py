@@ -4,4 +4,4 @@ from django.apps import apps
 from .models import *
 # Register your models here.
 
-admin.site.register([PropertyInfo,RentalInfo,Gallery,Amenities,FieldVisit,PropertyDiscussionBoard,Schedule])
+admin.site.register([PropertyInfo,Location,RentalInfo,Gallery,Amenities,FieldVisit,PropertyDiscussionBoard,Schedule])

@@ -23,6 +23,7 @@ from api.serializers.property_serializer import (
     AmenitiesSerializer,
     ScheduleSerializer,
     LocationSerializer,
+    PropertyDetailSerializer,
 )
 
 
@@ -128,3 +129,9 @@ class ScheduleList(generics.ListCreateAPIView):
         queryset = self.get_queryset()
         serializer = ScheduleSerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class PropertyDetailsView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = PropertyInfo.objects.all()
+    serializer_class = PropertyDetailSerializer
+

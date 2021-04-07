@@ -18,6 +18,7 @@ from api.viewsets.property_viewset import (
     AmentitesViewSet,
     ScheduleViewSet,
     LocationViewSet,
+    PropertyDetailsView,
 )
 
 
@@ -34,4 +35,5 @@ router.register(r"schedule", ScheduleViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
+    path('property-details/<int:pk>/',PropertyDetailsView.as_view(),name="property_details")
 ]

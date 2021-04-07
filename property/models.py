@@ -76,6 +76,21 @@ class PropertyInfo(CommonInfo):
         ("F", "Flatmates"),
         ("S", "Sale"),
     )
+    MEMBERSHIP_PLAN_CHOICES = (
+        ("S", "Silver"),
+        ("G", "Gold"),
+        ("P", "Platinum"),
+    )
+    LISTING_TYPE_CHOICES = (
+        ("T", "Top"),
+        ("P", "Premium"),
+        ("F", "Featured"),
+    )
+    CONDITION_CHOICES = (
+        ("N", "New"),
+        ("U", "Used"),
+    )
+
     property_type = models.CharField(
         max_length=1, choices=PROPERTY_TYPE_CHOICES, default="R"
     )
@@ -95,7 +110,7 @@ class PropertyInfo(CommonInfo):
     )
     age = models.CharField(
         max_length=1, choices=AGE_CHOICES, default="U"
-    )  # propertu age
+    )  # property age
     facing = models.CharField(max_length=2, choices=FACING_CHOICES)
     property_size = models.FloatField(default=0.00)
     owner = models.ForeignKey(
@@ -125,7 +140,12 @@ class PropertyInfo(CommonInfo):
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
     publish = models.BooleanField(default=False)
-
+    description = models.TextField(null=True,blank=True)
+    views = models.PositiveIntegerField(default=0)
+    listing_type = models.CharField(max_length=1, choices=LISTING_TYPE_CHOICES)
+    membership_plan = models.CharField(max_length=1, choices=MEMBERSHIP_PLAN_CHOICES)
+    condition_type = models.CharField(max_length=1, choices=CONDITION_CHOICES)
+    
     def __str__(self):
         return str(self.id)
 
@@ -154,7 +174,7 @@ class Location(CommonInfo):
     city = models.CharField(max_length=60)
     locality = models.TextField()
     street = models.TextField()
-    property_info = models.ForeignKey(
+    property_info = models.OneToOneField(
         PropertyInfo, related_name="locations", on_delete=models.CASCADE
     )
 
@@ -219,7 +239,6 @@ class Gallery(CommonInfo):
     """
 
     image = models.ImageField(upload_to="property/images")
-    video = models.FileField(upload_to="property/videos")
     property_info = models.ForeignKey(
         PropertyInfo, related_name="gallery", on_delete=models.CASCADE
     )
