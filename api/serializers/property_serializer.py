@@ -11,12 +11,12 @@ from property.models import (
 )
 from user.models import UserProfile, AgentDetail
 
-
 class PropertySerializer(serializers.ModelSerializer):
     """
     return the property details
     """
-
+    property_type= serializers.CharField(source="get_property_type_display")
+    #property_type=ChoiceField(choices=PropertyInfo.PROPERTY_TYPE_CHOICES)
     class Meta:
         model = PropertyInfo
         fields = (

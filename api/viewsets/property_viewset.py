@@ -80,6 +80,16 @@ class PropertyViewSet(viewsets.ModelViewSet):
             )
         )
 
+class PropertyList(generics.ListAPIView):
+    serializer_class=PropertySerializer
+    queryset=PropertyInfo.objects.filter(publish=True)
+    
+    # def get_queryset(self):
+    #     """
+    #         This view returns a list of all the properties
+    #         that are verified by admin.
+    #     """
+    #     return PropertyInfo.objects.filter(publish=True)
 
 class RentalViewSet(viewsets.ModelViewSet):
     queryset = RentalInfo.objects.all()
