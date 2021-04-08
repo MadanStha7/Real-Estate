@@ -3,9 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from api.serializers.user_serializer import UserProfileSerializer, \
     AgentDetailSerializer, ChangePasswordSerializer, \
-    UserSerializer, UserRegisterSerializer
-from user.models import UserProfile, User
-from user.models import AgentDetail
+    UserSerializer, UserRegisterSerializer,ContactSerializer
+from user.models import UserProfile, User,AgentDetail,Contact
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -33,3 +32,8 @@ class UserViewSet(viewsets.ModelViewSet):
 class UserRegisterViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserRegisterSerializer
+
+
+class ContactViewSet(viewsets.ModelViewSet):
+    queryset = Contact.objects.all()
+    serializer_class = ContactSerializer

@@ -99,3 +99,21 @@ class StaffDetail(CommonInfo):
         ordering = ["-id"]
         db_table = "staff_detail"
 
+
+
+class Contact(models.Model):
+    """
+    Contact us page
+    """
+    name = models.CharField(max_length=60, null=True)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    message = models.TextField()
+    date = models.DateField(auto_now=True)
+
+    class Meta:
+        ordering = ["-id"]
+        verbose_name_plural = "Contact us"
+
+    def __name__(self):
+        return self.email

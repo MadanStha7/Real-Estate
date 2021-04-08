@@ -337,6 +337,7 @@ class Schedule(models.Model):
         ("W", "Weekdays(Sunday - Friday)"),
         ("S", "Weekend(Saturday)"),
     )
+    
     paint = models.CharField(
         max_length=1, choices=YES_NO_CHOICES, default="Y", null=True, blank=True
     )  # i want my house painted
