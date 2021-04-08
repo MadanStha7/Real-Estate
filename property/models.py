@@ -192,8 +192,14 @@ class RentalInfo(CommonInfo):
     rental details about property
     """
 
-    AVAILABLE_FOR_CHOICES = (("R", "Only Rent"), ("L", "Only Lease"))
-    MAINTENANCE_CHOICES = (("I", "Maintenance Included"), ("E", "Maintenance Extra"))
+    AVAILABLE_FOR_CHOICES = (
+        ("R", "Only Rent"), 
+        ("L", "Only Lease")
+        )
+    MAINTENANCE_CHOICES = (
+        ("I", "Maintenance Included"), 
+        ("E", "Maintenance Extra")
+        )
     TENANTS_CHOICES = (
         ("D", "Doesn't Matter"),
         ("F", "Family"),
@@ -205,7 +211,12 @@ class RentalInfo(CommonInfo):
         ("S", "Semi Furnishing"),
         ("U", "Unfurnishing"),
     )
-    PARKING_CHOICES = (("N", "None"), ("M", "Motorbike"), ("C", "Car"), ("B", "Both"))
+    PARKING_CHOICES = (
+        ("N", "None"), 
+        ("M", "Motorbike"), 
+        ("C", "Car"), 
+        ("B", "Both")
+        )
     available_for = models.CharField(max_length=1, choices=AVAILABLE_FOR_CHOICES)
     expected_rent = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
     expected_deposit = models.DecimalField(
@@ -256,8 +267,14 @@ class Amenities(CommonInfo):
     Amenities
     """
 
-    YES_NO_CHOICES = (("Y", "Yes"), ("N", "No"))
-    WATER_SUPPLY_CHOICES = (("C", "Corporation"), ("W", "Borewell"), ("B", "Both"))
+    YES_NO_CHOICES = (
+        ("Y", "Yes"), 
+        ("N", "No")
+        )
+    WATER_SUPPLY_CHOICES = (
+        ("C", "Corporation"), 
+        ("W", "Borewell"), 
+        ("B", "Both"))
     VIEWER_CHOICES = (
         ("H", "Need Help"),
         ("I", "I will show"),
@@ -311,7 +328,10 @@ class FieldVisit(CommonInfo):
 
 
 class Schedule(models.Model):
-    YES_NO_CHOICES = (("Y", "Yes"), ("N", "No"))
+    YES_NO_CHOICES = (
+        ("Y", "Yes"), 
+        ("N", "No")
+        )
     AVAILABLE_DAY_CHOICES = (
         ("E", "Everyday(Sunday - Saturday)"),
         ("W", "Weekdays(Sunday - Friday)"),
