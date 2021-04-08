@@ -11,7 +11,6 @@ from property.models import (
 )
 from user.models import UserProfile, AgentDetail
 
-
 class PropertySerializer(serializers.ModelSerializer):
     """
     return the property details
@@ -41,9 +40,34 @@ class PropertySerializer(serializers.ModelSerializer):
             "listing_type",
             "membership_plan",
             "condition_type",
+            "description",
         )
 
 
+class PropertyListingSerializer(serializers.ModelSerializer):
+    """
+    return propety listing
+    """
+    locations=serializers.SlugRelatedField(read_only=True, slug_field="city")
+    listing_type= serializers.CharField(source="get_listing_type_display", read_only=True)
+    apartment_type= serializers.CharField(source="get_apartment_type_display", read_only=True)
+    #gallery=serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    gallery = serializers.HyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        view_name='gallery-detail'
+    )
+    class Meta:
+        model=PropertyInfo
+        fields = [
+            "id",
+            "apartment_name",
+            "apartment_type",
+            "gallery",
+            "created_on",
+            "locations",
+            "listing_type",
+        ]
 class LocationSerializer(serializers.ModelSerializer):
     """
     Location of property info
@@ -58,10 +82,10 @@ class GallerySerializer(serializers.ModelSerializer):
     """
     gallery of property info
     """
-
+    property_info_value=PropertySerializer(read_only=True)
     class Meta:
         model = Gallery
-        fields = ("id", "image", "property_info")
+        fields = ("id", "image", "property_info","property_info_value")
 
 
 class AmenitiesSerializer(serializers.ModelSerializer):

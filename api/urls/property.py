@@ -8,7 +8,11 @@ from api.viewsets.property_viewset import PropertyViewSet, \
          PropertyDiscussionViewSet,\
              RentalViewSet, \
                  GalleryViewSet, \
-                     AmentitesViewSet,ScheduleViewSet
+                     AmentitesViewSet,\
+                         ScheduleViewSet, \
+                             PropertyList,\
+                             PropertyCategoryList
+                             
 from api.viewsets.property_viewset import (
     PropertyViewSet,
     FieldVisitViewSet,
@@ -35,5 +39,6 @@ router.register(r"schedule", ScheduleViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
-    path('property-details/<int:pk>/',PropertyDetailsView.as_view(),name="property_details")
+    path('property-list/',PropertyList.as_view(),name="list_property"),
+    path('property-category/',PropertyCategoryList.as_view(),name="property_category_list"),
 ]
