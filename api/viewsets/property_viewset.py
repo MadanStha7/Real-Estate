@@ -2,6 +2,7 @@ from django.db.models import QuerySet
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework import generics
+from itertools import chain
 
 from rest_framework.response import Response
 from property.models import (
@@ -24,6 +25,7 @@ from api.serializers.property_serializer import (
     ScheduleSerializer,
     LocationSerializer,
     PropertyDetailSerializer,
+    PropertyListingSerializer,
 )
 
 
@@ -85,22 +87,15 @@ class PropertyList(generics.ListAPIView):
     serializer_class=PropertySerializer
     queryset=PropertyInfo.objects.filter(publish=True)
     
-    # def get_queryset(self):
-    #     """
-    #         This view returns a list of all the properties
-    #         that are verified by admin.
-    #     """
-    #     return PropertyInfo.objects.filter(publish=True)
 
 class PropertyCategoryList(generics.ListAPIView):
-    serializer_class=PropertySerializer
+    serializer_class=PropertyListingSerializer
 
     def get_queryset(self):
-        top_category= PropertyList.objects.filter(listing_type="T")
-        premium_category= PropertyList.objects.filter(listing_type="P")
-        featured_category= PropertyList.objects.filter(listing_type="F")
-        return queryset
-
+        top_category= PropertyInfo.objects.filter(listing_type="T",).filter(publish=True)
+        premium_category= PropertyInfo.objects.filter(listing_type="P").filter(publish=True)
+        featured_category= PropertyInfo.objects.filter(listing_type="F").filter(publish=True)
+        return chain(top_category, premium_category, featured_category)
 class RentalViewSet(viewsets.ModelViewSet):
     queryset = RentalInfo.objects.all()
     serializer_class = RentalSerializer
