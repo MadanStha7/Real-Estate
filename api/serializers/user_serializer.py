@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from user.models import AgentDetail, UserProfile, User,Contact
+from user.models import AgentDetail, UserProfile, User, Contact
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -140,12 +140,23 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         instance.save()
 
 
+def send_email():
+    email = EmailMessage(
+        "Title",
+        (ConsultSerializer.name, ConsultSerializer.email, ConsultSerializer.phone),
+        "my-email",
+        ["my-receive-email"],
+    )
+    email.attach_file(ConsultSerializer.file)
+    email.send()
+
+
 class ContactSerializer(serializers.ModelSerializer):
     """
     details of contact
     """
-    name = serializers.CharField(max_length=200)
 
+    name = serializers.CharField(max_length=60)
 
     class Meta:
         model = Contact
