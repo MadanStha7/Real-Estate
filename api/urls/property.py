@@ -23,6 +23,7 @@ from api.viewsets.property_viewset import (
     ScheduleViewSet,
     LocationViewSet,
     PropertyDetailsView,
+    PropertySearchView
 )
 
 
@@ -40,5 +41,6 @@ router.register(r"schedule", ScheduleViewSet)
 urlpatterns = [
     path("", include(router.urls)),
     path('property-list/',PropertyList.as_view(),name="list_property"),
+    path('locations/',PropertySearchView.as_view(),name="search_property"),
     path('property-category/',PropertyCategoryList.as_view(),name="property_category_list"),
 ]
