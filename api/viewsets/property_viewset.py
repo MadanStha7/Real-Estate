@@ -84,11 +84,17 @@ class PropertyViewSet(viewsets.ModelViewSet):
         )
 
 class PropertyList(generics.ListAPIView):
+    """
+    This views returns listing of porperty in homepage
+    """
     serializer_class=PropertySerializer
     queryset=PropertyInfo.objects.filter(publish=True)
     
 
 class PropertyCategoryList(generics.ListAPIView):
+    """
+    This views returns listing of porperty for different category
+    """
     serializer_class=PropertyListingSerializer
 
     def get_queryset(self):
