@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from user.models import AgentDetail, UserProfile, User,Contact
-
+from user.models import AgentDetail, UserProfile, User, Contact
+from django.contrib.auth import authenticate
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -146,7 +146,71 @@ class ContactSerializer(serializers.ModelSerializer):
     """
     name = serializers.CharField(max_length=200)
 
-
     class Meta:
         model = Contact
         fields = ("name", "email", "phone", "message")
+
+
+# class LoginSerializer(serializers.Serializer):
+#     email_or_username = serializers.EmailField(write_only=True, required=True)
+#     password = serializers.CharField(max_length=128, write_only=True, required=True)
+
+#     def validate(self, attrs):
+#         print("##############", attrs)
+#         email_or_username = data.get('email_or_username')
+#         password = data.get('password')
+#         print("email", email_or_username)
+#         print("######", password)
+
+#         if email_or_username is None or password is None:
+#             raise serializers.ValidationError(
+#                 'This field is required.'
+#             )
+
+class LoginSerializer(serializers.Serializer):
+    """
+    Authenticates an existing user.
+    Email and password are required.
+    Returns a JSON web token.
+    """
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(max_length=128, write_only=True)
+
+    # Ignore these fields if they are included in the request.
+    username = serializers.CharField(max_length=255, read_only=True)
+    token = serializers.CharField(max_length=255, read_only=True)
+
+    def validate(self, data):
+        """
+        Validates user data.
+        """
+        email = data.get('email', None)
+        password = data.get('password', None)
+        print(email)
+
+        if email is None:
+            raise serializers.ValidationError(
+                'An email address is required to log in.'
+            )
+
+        if password is None:
+            raise serializers.ValidationError(
+                'A password is required to log in.'
+            )
+        user = authenticate(username=email, password=password)
+
+        print(user)
+
+        if user is None:
+            raise serializers.ValidationError(
+                'A user with this email and password was not found.'
+            )
+
+        if not user.is_active:
+            raise serializers.ValidationError(
+                'This user has been deactivated.'
+            )
+
+        return {
+            'token': user.token,
+        }

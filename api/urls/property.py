@@ -23,7 +23,8 @@ from api.viewsets.property_viewset import (
     ScheduleViewSet,
     LocationViewSet,
     PropertyDetailsView,
-    PropertySearchView
+    PropertySearchView,
+    
 )
 
 
