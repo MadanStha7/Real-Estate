@@ -3,6 +3,8 @@ from rest_framework import viewsets
 from rest_framework import status
 from rest_framework import generics
 from itertools import chain
+# from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework.response import Response
 from property.models import (
@@ -102,6 +104,7 @@ class PropertyCategoryList(generics.ListAPIView):
         premium_category= PropertyInfo.objects.filter(listing_type="P").filter(publish=True)
         featured_category= PropertyInfo.objects.filter(listing_type="F").filter(publish=True)
         return chain(top_category, premium_category, featured_category)
+
 class RentalViewSet(viewsets.ModelViewSet):
     queryset = RentalInfo.objects.all()
     serializer_class = RentalSerializer
@@ -155,3 +158,12 @@ class PropertyDetailsView(generics.RetrieveUpdateDestroyAPIView):
     queryset = PropertyInfo.objects.all()
     serializer_class = PropertyDetailSerializer
 
+
+
+class PropertySearchView(generics.ListAPIView):
+    queryset=Location.objects.all()
+    serializer_class=LocationSerializer
+    filter_backends=[DjangoFilterBackend]
+    filterset_fields=['city', "locality"]
+
+    
