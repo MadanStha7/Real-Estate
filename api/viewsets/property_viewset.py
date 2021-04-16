@@ -5,6 +5,9 @@ from rest_framework import generics
 from itertools import chain
 import django_filters.rest_framework
 from rest_framework import filters
+# from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework.response import Response
 
 from property.models import (
@@ -198,3 +201,12 @@ class PropertyDetailsView(generics.RetrieveUpdateDestroyAPIView):
     queryset = PropertyInfo.objects.all()
     serializer_class = PropertyDetailSerializer
 
+
+
+class PropertySearchView(generics.ListAPIView):
+    queryset=Location.objects.all()
+    serializer_class=LocationSerializer
+    filter_backends=[DjangoFilterBackend]
+    filterset_fields=['city', "locality"]
+
+    
