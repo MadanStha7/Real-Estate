@@ -43,6 +43,7 @@ class AgentDetail(CommonInfo):
         db_table = "agent_detail"
 
 
+
 class UserProfile(CommonInfo):
     """
     Buyer and seller profile
@@ -51,7 +52,6 @@ class UserProfile(CommonInfo):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="buyer_seller_profile"
     )
-
     full_name = models.CharField(max_length=60, blank=True)
     profile_picture = models.ImageField(
         upload_to="user/buyerseller", blank=True, null=True
@@ -59,6 +59,12 @@ class UserProfile(CommonInfo):
     phone_number = models.CharField(max_length=15, blank=True)
     address = models.TextField(blank=True)
     added_at = models.DateTimeField(auto_now_add=True)
+    otp_code = models.CharField(max_length=6,blank=True,null=True)
+    count = models.PositiveBigIntegerField(default=0)
+    is_email = models.BooleanField(default=False)
+    is_phone = models.BooleanField(default=False)
+
+
 
     def save(self, *args, **kwargs):
         group, created = Group.objects.get_or_create(name="BuyerOrSeller")
@@ -99,3 +105,21 @@ class StaffDetail(CommonInfo):
         ordering = ["-id"]
         db_table = "staff_detail"
 
+
+
+class Contact(models.Model):
+    """
+    Contact us page
+    """
+    name = models.CharField(max_length=60, null=True)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    message = models.TextField()
+    date = models.DateField(auto_now=True)
+
+    class Meta:
+        ordering = ["-id"]
+        verbose_name_plural = "Contact us"
+
+    def __name__(self):
+        return self.email
