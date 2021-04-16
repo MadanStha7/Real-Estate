@@ -1,7 +1,10 @@
+import uuid
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from user.models import AgentDetail, UserProfile, User, Contact
-
+from project.settings import EMAIL_HOST_USER
+from rest_framework.response import Response
+from django.core.mail import send_mail, EmailMessage
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,6 +28,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class AgentDetailSerializer(serializers.ModelSerializer):
+    """
+    This view returns the detail of agent
+    """
     # user = UserSerializer(many=True, read_only=True)
 
     class Meta:
@@ -41,6 +47,9 @@ class AgentDetailSerializer(serializers.ModelSerializer):
 
 
 class ChangePasswordSerializer(serializers.ModelSerializer):
+    """
+    This view returns when user change the password 
+    """
     password = serializers.CharField(write_only=True, required=True)
     password2 = serializers.CharField(write_only=True, required=True)
     old_password = serializers.CharField(write_only=True, required=True)
@@ -79,9 +88,10 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     created when user register
     """
 
-    full_name = serializers.CharField(write_only=True)
+    full_name = serializers.CharField(write_only=True,required=False)
     username = serializers.CharField(write_only=True, required=True)
     email = serializers.CharField(write_only=True, required=True)
+    phone = serializers.CharField(write_only=True, required=True)
     password = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
 
@@ -94,25 +104,28 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             "username",
             "password",
             "password2",
+            "phone",
         )
 
     def create(self, validated_data):
-
-        full_name = validated_data.pop("full_name")
         username = validated_data.pop("username")
         email = validated_data.pop("email")
+        phone = validated_data.pop("phone")
         password = validated_data.pop("password")
-        print("email", email)
-        print("username", username)
-        print("password", password)
-        print("password2", password)
 
-        user = User.objects.create_user(
-            username=username, email=email, password=password
+        ran_number = str(uuid.uuid1())[:4]
+        ran_num_upper = ran_number[:2].upper() + ran_number[2:]
+        send_mail(
+            "Please Confirm Your Account",
+            "Here is the message. {}".format("Your 4 Digit Verification Pin"+str(ran_num_upper)),
+            email,
+            [EMAIL_HOST_USER],
+            fail_silently=False,
         )
-        print("user", user.id)
-        profile = UserProfile.objects.create(user_id=user.id, full_name=full_name)
-        return profile
+        user = User.objects.create_user(username=username,email=email, password=password
+        )
+        UserProfile.objects.create(user_id=user.id, otp_code=ran_num_upper)
+        return user
 
     def validate(self, attrs):
         print(attrs, "===attrs")
@@ -124,8 +137,10 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def validate_username(self, username):
+        print("username",username)
         user_old = User.objects.filter(username=username).exists()
         if user_old:
+            print('already')
             raise serializers.ValidationError("User already exists")
         return username
 
@@ -140,20 +155,17 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         instance.save()
 
 
-def send_email():
-    email = EmailMessage(
-        "Title",
-        (ConsultSerializer.name, ConsultSerializer.email, ConsultSerializer.phone),
-        "my-email",
-        ["my-receive-email"],
-    )
-    email.attach_file(ConsultSerializer.file)
-    email.send()
+class UserLoginSerializer(serializers.Serializer):
+    username_or_email = serializers.CharField(max_length=50, required=True,write_only=True)
+    password = serializers.CharField(max_length=50,required=True,write_only=True)
+
+
+
 
 
 class ContactSerializer(serializers.ModelSerializer):
     """
-    details of contact
+    This view return details of contact
     """
 
     name = serializers.CharField(max_length=60)
@@ -161,3 +173,13 @@ class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
         fields = ("name", "email", "phone", "message")
+
+
+
+class OtpSerializer(serializers.Serializer):
+    """
+    created when user register
+    """
+    otp_code = serializers.CharField(write_only=True,required=True)
+    user_id = serializers.IntegerField(write_only=True,required=True)
+

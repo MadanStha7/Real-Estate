@@ -16,6 +16,8 @@ Including another URLconf
 from rest_framework.authtoken import views
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.static import static,settings
+
 
 urlpatterns = [
     path('api/admin/', admin.site.urls),
@@ -23,3 +25,5 @@ urlpatterns = [
     path('api/v1/api-token-auth/', views.obtain_auth_token)
 
 ]
+urlpatterns += static(settings.STATIC_URL,document_root = settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

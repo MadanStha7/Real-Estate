@@ -3,16 +3,6 @@ from rest_framework import routers
 from property.models import Schedule
 from api.viewsets.property_viewset import ScheduleList
 
-from api.viewsets.property_viewset import PropertyViewSet, \
-     FieldVisitViewSet, \
-         PropertyDiscussionViewSet,\
-             RentalViewSet, \
-                 GalleryViewSet, \
-                     AmentitesViewSet,\
-                         ScheduleViewSet, \
-                             PropertyList,\
-                             PropertyCategoryList
-                             
 from api.viewsets.property_viewset import (
     PropertyViewSet,
     FieldVisitViewSet,
@@ -23,6 +13,17 @@ from api.viewsets.property_viewset import (
     ScheduleViewSet,
     LocationViewSet,
     PropertyDetailsView,
+    PropertyViewSet,
+    FieldVisitViewSet,
+    PropertyDiscussionViewSet,
+    RentalViewSet,
+    GalleryViewSet,
+    AmentitesViewSet,
+    ScheduleViewSet,
+    PropertyList,
+    PropertyTop,
+    PropertyPremium,
+    PropertyFeatured,
 )
 
 
@@ -39,6 +40,17 @@ router.register(r"schedule", ScheduleViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
-    path('property-list/',PropertyList.as_view(),name="list_property"),
-    path('property-category/',PropertyCategoryList.as_view(),name="property_category_list"),
+    path("property-list/", PropertyList.as_view(), name="list_property"),
+    path("property-detail/<int:pk>/", PropertyDetailsView.as_view(), name="property_detail"),
+
+    path("property-category/top/", PropertyTop.as_view(), name="property_top"),
+    path(
+        "property-category/premium/", PropertyPremium.as_view(), name="property_premium"
+    ),
+    path(
+        "property-category/featured/",
+        PropertyFeatured.as_view(),
+        name="property_featured",
+    ),
+    # search
 ]
