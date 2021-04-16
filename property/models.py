@@ -5,6 +5,17 @@ from common.models import CommonInfo
 from user.models import UserProfile, AgentDetail, StaffDetail
 
 
+class City(CommonInfo):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "City"
+        ordering = ["-created_on"]
+
+
 class PropertyInfo(CommonInfo):
     """
     Info about property
@@ -90,7 +101,9 @@ class PropertyInfo(CommonInfo):
         ("N", "New"),
         ("U", "Used"),
     )
-
+    city = models.ForeignKey(
+        City, on_delete=models.CASCADE, related_name="city_property"
+    )
     property_type = models.CharField(
         max_length=1, choices=PROPERTY_TYPE_CHOICES, default="R"
     )
@@ -112,7 +125,7 @@ class PropertyInfo(CommonInfo):
         max_length=1, choices=AGE_CHOICES, default="U"
     )  # property age
     facing = models.CharField(max_length=2, choices=FACING_CHOICES)
-    property_size = models.FloatField(default=0.00)
+    property_size = models.FloatField(default=0.00)  # size in sq.m
     owner = models.ForeignKey(
         UserProfile,
         related_name="userprofile",
@@ -140,17 +153,18 @@ class PropertyInfo(CommonInfo):
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
     publish = models.BooleanField(default=False)
-    description = models.TextField(null=True,blank=True)
+    description = models.TextField(null=True, blank=True)
     views = models.PositiveIntegerField(default=0)
     listing_type = models.CharField(max_length=1, choices=LISTING_TYPE_CHOICES)
     membership_plan = models.CharField(max_length=1, choices=MEMBERSHIP_PLAN_CHOICES)
-    condition_type = models.CharField(max_length=1, choices=CONDITION_CHOICES)
-    
+    condition_type = models.CharField(
+        max_length=1, choices=CONDITION_CHOICES
+    )  # sell type
+
     def __str__(self):
         return str(self.id)
 
     def save(self, *args, **kwargs):
-
         if self.location:
             self.latitude = self.location.y
             self.longitude = self.location.x
@@ -164,14 +178,16 @@ class PropertyInfo(CommonInfo):
         verbose_name_plural = "Property Info"
         db_table = "property"
         ordering = ["-created_on"]
- 
+
 
 class Location(CommonInfo):
     """
     Location of property
     """
 
-    city = models.CharField(max_length=60)
+    city = models.ForeignKey(
+        City, on_delete=models.CASCADE, related_name="city_locations"
+    )
     locality = models.TextField()
     street = models.TextField()
     property_info = models.OneToOneField(
@@ -192,14 +208,8 @@ class RentalInfo(CommonInfo):
     rental details about property
     """
 
-    AVAILABLE_FOR_CHOICES = (
-        ("R", "Only Rent"), 
-        ("L", "Only Lease")
-        )
-    MAINTENANCE_CHOICES = (
-        ("I", "Maintenance Included"), 
-        ("E", "Maintenance Extra")
-        )
+    AVAILABLE_FOR_CHOICES = (("R", "Only Rent"), ("L", "Only Lease"))
+    MAINTENANCE_CHOICES = (("I", "Maintenance Included"), ("E", "Maintenance Extra"))
     TENANTS_CHOICES = (
         ("D", "Doesn't Matter"),
         ("F", "Family"),
@@ -211,12 +221,7 @@ class RentalInfo(CommonInfo):
         ("S", "Semi Furnishing"),
         ("U", "Unfurnishing"),
     )
-    PARKING_CHOICES = (
-        ("N", "None"), 
-        ("M", "Motorbike"), 
-        ("C", "Car"), 
-        ("B", "Both")
-        )
+    PARKING_CHOICES = (("N", "None"), ("M", "Motorbike"), ("C", "Car"), ("B", "Both"))
     available_for = models.CharField(max_length=1, choices=AVAILABLE_FOR_CHOICES)
     expected_rent = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
     expected_deposit = models.DecimalField(
@@ -267,14 +272,8 @@ class Amenities(CommonInfo):
     Amenities
     """
 
-    YES_NO_CHOICES = (
-        ("Y", "Yes"), 
-        ("N", "No")
-        )
-    WATER_SUPPLY_CHOICES = (
-        ("C", "Corporation"), 
-        ("W", "Borewell"), 
-        ("B", "Both"))
+    YES_NO_CHOICES = (("Y", "Yes"), ("N", "No"))
+    WATER_SUPPLY_CHOICES = (("C", "Corporation"), ("W", "Borewell"), ("B", "Both"))
     VIEWER_CHOICES = (
         ("H", "Need Help"),
         ("I", "I will show"),
@@ -307,8 +306,8 @@ class Amenities(CommonInfo):
 
 
 class FieldVisit(CommonInfo):
-    """"
-    Visit made by buyer 
+    """ "
+    Visit made by buyer
     """
 
     name = models.CharField(max_length=64, blank=False, null=False)
@@ -328,16 +327,13 @@ class FieldVisit(CommonInfo):
 
 
 class Schedule(models.Model):
-    YES_NO_CHOICES = (
-        ("Y", "Yes"), 
-        ("N", "No")
-        )
+    YES_NO_CHOICES = (("Y", "Yes"), ("N", "No"))
     AVAILABLE_DAY_CHOICES = (
         ("E", "Everyday(Sunday - Saturday)"),
         ("W", "Weekdays(Sunday - Friday)"),
         ("S", "Weekend(Saturday)"),
     )
-    
+
     paint = models.CharField(
         max_length=1, choices=YES_NO_CHOICES, default="Y", null=True, blank=True
     )  # i want my house painted

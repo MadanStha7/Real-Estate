@@ -1,7 +1,10 @@
+import uuid
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from user.models import AgentDetail, UserProfile, User, Contact
-from django.contrib.auth import authenticate
+from project.settings import EMAIL_HOST_USER
+from rest_framework.response import Response
+from django.core.mail import send_mail, EmailMessage
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,6 +28,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class AgentDetailSerializer(serializers.ModelSerializer):
+    """
+    This view returns the detail of agent
+    """
     # user = UserSerializer(many=True, read_only=True)
 
     class Meta:
@@ -41,6 +47,9 @@ class AgentDetailSerializer(serializers.ModelSerializer):
 
 
 class ChangePasswordSerializer(serializers.ModelSerializer):
+    """
+    This view returns when user change the password 
+    """
     password = serializers.CharField(write_only=True, required=True)
     password2 = serializers.CharField(write_only=True, required=True)
     old_password = serializers.CharField(write_only=True, required=True)
@@ -79,9 +88,10 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     created when user register
     """
 
-    full_name = serializers.CharField(write_only=True)
+    full_name = serializers.CharField(write_only=True,required=False)
     username = serializers.CharField(write_only=True, required=True)
     email = serializers.CharField(write_only=True, required=True)
+    phone = serializers.CharField(write_only=True, required=True)
     password = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
 
@@ -94,25 +104,28 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             "username",
             "password",
             "password2",
+            "phone",
         )
 
     def create(self, validated_data):
-
-        full_name = validated_data.pop("full_name")
         username = validated_data.pop("username")
         email = validated_data.pop("email")
+        phone = validated_data.pop("phone")
         password = validated_data.pop("password")
-        print("email", email)
-        print("username", username)
-        print("password", password)
-        print("password2", password)
 
-        user = User.objects.create_user(
-            username=username, email=email, password=password
+        ran_number = str(uuid.uuid1())[:4]
+        ran_num_upper = ran_number[:2].upper() + ran_number[2:]
+        send_mail(
+            "Please Confirm Your Account",
+            "Here is the message. {}".format("Your 4 Digit Verification Pin"+str(ran_num_upper)),
+            email,
+            [EMAIL_HOST_USER],
+            fail_silently=False,
         )
-        print("user", user.id)
-        profile = UserProfile.objects.create(user_id=user.id, full_name=full_name)
-        return profile
+        user = User.objects.create_user(username=username,email=email, password=password
+        )
+        UserProfile.objects.create(user_id=user.id, otp_code=ran_num_upper)
+        return user
 
     def validate(self, attrs):
         print(attrs, "===attrs")
@@ -124,8 +137,10 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def validate_username(self, username):
+        print("username",username)
         user_old = User.objects.filter(username=username).exists()
         if user_old:
+            print('already')
             raise serializers.ValidationError("User already exists")
         return username
 
@@ -140,77 +155,31 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         instance.save()
 
 
+class UserLoginSerializer(serializers.Serializer):
+    username_or_email = serializers.CharField(max_length=50, required=True,write_only=True)
+    password = serializers.CharField(max_length=50,required=True,write_only=True)
+
+
+
+
+
 class ContactSerializer(serializers.ModelSerializer):
     """
-    details of contact
+    This view return details of contact
     """
-    name = serializers.CharField(max_length=200)
+
+    name = serializers.CharField(max_length=60)
 
     class Meta:
         model = Contact
         fields = ("name", "email", "phone", "message")
 
 
-# class LoginSerializer(serializers.Serializer):
-#     email_or_username = serializers.EmailField(write_only=True, required=True)
-#     password = serializers.CharField(max_length=128, write_only=True, required=True)
 
-#     def validate(self, attrs):
-#         print("##############", attrs)
-#         email_or_username = data.get('email_or_username')
-#         password = data.get('password')
-#         print("email", email_or_username)
-#         print("######", password)
-
-#         if email_or_username is None or password is None:
-#             raise serializers.ValidationError(
-#                 'This field is required.'
-#             )
-
-class LoginSerializer(serializers.Serializer):
+class OtpSerializer(serializers.Serializer):
     """
-    Authenticates an existing user.
-    Email and password are required.
-    Returns a JSON web token.
+    created when user register
     """
-    email = serializers.EmailField(write_only=True)
-    password = serializers.CharField(max_length=128, write_only=True)
+    otp_code = serializers.CharField(write_only=True,required=True)
+    user_id = serializers.IntegerField(write_only=True,required=True)
 
-    # Ignore these fields if they are included in the request.
-    username = serializers.CharField(max_length=255, read_only=True)
-    token = serializers.CharField(max_length=255, read_only=True)
-
-    def validate(self, data):
-        """
-        Validates user data.
-        """
-        email = data.get('email', None)
-        password = data.get('password', None)
-        print(email)
-
-        if email is None:
-            raise serializers.ValidationError(
-                'An email address is required to log in.'
-            )
-
-        if password is None:
-            raise serializers.ValidationError(
-                'A password is required to log in.'
-            )
-        user = authenticate(username=email, password=password)
-
-        print(user)
-
-        if user is None:
-            raise serializers.ValidationError(
-                'A user with this email and password was not found.'
-            )
-
-        if not user.is_active:
-            raise serializers.ValidationError(
-                'This user has been deactivated.'
-            )
-
-        return {
-            'token': user.token,
-        }
