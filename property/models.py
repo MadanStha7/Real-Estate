@@ -102,7 +102,7 @@ class PropertyInfo(CommonInfo):
         ("U", "Used"),
     )
     city = models.ForeignKey(
-        City, on_delete=models.CASCADE, related_name="city_property"
+        City, on_delete=models.CASCADE, related_name="city_property", null=True
     )
     property_type = models.CharField(
         max_length=1, choices=PROPERTY_TYPE_CHOICES, default="R"
@@ -186,7 +186,7 @@ class Location(CommonInfo):
     """
 
     city = models.ForeignKey(
-        City, on_delete=models.CASCADE, related_name="city_locations"
+        City, on_delete=models.CASCADE, related_name="city_locations", null=True
     )
     locality = models.TextField()
     street = models.TextField()
@@ -195,7 +195,7 @@ class Location(CommonInfo):
     )
 
     def __str__(self):
-        return self.city
+        return str(self.city)
 
     class Meta:
         verbose_name_plural = "Property Location"

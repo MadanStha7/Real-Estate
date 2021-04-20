@@ -12,6 +12,8 @@ IDENTIFICATION_TYPE = (
     ("driving-license", "Driving License"),
     ("others", "Others"),
 )
+
+
 class AgentDetail(CommonInfo):
     """
     agent detail
@@ -31,7 +33,7 @@ class AgentDetail(CommonInfo):
 
     def save(self, *args, **kwargs):
         group, created = Group.objects.get_or_create(name="Agent")
-        print("group",group)
+        print("group", group)
         self.user.groups.add(group)
         super().save(*args, **kwargs)
 
@@ -41,7 +43,6 @@ class AgentDetail(CommonInfo):
     class Meta:
         ordering = ["-added_at"]
         db_table = "agent_detail"
-
 
 
 class UserProfile(CommonInfo):
@@ -59,12 +60,10 @@ class UserProfile(CommonInfo):
     phone_number = models.CharField(max_length=15, blank=True)
     address = models.TextField(blank=True)
     added_at = models.DateTimeField(auto_now_add=True)
-    otp_code = models.CharField(max_length=6,blank=True,null=True)
+    otp_code = models.CharField(max_length=6, blank=True, null=True)
     count = models.PositiveBigIntegerField(default=0)
     is_email = models.BooleanField(default=False)
     is_phone = models.BooleanField(default=False)
-
-
 
     def save(self, *args, **kwargs):
         group, created = Group.objects.get_or_create(name="BuyerOrSeller")
@@ -104,7 +103,6 @@ class StaffDetail(CommonInfo):
     class Meta:
         ordering = ["-id"]
         db_table = "staff_detail"
-
 
 
 class Contact(models.Model):
