@@ -6,6 +6,7 @@ from project.settings import EMAIL_HOST_USER
 from rest_framework.response import Response
 from django.core.mail import send_mail, EmailMessage
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -20,8 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    # user_name=serializers.CharField(source="user.full_name")
-    # user=UserSerializer()
+
     class Meta:
         model = UserProfile
         fields = ["id", "user", "profile_picture", "phone_number", "address"]
@@ -31,7 +31,6 @@ class AgentDetailSerializer(serializers.ModelSerializer):
     """
     This view returns the detail of agent
     """
-    # user = UserSerializer(many=True, read_only=True)
 
     class Meta:
         model = AgentDetail
@@ -88,7 +87,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     created when user register
     """
 
-    full_name = serializers.CharField(write_only=True,required=False)
+    full_name = serializers.CharField(write_only=True, required=False)
     username = serializers.CharField(write_only=True, required=True)
     email = serializers.CharField(write_only=True, required=True)
     phone = serializers.CharField(write_only=True, required=True)
@@ -117,13 +116,14 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         ran_num_upper = ran_number[:2].upper() + ran_number[2:]
         send_mail(
             "Please Confirm Your Account",
-            "Here is the message. {}".format("Your 4 Digit Verification Pin"+str(ran_num_upper)),
+            "Here is the message. {}".format(
+                "Your 4 Digit Verification Pin" + str(ran_num_upper)),
             email,
             [EMAIL_HOST_USER],
             fail_silently=False,
         )
-        user = User.objects.create_user(username=username,email=email, password=password
-        )
+        user = User.objects.create_user(username=username, email=email, password=password
+                                        )
         UserProfile.objects.create(user_id=user.id, otp_code=ran_num_upper)
         return user
 
@@ -137,7 +137,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def validate_username(self, username):
-        print("username",username)
+        print("username", username)
         user_old = User.objects.filter(username=username).exists()
         if user_old:
             print('already')
@@ -156,11 +156,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class UserLoginSerializer(serializers.Serializer):
-    username_or_email = serializers.CharField(max_length=50, required=True,write_only=True)
-    password = serializers.CharField(max_length=50,required=True,write_only=True)
-
-
-
+    username_or_email = serializers.CharField(
+        max_length=50, required=True, write_only=True)
+    password = serializers.CharField(max_length=50, required=True, write_only=True)
 
 
 class ContactSerializer(serializers.ModelSerializer):
@@ -175,11 +173,9 @@ class ContactSerializer(serializers.ModelSerializer):
         fields = ("name", "email", "phone", "message")
 
 
-
 class OtpSerializer(serializers.Serializer):
     """
     created when user register
     """
-    otp_code = serializers.CharField(write_only=True,required=True)
-    user_id = serializers.IntegerField(write_only=True,required=True)
-
+    otp_code = serializers.CharField(write_only=True, required=True)
+    user_id = serializers.IntegerField(write_only=True, required=True)
