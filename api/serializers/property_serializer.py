@@ -147,6 +147,7 @@ class AmenitiesSerializer(serializers.ModelSerializer):
             "non_veg_value",
             "security_value",
             "viewer_value",
+            "property_info"
         )
 
 
