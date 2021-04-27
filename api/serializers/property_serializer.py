@@ -8,15 +8,27 @@ from property.models import (
     Amenities,
     Schedule,
     Location,
+    City,
 )
 from user.models import UserProfile, AgentDetail
+
+
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = (
+            "id",
+            "name"
+        )
 
 
 class PropertySerializer(serializers.ModelSerializer):
     """
     return the property details in homepage
     """
-
+    listing_type = serializers.CharField(required=False)
+    membership_plan = serializers.CharField(required=False)
+    condition_type = serializers.CharField(required=False)
     created_on = serializers.CharField(read_only=True)
 
     class Meta:
@@ -62,7 +74,6 @@ class PropertyListingSerializer(serializers.ModelSerializer):
     apartment_type = serializers.CharField(
         source="get_apartment_type_display", read_only=True
     )
-    # gallery=serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     gallery = serializers.HyperlinkedRelatedField(
         many=True, read_only=True, view_name="gallery-detail"
     )
@@ -85,6 +96,7 @@ class LocationSerializer(serializers.ModelSerializer):
     """
     Location of property info
     """
+    city = CitySerializer(read_only=True)
 
     class Meta:
         model = Location
@@ -135,6 +147,7 @@ class AmenitiesSerializer(serializers.ModelSerializer):
             "non_veg_value",
             "security_value",
             "viewer_value",
+            "property_info"
         )
 
 
@@ -269,4 +282,22 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             "condition_type",
             "membership_plan",
             "views",
+        )
+
+
+class DetailPropertySerializer(serializers.ModelSerializer):
+    """
+    This returns property
+    """
+    class Meta:
+        model = PropertyInfo
+        fields = (
+            "apartment_type",
+            "apartment_name",
+            "bhk_type",
+            "floor",
+            "total_floor",
+            "age",
+            "facing",
+            "property_size"
         )

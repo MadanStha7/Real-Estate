@@ -81,7 +81,8 @@ class UserLoginView(APIView):
 
                 else:
                     get_user = User.objects.get(username=u_name)
-                user = authenticate(username=get_user, password=pword)
+
+                user = authenticate(username=u_name, password=pword)
 
                 try:
                     token = Token.objects.get(user=user.id)
@@ -136,7 +137,6 @@ class OtpVerify(APIView):
             otp = data.get("otp_code")
             u_id = data.get("user_id")
             try:
-                print("snsns")
                 # get the user id
                 user_profile = UserProfile.objects.get(user_id=u_id)
                 old_otp = user_profile.otp_code
@@ -145,7 +145,6 @@ class OtpVerify(APIView):
                         {"Otp": "Invalid otp"}, status=status.HTTP_406_NOT_ACCEPTABLE
                     )
                 else:
-                    print("hello from else")
                     user_profile.is_email = True
                     user_profile.is_phone = True
                     user_profile.save()
@@ -183,7 +182,6 @@ class SendMailView(APIView):
             email = data.get("email")
             phone = data.get("phone")
             message = data.get("message")
-            print("EMAIL_HOST_USER", EMAIL_HOST_USER)
             send_mail(
                 "Sent email from {}".format(name),
                 "Here is the message. {}".format(message),
