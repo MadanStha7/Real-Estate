@@ -25,6 +25,7 @@ from api.viewsets.property_viewset import (
     PropertyPremium,
     PropertyFeatured,
     PropertySearchView
+    
 )
 
 
@@ -56,5 +57,5 @@ urlpatterns = [
     # search
     path('property-list/',PropertyList.as_view(),name="list_property"),
     path('locations/',PropertySearchView.as_view(),name="search_property"),
-    path('property-category/',PropertyCategoryList.as_view(),name="property_category_list"),
+    # path('property-category/',PropertyCategoryList.as_view(),name="property_category_list"),
 ]

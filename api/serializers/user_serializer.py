@@ -5,6 +5,7 @@ from user.models import AgentDetail, UserProfile, User, Contact
 from project.settings import EMAIL_HOST_USER
 from rest_framework.response import Response
 from django.core.mail import send_mail, EmailMessage
+from django.contrib.auth import authenticate
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -160,15 +161,10 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=50,required=True,write_only=True)
 
 
-
-
-
 class ContactSerializer(serializers.ModelSerializer):
     """
     This view return details of contact
     """
-
-    name = serializers.CharField(max_length=60)
 
     class Meta:
         model = Contact

@@ -2,7 +2,8 @@ from django.urls import include, path
 from rest_framework import routers
 from api.viewsets.user_viewset import UserProfileViewSet, AgentDetailViewSet, \
     ChangePasswordView, UserViewSet, \
-    ContactViewSet,SendMailView,RegisterView,OtpVerify,UserLoginView
+    ContactViewSet,SendMailView,RegisterView,OtpVerify,UserLoginView, \
+    ContactViewSet
 
 router = routers.DefaultRouter()
 router.register(r'buyer_seller_profile', UserProfileViewSet)

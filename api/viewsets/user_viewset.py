@@ -16,6 +16,7 @@ from api.serializers.user_serializer import (
     OtpSerializer,
     UserLoginSerializer,
 )
+from rest_framework.authtoken.models import Token
 from user.models import UserProfile, User, AgentDetail, Contact
 from rest_framework.views import APIView
 from django.core.mail import send_mail, EmailMessage
@@ -23,6 +24,14 @@ from project.settings import EMAIL_HOST_USER
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
+from rest_framework import viewsets, generics, views, status
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.contrib.auth import authenticate
+from rest_framework.response import Response
+
+from api.serializers.user_serializer import AgentDetailSerializer, ChangePasswordSerializer, \
+    UserSerializer, UserRegisterSerializer, ContactSerializer
+from user.models import UserProfile, User, AgentDetail, Contact
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -60,47 +69,52 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class UserLoginView(APIView):
     def post(self, request, format=None):
-        print("ram*************************")
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
-            print("data", data)
             try:
                 u_name = data.get("username_or_email", None)
                 pword = data.get("password", None)
 
-                print("userbname", type(u_name))
-                print("passs#######", u_name)
                 if "@" in u_name:
-                    print("email exist")
                     get_user = User.objects.get(email=u_name)
 
-                    print("get_user", get_user)
-
                 else:
-                    print("username exist")
-                    print("all user", u_name)
                     get_user = User.objects.get(username=u_name)
-                    User.objects.get(username=b)
-                    print("get_user", get_user)
+                user = authenticate(username=get_user, password=pword)
 
-                user = authenticate(username=u_name, password=pword)
-                print("this is user", user)
-
+                try:
+                    token = Token.objects.get(user=user.id)
+                except:
+                    return Response(
+                        {"Invalid": "Unauthenticated user"},
+                        status=status.HTTP_404_NOT_FOUND,
+                    )
                 if user is not None:
                     if user.is_active:
-                        login(request, user)
-
-                        return Response(status=status.HTTP_200_OK)
+                        return Response(
+                            {
+                                "Success": "User successfully logged in.",
+                                'token': token.key,
+                                "id": user.id,
+                            },
+                            status=status.HTTP_200_OK,
+                        )
                     else:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                 else:
-                    return Response(status=status.HTTP_404_NOT_FOUND)
+                    return Response(
+                        "User doesnot exist", status=status.HTTP_404_NOT_FOUND
+                    )
 
             except:
                 return Response(
                     {"Invalid": "Invalid Credential"}, status=status.HTTP_404_NOT_FOUND
                 )
+        else:
+            return Response(
+                "Field is required", status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class RegisterView(generics.ListCreateAPIView):
