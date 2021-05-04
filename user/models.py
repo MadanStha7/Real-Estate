@@ -82,14 +82,42 @@ class StaffDetail(CommonInfo):
     """
     Employee staff detail
     """
-
+    DESIGNATION_CHOICES = (
+        ("F", "Field Manager"),
+        ("E", "Engineer"),
+        ("C", "Cameraman"),
+    )
+    GENDER_CHOICES = (
+        ("M", "Male"),
+        ("F", "Female"),
+        ("O", "Other")
+    )
+    INFORMATION_CHOICES = (
+        ("C", "Citizenship"),
+        ("P", "Passport"),
+        ("D", "Driving license"),
+        ("O", "Other")
+    )
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="staff_detail"
     )
+    designation = models.CharField(
+        max_length=1, choices=DESIGNATION_CHOICES
+    )
     full_name = models.CharField(max_length=60, blank=True)
-    profile_picture = models.ImageField(upload_to="user/staff", blank=True, null=True)
+
+    email =  models.EmailField(max_length=254)
+    gender = models.CharField(
+        max_length=1, choices=GENDER_CHOICES
+    )
     phone_number = models.CharField(max_length=15, blank=True)
-    address = models.TextField(blank=True)
+    city = models.CharField(max_length=60, blank=True)
+    state = models.CharField(max_length=60, blank=True)
+    information = models.CharField(
+        max_length=1, choices=INFORMATION_CHOICES
+    )
+    identification_number = models.PositiveBigIntegerField(default=0)
+    identification_image = models.ImageField(upload_to="user/staff", blank=True, null=True)
     added_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
