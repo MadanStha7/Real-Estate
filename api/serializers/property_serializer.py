@@ -285,19 +285,3 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
         )
 
 
-class DetailPropertySerializer(serializers.ModelSerializer):
-    """
-    This returns property
-    """
-    class Meta:
-        model = PropertyInfo
-        fields = (
-            "apartment_type",
-            "apartment_name",
-            "bhk_type",
-            "floor",
-            "total_floor",
-            "age",
-            "facing",
-            "property_size"
-        )
