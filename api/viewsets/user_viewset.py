@@ -15,6 +15,7 @@ from api.serializers.user_serializer import (
     ContactSerializer,
     OtpSerializer,
     UserLoginSerializer,
+    StaffDetailSerializer
 )
 from rest_framework.authtoken.models import Token
 from user.models import UserProfile, User, AgentDetail, Contact
@@ -31,7 +32,7 @@ from rest_framework.response import Response
 
 from api.serializers.user_serializer import AgentDetailSerializer, ChangePasswordSerializer, \
     UserSerializer, UserRegisterSerializer, ContactSerializer
-from user.models import UserProfile, User, AgentDetail, Contact
+from user.models import UserProfile, User, AgentDetail, Contact,StaffDetail
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -67,7 +68,27 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 
+
+class StaffDetailViewset(viewsets.ModelViewSet):
+    """
+    This view returns the list and creation of staff
+    """
+    queryset = StaffDetail.objects.all()
+    serializer_class = StaffDetailSerializer
+
+    def perform_create(self, serializer):
+        serializer = StaffDetailSerializer(data=self.request.data)
+        print("serialzer",serializer)
+        if serializer.is_valid():
+            print("hello eevrtone")
+            serializer.save()
+            return Response({"True"}, status=status.HTTP_201_CREATED)
+        return Response("serializer errors", status=status.HTTP_400_BAD_REQUEST)
+
+
 class UserLoginView(APIView):
+    """This view returns the login of user"""
+
     def post(self, request, format=None):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
