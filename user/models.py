@@ -102,19 +102,19 @@ class StaffDetail(CommonInfo):
         User, on_delete=models.CASCADE, related_name="staff_detail"
     )
     designation = models.CharField(
-        max_length=1, choices=DESIGNATION_CHOICES
+        max_length=1, choices=DESIGNATION_CHOICES,null=True,blank=True
     )
-    full_name = models.CharField(max_length=60, blank=True)
+    full_name = models.CharField(max_length=60,null=True)
 
-    email =  models.EmailField(max_length=254)
     gender = models.CharField(
-        max_length=1, choices=GENDER_CHOICES
+        max_length=1, choices=GENDER_CHOICES,null=True,blank=True
     )
-    phone_number = models.CharField(max_length=15, blank=True)
-    city = models.CharField(max_length=60, blank=True)
-    state = models.CharField(max_length=60, blank=True)
+    phone_number = models.CharField(max_length=15,null=True, blank=True)
+    address = models.CharField(max_length=60,null=True)
+    city = models.CharField(max_length=60,null=True, blank=True)
+    state = models.CharField(max_length=60,null=True, blank=True)
     information = models.CharField(
-        max_length=1, choices=INFORMATION_CHOICES
+        max_length=1, choices=INFORMATION_CHOICES,null=True,blank=True
     )
     identification_number = models.PositiveBigIntegerField(default=0)
     identification_image = models.ImageField(upload_to="user/staff", blank=True, null=True)
