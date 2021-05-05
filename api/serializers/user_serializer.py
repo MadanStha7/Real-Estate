@@ -1,23 +1,48 @@
 import uuid
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from user.models import AgentDetail, UserProfile, User, Contact
+from user.models import AgentDetail, UserProfile, User, Contact,StaffDetail
 from project.settings import EMAIL_HOST_USER
 from rest_framework.response import Response
 from django.core.mail import send_mail, EmailMessage
-
+from django.contrib.auth import authenticate
+from django.db import transaction
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True)
+    email = serializers.CharField(required=True)
+    password = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
+
     class Meta:
         model = User
-        fields = [
-            "id",
-            "username",
-            "first_name",
-            "last_name",
-            "is_staff",
-            "is_superuser",
-        ]
+        fields = ["id", "username","email", "password","password2"]
+
+    
+    def validate(self, attrs):
+        print(attrs, "===attrs")
+        if attrs["password"] != attrs["password2"]:
+            raise serializers.ValidationError(
+                {"password": "Password fields didn't match."}
+            )
+
+        return attrs
+
+    def validate_username(self, username):
+        print("username", username)
+        user_old = User.objects.filter(username=username).exists()
+        if user_old:
+            print('already')
+            raise serializers.ValidationError("User already exists")
+        return username
+
+    def validate_email(self, email):
+        email_old = User.objects.filter(email=email).exists()
+        if email_old:
+            raise serializers.ValidationError("Email already exists")
+        return email
+
+
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -45,6 +70,68 @@ class AgentDetailSerializer(serializers.ModelSerializer):
         ]
 
 
+class StaffDetailSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    designation_display = serializers.CharField(source="get_designation_display", read_only=True)
+    gender_display = serializers.CharField(source="get_gender_display", read_only=True)
+    information_display = serializers.CharField(source="get_information_display", read_only=True)
+    # identification_image = serializers.ImageField(required=False)
+
+    class Meta:
+        model = StaffDetail
+        fields = [
+            "id",
+            "user",
+            "designation",
+            "designation_display",
+            "gender",
+            "gender_display",
+            "information",
+            "information_display",
+            "full_name",
+            "phone_number",
+            "address",
+            "city",
+            "state",
+            "identification_number",
+        ]
+
+    @transaction.atomic
+    def create(self, validated_data):
+        # create user 
+        user = validated_data.pop("user")
+        users = User.objects.create_user(username = user['username'],email = user['email'],password= user['password'])
+        StaffDetail.objects.create(user_id=users.id,
+                                designation=validated_data['designation'],
+                                gender=validated_data['gender'],
+                                information=validated_data['information'],
+                                full_name=validated_data['full_name'],
+                                phone_number=validated_data['phone_number'],
+                                address=validated_data['address'],
+                                city=validated_data['city'],
+                                state=validated_data['state'],
+                                identification_number=validated_data['identification_number'],
+                                # identification_image=validated_data['identification_image'],
+
+                                )
+        return True
+
+
+    # def update(self, instance, validated_data):
+    #     # instance.user_id = validated_data.get('user', instance.user_id)
+    #     instance.designation = validated_data.get('designation', instance.designation)
+    #     instance.full_name = validated_data.get('full_name', instance.full_name)
+    #     instance.gender = validated_data.get('gender', instance.gender)
+    #     instance.phone_number = validated_data.get('phone_number', instance.phone_number)
+    #     instance.address = validated_data.get('address', instance.address)
+    #     instance.city = validated_data.get('city', instance.city)
+    #     instance.state = validated_data.get('state', instance.state)
+    #     instance.information = validated_data.get('information', instance.information)
+    #     instance.identification_number = validated_data.get('identification_number', instance.identification_number)
+    #     instance.identification_image = validated_data.get('identification_image', instance.identification_image)
+    #     instance.save()
+    #     return instance
+        
 class ChangePasswordSerializer(serializers.ModelSerializer):
     """
     This view returns when user change the password 
@@ -105,7 +192,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             "password2",
             "phone",
         )
-
+    @transaction.atomic
     def create(self, validated_data):
         username = validated_data.pop("username")
         email = validated_data.pop("email")

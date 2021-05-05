@@ -58,7 +58,8 @@ class PropertySerializer(serializers.ModelSerializer):
             "membership_plan",
             "condition_type",
             "description",
-            "created_on",
+            "price",
+            "created_on"
         )
 
 
@@ -285,5 +286,4 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             "price",
             "created_on"
         )
-
 

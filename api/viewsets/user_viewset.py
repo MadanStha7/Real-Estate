@@ -15,7 +15,9 @@ from api.serializers.user_serializer import (
     ContactSerializer,
     OtpSerializer,
     UserLoginSerializer,
+    StaffDetailSerializer
 )
+from rest_framework.authtoken.models import Token
 from user.models import UserProfile, User, AgentDetail, Contact
 from rest_framework.views import APIView
 from django.core.mail import send_mail, EmailMessage
@@ -23,6 +25,14 @@ from project.settings import EMAIL_HOST_USER
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
+from rest_framework import viewsets, generics, views, status
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.contrib.auth import authenticate
+from rest_framework.response import Response
+
+from api.serializers.user_serializer import AgentDetailSerializer, ChangePasswordSerializer, \
+    UserSerializer, UserRegisterSerializer, ContactSerializer
+from user.models import UserProfile, User, AgentDetail, Contact,StaffDetail
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -58,7 +68,27 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 
+
+class StaffDetailViewset(viewsets.ModelViewSet):
+    """
+    This view returns the list and creation of staff
+    """
+    queryset = StaffDetail.objects.all()
+    serializer_class = StaffDetailSerializer
+
+    def perform_create(self, serializer):
+        serializer = StaffDetailSerializer(data=self.request.data)
+        print("serialzer",serializer)
+        if serializer.is_valid():
+            print("hello eevrtone")
+            serializer.save()
+            return Response({"True"}, status=status.HTTP_201_CREATED)
+        return Response("serializer errors", status=status.HTTP_400_BAD_REQUEST)
+
+
 class UserLoginView(APIView):
+    """This view returns the login of user"""
+
     def post(self, request, format=None):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -72,24 +102,41 @@ class UserLoginView(APIView):
 
                 else:
                     get_user = User.objects.get(username=u_name)
-                    User.objects.get(username=b)
 
                 user = authenticate(username=u_name, password=pword)
 
+                try:
+                    token = Token.objects.get(user=user.id)
+                except:
+                    return Response(
+                        {"Invalid": "Unauthenticated user"},
+                        status=status.HTTP_404_NOT_FOUND,
+                    )
                 if user is not None:
                     if user.is_active:
-                        login(request, user)
-
-                        return Response(status=status.HTTP_200_OK)
+                        return Response(
+                            {
+                                "Success": "User successfully logged in.",
+                                'token': token.key,
+                                "id": user.id,
+                            },
+                            status=status.HTTP_200_OK,
+                        )
                     else:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                 else:
-                    return Response(status=status.HTTP_404_NOT_FOUND)
+                    return Response(
+                        "User doesnot exist", status=status.HTTP_404_NOT_FOUND
+                    )
 
             except:
                 return Response(
                     {"Invalid": "Invalid Credential"}, status=status.HTTP_404_NOT_FOUND
                 )
+        else:
+            return Response(
+                "Field is required", status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class RegisterView(generics.ListCreateAPIView):

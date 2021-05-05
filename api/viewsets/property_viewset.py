@@ -140,6 +140,10 @@ class ScheduleList(generics.ListCreateAPIView):
 
 
 class PropertyDetailsView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    This views returns detail of each property
+    """
+
     queryset = PropertyInfo.objects.all()
     serializer_class = PropertyDetailSerializer
 

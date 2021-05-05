@@ -81,7 +81,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "project.wsgi.application"
 
-
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    # "user.backends.EmailOrUsernameModelBackend",
+)
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
