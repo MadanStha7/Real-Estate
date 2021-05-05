@@ -282,6 +282,8 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             "condition_type",
             "membership_plan",
             "views",
+            "price",
+            "created_on"
         )
 
 
