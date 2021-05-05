@@ -282,22 +282,8 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             "condition_type",
             "membership_plan",
             "views",
+            "price",
+            "created_on"
         )
 
 
-class DetailPropertySerializer(serializers.ModelSerializer):
-    """
-    This returns property
-    """
-    class Meta:
-        model = PropertyInfo
-        fields = (
-            "apartment_type",
-            "apartment_name",
-            "bhk_type",
-            "floor",
-            "total_floor",
-            "age",
-            "facing",
-            "property_size"
-        )
