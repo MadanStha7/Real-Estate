@@ -382,3 +382,51 @@ class PropertyDiscussionBoard(CommonInfo):
     class Meta:
         verbose_name_plural = "Property Discussion Board"
         db_table = "property_discussionboard"
+
+
+class PropertyRequest(CommonInfo):
+    REQUEST_TYPE_CHOICES = (
+        ("B", "Buy"),
+        ("R", "Rent"),
+        ("S", "Sell"),
+    )
+    PROPERTY_TYPE_CHOICES = (
+        ("B", "House/Bungalow"),
+        ("F", "Flat & Apartment"),
+        ("C", "Commercial Property"),
+        ("L", "land"),
+        ("A", "Agricultural Land"),
+        ("O", "Office Space"),
+        ("S", "Shutter & Shop Space"),
+        ("R", "Restaurant for sale"),
+        ("H", "House in a Colony")
+    )
+    URGENT_CHOICES = (
+        ("V", "Very Urgent"),
+        ("W", "Within a few days"),
+        ("M", "Within a month"),
+        ("I", "In few months time")
+    )
+    name = models.CharField(max_length=32,
+                            blank=True, null=True)
+    phone = models.IntegerField(default=0)
+    email = models.EmailField(max_length=254)
+    request_type = models.CharField(
+        max_length=1, choices=REQUEST_TYPE_CHOICES)
+    property_type = models.CharField(
+        max_length=1, choices=PROPERTY_TYPE_CHOICES)
+    urgent = models.CharField(
+        max_length=1, choices=URGENT_CHOICES)
+    place = models.TextField()
+    price_range = models.TextField()
+    size = models.DecimalField(
+        default=0.00, decimal_places=4,
+        max_digits=10)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "Property Request"
+        db_table = "property_request"
