@@ -9,6 +9,7 @@ from property.models import (
     Schedule,
     Location,
     City,
+    PropertyRequest,
 )
 from user.models import UserProfile, AgentDetail
 
@@ -16,16 +17,14 @@ from user.models import UserProfile, AgentDetail
 class CitySerializer(serializers.ModelSerializer):
     class Meta:
         model = City
-        fields = (
-            "id",
-            "name"
-        )
+        fields = ("id", "name")
 
 
 class PropertySerializer(serializers.ModelSerializer):
     """
     return the property details in homepage
     """
+
     listing_type = serializers.CharField(required=False)
     membership_plan = serializers.CharField(required=False)
     condition_type = serializers.CharField(required=False)
@@ -64,7 +63,7 @@ class PropertySerializer(serializers.ModelSerializer):
 
 class PropertyListingSerializer(serializers.ModelSerializer):
     """
-    return propety listing
+    return property listing
     """
 
     locations = serializers.SlugRelatedField(read_only=True, slug_field="city")
@@ -96,6 +95,7 @@ class LocationSerializer(serializers.ModelSerializer):
     """
     Location of property info
     """
+
     city = CitySerializer(read_only=True)
 
     class Meta:
@@ -147,7 +147,7 @@ class AmenitiesSerializer(serializers.ModelSerializer):
             "non_veg_value",
             "security_value",
             "viewer_value",
-            "property_info"
+            "property_info",
         )
 
 
@@ -283,6 +283,41 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             "membership_plan",
             "views",
             "price",
-            "created_on"
+            "created_on",
         )
 
+
+class DetailPropertySerializer(serializers.ModelSerializer):
+    """
+    This returns property
+    """
+
+    class Meta:
+        model = PropertyInfo
+        fields = (
+            "apartment_type",
+            "apartment_name",
+            "bhk_type",
+            "floor",
+            "total_floor",
+            "age",
+            "facing",
+            "property_size",
+        )
+
+
+class PropertyRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyRequest
+        fields = (
+            "name",
+            "phone",
+            "email",
+            "request_type",
+            "property_type",
+            "urgent",
+            "place",
+            "price_range",
+            "size",
+            "description",
+        )

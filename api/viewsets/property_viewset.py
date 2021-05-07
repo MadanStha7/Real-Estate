@@ -19,6 +19,7 @@ from property.models import (
     Schedule,
     City,
     Location,
+    PropertyRequest,
 )
 from api.serializers.property_serializer import (
     PropertySerializer,
@@ -32,6 +33,8 @@ from api.serializers.property_serializer import (
     PropertyDetailSerializer,
     CitySerializer,
     PropertyListingSerializer,
+    DetailPropertySerializer,
+    PropertyRequestSerializer,
 )
 
 
@@ -42,7 +45,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
 class PropertyList(generics.ListAPIView):
     """
-    This views returns listing of porperty in homepage
+    This views returns listing of property in homepage
     """
 
     serializer_class = PropertyDetailSerializer
@@ -197,3 +200,9 @@ class PropertyFilterView(viewsets.ModelViewSet):
         else:
             pass
         return super().get_queryset()
+    serializer_class = DetailPropertySerializer
+
+
+class PropertyRequestViewSet(viewsets.ModelViewSet):
+    queryset = PropertyRequest.objects.all()
+    serializer_class = PropertyRequestSerializer
