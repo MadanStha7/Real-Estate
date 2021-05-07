@@ -80,6 +80,7 @@ class UserLoginView(APIView):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
+
             try:
                 u_name = data.get("username_or_email", None)
                 pword = data.get("password", None)
