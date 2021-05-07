@@ -159,7 +159,11 @@ class CityListView(generics.ListAPIView):
     serializer_class = CitySerializer
 
 
-class DetailPropertyView(generics.ListCreateAPIView):
+class PropertyFilterView(viewsets.ModelViewSet):
+    """
+    This views returns filtered property
+    """
+
     queryset = PropertyInfo.objects.all()
     serializer_class = DetailPropertySerializer
 

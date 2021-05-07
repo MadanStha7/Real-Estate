@@ -126,6 +126,7 @@ class PropertyInfo(CommonInfo):
     )  # property age
     facing = models.CharField(max_length=2, choices=FACING_CHOICES)
     property_size = models.FloatField(default=0.00)  # size in sq.m
+    price = models.FloatField(default=0.00)
     owner = models.ForeignKey(
         UserProfile,
         related_name="userprofile",
