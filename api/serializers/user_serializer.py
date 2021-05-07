@@ -19,28 +19,28 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["id", "username","email", "password","password2"]
 
     
-    def validate(self, attrs):
-        print(attrs, "===attrs")
-        if attrs["password"] != attrs["password2"]:
-            raise serializers.ValidationError(
-                {"password": "Password fields didn't match."}
-            )
+    # def validate(self, attrs):
+    #     print(attrs, "===attrs")
+    #     if attrs["password"] != attrs["password2"]:
+    #         raise serializers.ValidationError(
+    #             {"password": "Password fields didn't match."}
+    #         )
 
-        return attrs
+    #     return attrs
 
-    def validate_username(self, username):
-        print("username", username)
-        user_old = User.objects.filter(username=username).exists()
-        if user_old:
-            print('already')
-            raise serializers.ValidationError("User already exists")
-        return username
+    # def validate_username(self, username):
+    #     print("username", username)
+    #     user_old = User.objects.filter(username=username).exists()
+    #     if user_old:
+    #         print('already')
+    #         raise serializers.ValidationError("User already exists")
+    #     return username
 
-    def validate_email(self, email):
-        email_old = User.objects.filter(email=email).exists()
-        if email_old:
-            raise serializers.ValidationError("Email already exists")
-        return email
+    # def validate_email(self, email):
+    #     email_old = User.objects.filter(email=email).exists()
+    #     if email_old:
+    #         raise serializers.ValidationError("Email already exists")
+    #     return email
 
 
 
@@ -174,8 +174,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     created when user register
     """
 
-    full_name = serializers.CharField(write_only=True, required=False)
-    username = serializers.CharField(write_only=True, required=True)
+    full_name = serializers.CharField(write_only=True, required=True)
     email = serializers.CharField(write_only=True, required=True)
     phone = serializers.CharField(write_only=True, required=True)
     password = serializers.CharField(write_only=True)
@@ -187,14 +186,13 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             "id",
             "full_name",
             "email",
-            "username",
             "password",
             "password2",
             "phone",
         )
     @transaction.atomic
     def create(self, validated_data):
-        username = validated_data.pop("username")
+        full_name = validated_data.pop("full_name")
         email = validated_data.pop("email")
         phone = validated_data.pop("phone")
         password = validated_data.pop("password")
@@ -209,7 +207,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             [EMAIL_HOST_USER],
             fail_silently=False,
         )
-        user = User.objects.create_user(username=username, email=email, password=password
+        user = User.objects.create_user(username=None, email=email, password=password
                                         )
         UserProfile.objects.create(user_id=user.id, otp_code=ran_num_upper)
         return user
@@ -223,13 +221,13 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
         return attrs
 
-    def validate_username(self, username):
-        print("username", username)
-        user_old = User.objects.filter(username=username).exists()
-        if user_old:
-            print('already')
-            raise serializers.ValidationError("User already exists")
-        return username
+    # def validate_username(self, username):
+    #     print("username", username)
+    #     user_old = User.objects.filter(username=username).exists()
+    #     if user_old:
+    #         print('already')
+    #         raise serializers.ValidationError("User already exists")
+    #     return username
 
     def validate_email(self, email):
         email_old = User.objects.filter(email=email).exists()
