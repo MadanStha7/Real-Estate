@@ -15,85 +15,257 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Contact',
+            name="Contact",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=60, null=True)),
-                ('email', models.EmailField(max_length=254)),
-                ('phone', models.CharField(max_length=20)),
-                ('message', models.TextField()),
-                ('date', models.DateField(auto_now=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=60, null=True)),
+                ("email", models.EmailField(max_length=254)),
+                ("phone", models.CharField(max_length=20)),
+                ("message", models.TextField()),
+                ("date", models.DateField(auto_now=True)),
             ],
             options={
-                'verbose_name_plural': 'Contact us',
-                'ordering': ['-id'],
+                "verbose_name_plural": "Contact us",
+                "ordering": ["-id"],
             },
         ),
         migrations.CreateModel(
-            name='UserProfile',
+            name="UserProfile",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Created at')),
-                ('modified_on', models.DateTimeField(auto_now=True, db_index=True, verbose_name='Last modified at')),
-                ('full_name', models.CharField(blank=True, max_length=60)),
-                ('profile_picture', models.ImageField(blank=True, null=True, upload_to='user/buyerseller')),
-                ('phone_number', models.CharField(blank=True, max_length=15)),
-                ('address', models.TextField(blank=True)),
-                ('added_at', models.DateTimeField(auto_now_add=True)),
-                ('otp_code', models.CharField(blank=True, max_length=6, null=True)),
-                ('count', models.PositiveBigIntegerField(default=0)),
-                ('is_email', models.BooleanField(default=False)),
-                ('is_phone', models.BooleanField(default=False)),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='user_userprofile_created', to=settings.AUTH_USER_MODEL, verbose_name='Created by')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='buyer_seller_profile', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_on",
+                    models.DateTimeField(
+                        auto_now_add=True, db_index=True, verbose_name="Created at"
+                    ),
+                ),
+                (
+                    "modified_on",
+                    models.DateTimeField(
+                        auto_now=True, db_index=True, verbose_name="Last modified at"
+                    ),
+                ),
+                ("full_name", models.CharField(blank=True, max_length=60)),
+                (
+                    "profile_picture",
+                    models.ImageField(
+                        blank=True, null=True, upload_to="user/buyerseller"
+                    ),
+                ),
+                ("phone_number", models.CharField(blank=True, max_length=15)),
+                ("address", models.TextField(blank=True)),
+                ("added_at", models.DateTimeField(auto_now_add=True)),
+                ("otp_code", models.CharField(blank=True, max_length=6, null=True)),
+                ("count", models.PositiveBigIntegerField(default=0)),
+                ("is_email", models.BooleanField(default=False)),
+                ("is_phone", models.BooleanField(default=False)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="user_userprofile_created",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Created by",
+                    ),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="buyer_seller_profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'db_table': 'Buyer/Seller',
-                'ordering': ['-added_at'],
+                "db_table": "Buyer/Seller",
+                "ordering": ["-added_at"],
             },
         ),
         migrations.CreateModel(
-            name='StaffDetail',
+            name="StaffDetail",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Created at')),
-                ('modified_on', models.DateTimeField(auto_now=True, db_index=True, verbose_name='Last modified at')),
-                ('designation', models.CharField(blank=True, choices=[('F', 'Field Manager'), ('E', 'Engineer'), ('C', 'Cameraman')], max_length=1, null=True)),
-                ('full_name', models.CharField(max_length=60, null=True)),
-                ('gender', models.CharField(blank=True, choices=[('M', 'Male'), ('F', 'Female'), ('O', 'Other')], max_length=1, null=True)),
-                ('phone_number', models.CharField(blank=True, max_length=15, null=True)),
-                ('address', models.CharField(blank=True, max_length=60, null=True)),
-                ('state', models.CharField(blank=True, max_length=60, null=True)),
-                ('information', models.CharField(blank=True, choices=[('C', 'Citizenship'), ('P', 'Passport'), ('D', 'Driving license'), ('O', 'Other')], max_length=1, null=True)),
-                ('identification_number', models.PositiveBigIntegerField(default=0)),
-                ('identification_image', models.ImageField(blank=True, null=True, upload_to='user/staff')),
-                ('added_at', models.DateTimeField(auto_now_add=True)),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='user_staffdetail_created', to=settings.AUTH_USER_MODEL, verbose_name='Created by')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='staff_detail', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_on",
+                    models.DateTimeField(
+                        auto_now_add=True, db_index=True, verbose_name="Created at"
+                    ),
+                ),
+                (
+                    "modified_on",
+                    models.DateTimeField(
+                        auto_now=True, db_index=True, verbose_name="Last modified at"
+                    ),
+                ),
+                (
+                    "designation",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("F", "Field Manager"),
+                            ("E", "Engineer"),
+                            ("C", "Cameraman"),
+                        ],
+                        max_length=1,
+                        null=True,
+                    ),
+                ),
+                ("full_name", models.CharField(max_length=60, null=True)),
+                (
+                    "gender",
+                    models.CharField(
+                        blank=True,
+                        choices=[("M", "Male"), ("F", "Female"), ("O", "Other")],
+                        max_length=1,
+                        null=True,
+                    ),
+                ),
+                (
+                    "phone_number",
+                    models.CharField(blank=True, max_length=15, null=True),
+                ),
+                ("address", models.CharField(blank=True, max_length=60, null=True)),
+                ("state", models.CharField(blank=True, max_length=60, null=True)),
+                (
+                    "information",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("C", "Citizenship"),
+                            ("P", "Passport"),
+                            ("D", "Driving license"),
+                            ("O", "Other"),
+                        ],
+                        max_length=1,
+                        null=True,
+                    ),
+                ),
+                ("identification_number", models.PositiveBigIntegerField(default=0)),
+                (
+                    "identification_image",
+                    models.ImageField(blank=True, null=True, upload_to="user/staff"),
+                ),
+                ("added_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="user_staffdetail_created",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Created by",
+                    ),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="staff_detail",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'db_table': 'staff_detail',
-                'ordering': ['-id'],
+                "db_table": "staff_detail",
+                "ordering": ["-id"],
             },
         ),
         migrations.CreateModel(
-            name='AgentDetail',
+            name="AgentDetail",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Created at')),
-                ('modified_on', models.DateTimeField(auto_now=True, db_index=True, verbose_name='Last modified at')),
-                ('location', models.TextField()),
-                ('identification_type', models.CharField(choices=[('citizenship', 'Citizenship'), ('driving-license', 'Driving License'), ('others', 'Others')], max_length=20)),
-                ('identification_number', models.CharField(max_length=20)),
-                ('identification_file', models.FileField(blank=True, null=True, upload_to='agent/identification')),
-                ('accept_terms_and_condition', models.BooleanField(default=False)),
-                ('added_at', models.DateTimeField(auto_now_add=True)),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='user_agentdetail_created', to=settings.AUTH_USER_MODEL, verbose_name='Created by')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='agent_detail', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_on",
+                    models.DateTimeField(
+                        auto_now_add=True, db_index=True, verbose_name="Created at"
+                    ),
+                ),
+                (
+                    "modified_on",
+                    models.DateTimeField(
+                        auto_now=True, db_index=True, verbose_name="Last modified at"
+                    ),
+                ),
+                ("location", models.TextField()),
+                (
+                    "identification_type",
+                    models.CharField(
+                        choices=[
+                            ("citizenship", "Citizenship"),
+                            ("driving-license", "Driving License"),
+                            ("others", "Others"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("identification_number", models.CharField(max_length=20)),
+                (
+                    "identification_file",
+                    models.FileField(
+                        blank=True, null=True, upload_to="agent/identification"
+                    ),
+                ),
+                ("accept_terms_and_condition", models.BooleanField(default=False)),
+                ("added_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="user_agentdetail_created",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Created by",
+                    ),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="agent_detail",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'db_table': 'agent_detail',
-                'ordering': ['-added_at'],
+                "db_table": "agent_detail",
+                "ordering": ["-added_at"],
             },
         ),
     ]

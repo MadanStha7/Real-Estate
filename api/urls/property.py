@@ -55,6 +55,7 @@ urlpatterns = [
         PropertyFeatured.as_view(),
         name="property_featured",
     ),
+    path("detail-property/", DetailPropertyView.as_view(), name="detail-property"),
     # search
     path("locations/", PropertySearchView.as_view(), name="search_property"),
     path("city/", CityListView.as_view(), name="city"),

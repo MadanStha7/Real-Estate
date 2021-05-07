@@ -1,4 +1,12 @@
 from django.contrib import admin
-from .models import *
+from user.models import AgentDetail, UserProfile, StaffDetail, Contact
+
 # Register your models here.
-admin.site.register([AgentDetail,UserProfile,StaffDetail,Contact])
+admin.site.register(
+    [
+        AgentDetail,
+        UserProfile,
+        StaffDetail,
+        Contact,
+    ]
+)
