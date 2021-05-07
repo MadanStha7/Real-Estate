@@ -1,7 +1,7 @@
 import uuid
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from user.models import AgentDetail, UserProfile, User, Contact, StaffDetail
+from user.models import AgentDetail, UserProfile, Contact, StaffDetail
 from project.settings import EMAIL_HOST_USER
 from rest_framework.response import Response
 from django.core.mail import send_mail, EmailMessage
@@ -30,7 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
         if email_old:
             raise serializers.ValidationError("Email already exists")
         return email
-    
+
     def validate(self, attrs):
         if attrs["password"] != attrs["password2"]:
             raise serializers.ValidationError(
@@ -82,8 +82,6 @@ class StaffDetailSerializer(serializers.ModelSerializer):
             "state",
             "identification_number",
         ]
-
-    
 
     @transaction.atomic
     def create(self, validated_data):
@@ -202,23 +200,22 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user_data = validated_data.pop("user")
         user = instance.user
-        #UserProfile model
-        instance.full_name = validated_data.get('full_name', instance.full_name)
-        instance.profile_picture = validated_data.get('profile_picture', instance.profile_picture)
-        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
-        instance.address = validated_data.get('profile_picture', instance.address)
-        instance.save()
-        #User model
-        user.email = user_data.get(
-            'email',
-            user.email
+        # UserProfile model
+        instance.full_name = validated_data.get("full_name", instance.full_name)
+        instance.profile_picture = validated_data.get(
+            "profile_picture", instance.profile_picture
         )
-        user.username = user_data.get(
-            'username',
-            user.username
-         )
+        instance.phone_number = validated_data.get(
+            "phone_number", instance.phone_number
+        )
+        instance.address = validated_data.get("profile_picture", instance.address)
+        instance.save()
+        # User model
+        user.email = user_data.get("email", user.email)
+        user.username = user_data.get("username", user.username)
         user.save()
         return instance
+
 
 class UserLoginSerializer(serializers.Serializer):
     username_or_email = serializers.CharField(

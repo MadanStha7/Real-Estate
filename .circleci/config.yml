@@ -5,7 +5,7 @@ version: 2.1
 # GIT_TOKEN                   ## Token from github. see: https://github.com/settings/tokens
 # CIRCLE_PROJECT_USERNAME     ## CircleCI default env-variable. see: https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
 # CIRCLE_PROJECT_REPONAME     ## CircleCI default env-variable. see: https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
-# SERVER_IP                   ## IP Address of Server to deploy. 
+# SERVER_IP                   ## IP Address of Server to deploy.
 # SSH_USER                    ## User in server that executes deployment commands. default: cicduser
 
 orbs:
@@ -57,7 +57,7 @@ jobs:
             python3 manage.py test > /tmp/test_result
 
       - store_test_results:     #Tests needs some work.
-          path: /tmp/test_result      
+          path: /tmp/test_result
 
       - run:
           name: Test Collect Static & Migrations
@@ -69,7 +69,7 @@ jobs:
       - slack/status:
           fail_only: true
           only_for_branches: master, production
-          webhook: $SLACK_WEBHOOK      
+          webhook: $SLACK_WEBHOOK
   build:
     working_directory: ~/project
     docker:
@@ -83,7 +83,7 @@ jobs:
             apt update && apt install -y docker.io
       - setup_remote_docker:
           version: 19.03.13
-      - run: 
+      - run:
           name: Docker Login
           command: |
             docker login -u $GIT_USER -p $GIT_TOKEN docker.pkg.github.com # Login to github package repository, build & push image.
@@ -109,7 +109,7 @@ jobs:
       - run:
           name: Install CURL
           command: apt update && apt install -y curl
-      - slack/notify:   # Used to push notification to Slack channel. Needs more of these. 
+      - slack/notify:   # Used to push notification to Slack channel. Needs more of these.
           color: '#42e2f4'
           message: $CIRCLE_PROJECT_REPONAME Deployment Successful on $SERVER_139
           webhook: $SLACK_WEBHOOK

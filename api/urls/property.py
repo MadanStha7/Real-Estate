@@ -4,13 +4,6 @@ from property.models import Schedule
 from api.viewsets.property_viewset import ScheduleList
 
 from api.viewsets.property_viewset import (
-    PropertyViewSet,
-    FieldVisitViewSet,
-    PropertyDiscussionViewSet,
-    RentalViewSet,
-    GalleryViewSet,
-    AmentitesViewSet,
-    ScheduleViewSet,
     LocationViewSet,
     PropertyDetailsView,
     PropertyViewSet,
@@ -23,10 +16,10 @@ from api.viewsets.property_viewset import (
     PropertyList,
     PropertyTop,
     PropertyPremium,
-    PropertyFeatured,    
+    PropertyFeatured,
     PropertySearchView,
     CityListView,
-    DetailPropertyView
+    DetailPropertyView,
 )
 
 
@@ -44,18 +37,22 @@ router.register(r"schedule", ScheduleViewSet)
 urlpatterns = [
     path("", include(router.urls)),
     path("property-list/", PropertyList.as_view(), name="list_property"),
-    path("property-detail/<int:pk>/", PropertyDetailsView.as_view(), name="property_detail"),
-
+    path(
+        "property-detail/<int:pk>/",
+        PropertyDetailsView.as_view(),
+        name="property_detail",
+    ),
     path("property-category/top/", PropertyTop.as_view(), name="property_top"),
     path(
         "property-category/premium/", PropertyPremium.as_view(), name="property_premium"
     ),
     path(
-        "property-category/featured/", PropertyFeatured.as_view(), name="property_featured",
+        "property-category/featured/",
+        PropertyFeatured.as_view(),
+        name="property_featured",
     ),
-    path('detail-property/', DetailPropertyView.as_view(), name="detail-property"),
+    path("detail-property/", DetailPropertyView.as_view(), name="detail-property"),
     # search
-    path('locations/', PropertySearchView.as_view(), name="search_property"),
-    path('city/', CityListView.as_view(), name="city"),
-
+    path("locations/", PropertySearchView.as_view(), name="search_property"),
+    path("city/", CityListView.as_view(), name="city"),
 ]
