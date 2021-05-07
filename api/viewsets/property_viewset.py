@@ -19,7 +19,7 @@ from property.models import (
     Schedule,
     City,
     Location,
-    PropertyRequest
+    PropertyRequest,
 )
 from api.serializers.property_serializer import (
     PropertySerializer,
@@ -34,7 +34,7 @@ from api.serializers.property_serializer import (
     CitySerializer,
     PropertyListingSerializer,
     DetailPropertySerializer,
-    PropertyRequestSerializer
+    PropertyRequestSerializer,
 )
 
 
@@ -45,7 +45,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
 class PropertyList(generics.ListAPIView):
     """
-    This views returns listing of porperty in homepage
+    This views returns listing of property in homepage
     """
 
     serializer_class = PropertyDetailSerializer
@@ -151,7 +151,7 @@ class PropertySearchView(generics.ListAPIView):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['city', "locality"]
+    filterset_fields = ["city", "locality"]
 
 
 class CityListView(generics.ListAPIView):

@@ -77,7 +77,7 @@ class PropertyInfo(CommonInfo):
         ("D", "Don't Know"),
     )
     PROPERTY_TYPE_CHOICES = (
-        ("R", "Residental"),
+        ("R", "Residential"),
         ("C", "Commercial"),
     )
     PROPERTYAD_TYPE_CHOICES = (
@@ -399,29 +399,23 @@ class PropertyRequest(CommonInfo):
         ("O", "Office Space"),
         ("S", "Shutter & Shop Space"),
         ("R", "Restaurant for sale"),
-        ("H", "House in a Colony")
+        ("H", "House in a Colony"),
     )
     URGENT_CHOICES = (
         ("V", "Very Urgent"),
         ("W", "Within a few days"),
         ("M", "Within a month"),
-        ("I", "In few months time")
+        ("I", "In few months time"),
     )
-    name = models.CharField(max_length=32,
-                            blank=True, null=True)
+    name = models.CharField(max_length=32, blank=True, null=True)
     phone = models.IntegerField(default=0)
     email = models.EmailField(max_length=254)
-    request_type = models.CharField(
-        max_length=1, choices=REQUEST_TYPE_CHOICES)
-    property_type = models.CharField(
-        max_length=1, choices=PROPERTY_TYPE_CHOICES)
-    urgent = models.CharField(
-        max_length=1, choices=URGENT_CHOICES)
+    request_type = models.CharField(max_length=1, choices=REQUEST_TYPE_CHOICES)
+    property_type = models.CharField(max_length=1, choices=PROPERTY_TYPE_CHOICES)
+    urgent = models.CharField(max_length=1, choices=URGENT_CHOICES)
     place = models.TextField()
     price_range = models.TextField()
-    size = models.DecimalField(
-        default=0.00, decimal_places=4,
-        max_digits=10)
+    size = models.DecimalField(default=0.00, decimal_places=4, max_digits=10)
     description = models.TextField()
 
     def __str__(self):
