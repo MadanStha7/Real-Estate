@@ -9,6 +9,7 @@ from property.models import (
     Schedule,
     Location,
     City,
+    PropertyRequest
 )
 from user.models import UserProfile, AgentDetail
 
@@ -300,4 +301,21 @@ class DetailPropertySerializer(serializers.ModelSerializer):
             "age",
             "facing",
             "property_size"
+        )
+
+
+class PropertyRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyRequest
+        fields = (
+            "name",
+            "phone",
+            "email",
+            "request_type",
+            "property_type",
+            "urgent",
+            "place",
+            "price_range",
+            "size",
+            "description"
         )

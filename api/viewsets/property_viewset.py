@@ -19,6 +19,7 @@ from property.models import (
     Schedule,
     City,
     Location,
+    PropertyRequest
 )
 from api.serializers.property_serializer import (
     PropertySerializer,
@@ -32,7 +33,8 @@ from api.serializers.property_serializer import (
     PropertyDetailSerializer,
     CitySerializer,
     PropertyListingSerializer,
-    DetailPropertySerializer
+    DetailPropertySerializer,
+    PropertyRequestSerializer
 )
 
 
@@ -160,3 +162,8 @@ class CityListView(generics.ListAPIView):
 class DetailPropertyView(generics.ListCreateAPIView):
     queryset = PropertyInfo.objects.all()
     serializer_class = DetailPropertySerializer
+
+
+class PropertyRequestViewSet(viewsets.ModelViewSet):
+    queryset = PropertyRequest.objects.all()
+    serializer_class = PropertyRequestSerializer
