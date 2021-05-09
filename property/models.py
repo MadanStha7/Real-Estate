@@ -409,7 +409,7 @@ class PropertyRequest(CommonInfo):
         ("I", "In few months time"),
     )
     name = models.CharField(max_length=32, blank=True, null=True)
-    phone = models.IntegerField(default=0)
+    phone = models.CharField(max_length=15)
     email = models.EmailField(max_length=254)
     request_type = models.CharField(max_length=1, choices=REQUEST_TYPE_CHOICES)
     property_type = models.CharField(max_length=1, choices=PROPERTY_TYPE_CHOICES)

@@ -200,7 +200,6 @@ class PropertyFilterView(viewsets.ModelViewSet):
         else:
             pass
         return super().get_queryset()
-    serializer_class = DetailPropertySerializer
 
 
 class PropertyRequestViewSet(viewsets.ModelViewSet):
