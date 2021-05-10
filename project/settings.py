@@ -82,7 +82,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "project.wsgi.application"
 
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
+    "django.contrib.auth.backends.ModelBackend",
     # "user.backends.EmailOrUsernameModelBackend",
 )
 
@@ -140,7 +140,7 @@ REST_FRAMEWORK = {
 }
 
 
-# allwo all incoming domain
+# allow all incoming domain
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_METHODS = [
