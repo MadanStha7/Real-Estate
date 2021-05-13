@@ -16,6 +16,6 @@ admin.site.register(
         FieldVisit,
         PropertyDiscussionBoard,
         Schedule,
-        PropertyRequest
+        PropertyRequest,
     ]
 )
