@@ -143,6 +143,10 @@ class ScheduleList(generics.ListCreateAPIView):
 
 
 class PropertyDetailsView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    This views returns detail of each property
+    """
+
     queryset = PropertyInfo.objects.all()
     serializer_class = PropertyDetailSerializer
 
@@ -154,7 +158,7 @@ class PropertySearchView(generics.ListAPIView):
     filterset_fields = ["city", "locality"]
 
 
-class CityListView(generics.ListAPIView):
+class CityListView(generics.ListCreateAPIView):
     queryset = City.objects.all()
     serializer_class = CitySerializer
 
@@ -165,7 +169,37 @@ class PropertyFilterView(viewsets.ModelViewSet):
     """
 
     queryset = PropertyInfo.objects.all()
-    serializer_class = DetailPropertySerializer
+    serializer_class = PropertyDetailSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    ordering_fields = ["price", "created_on"]
+    search_fields = ["city", "bhk_type", "facing", "property_size", "property_adtype"]
+
+    def get_queryset(self):
+        verified_property = PropertyInfo.objects.filter(publish=True)
+        city = self.request.query_params.get("city", None)
+        bhk_type = self.request.query_params.get("bhk_type", None)
+        facing = self.request.query_params.get("facing", None)
+        property_size = self.request.query_params.get("property_size", None)
+        property_adtype = self.request.query_params.get("property_adtype", None)
+        if city:
+            queryset = verified_property.filter(city__name=city)
+            return queryset
+        if bhk_type:
+            queryset = verified_property.filter(bhk_type=bhk_type)
+            return queryset
+        elif facing:
+            queryset = verified_property.filter(facing=facing)
+            return queryset
+        elif property_size:
+            queryset = verified_property.filter(property_size=property_size)
+            return queryset
+        elif property_adtype:
+            queryset = verified_property.filter(property_adtype=property_adtype)
+            return queryset
+
+        else:
+            pass
+        return super().get_queryset()
 
 
 class DetailPropertyView(generics.ListCreateAPIView):
