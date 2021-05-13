@@ -2,7 +2,7 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
 from django.contrib.postgres.fields import ArrayField
 from common.models import CommonInfo
-from user.models import UserProfile, AgentDetail, StaffDetail
+from user.models import AdminProfile, UserProfile, AgentDetail, StaffDetail
 
 
 class City(CommonInfo):
@@ -144,6 +144,13 @@ class PropertyInfo(CommonInfo):
     staff = models.ForeignKey(
         StaffDetail,
         related_name="staffdetail",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    admin = models.ForeignKey(
+        AdminProfile,
+        related_name="admin_profile",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
@@ -409,7 +416,7 @@ class PropertyRequest(CommonInfo):
         ("I", "In few months time"),
     )
     name = models.CharField(max_length=32, blank=True, null=True)
-    phone = models.IntegerField(default=0)
+    phone = models.CharField(max_length=15)
     email = models.EmailField(max_length=254)
     request_type = models.CharField(max_length=1, choices=REQUEST_TYPE_CHOICES)
     property_type = models.CharField(max_length=1, choices=PROPERTY_TYPE_CHOICES)
