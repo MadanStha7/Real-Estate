@@ -30,6 +30,7 @@ class AgentDetail(CommonInfo):
     )
     accept_terms_and_condition = models.BooleanField(default=False)
     added_at = models.DateTimeField(auto_now_add=True)
+    is_verified = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         group, created = Group.objects.get_or_create(name="Agent")
@@ -102,22 +103,23 @@ class StaffDetail(CommonInfo):
         User, on_delete=models.CASCADE, related_name="staff_detail"
     )
     designation = models.CharField(
-        max_length=1, choices=DESIGNATION_CHOICES,null=True,blank=True
+        max_length=1, choices=DESIGNATION_CHOICES, null=True, blank=True
     )
-    full_name = models.CharField(max_length=60,null=True)
+    full_name = models.CharField(max_length=60, null=True)
 
     gender = models.CharField(
-        max_length=1, choices=GENDER_CHOICES,null=True,blank=True
+        max_length=1, choices=GENDER_CHOICES, null=True, blank=True
     )
-    phone_number = models.CharField(max_length=15,null=True, blank=True)
-    address = models.CharField(max_length=60,null=True)
-    city = models.CharField(max_length=60,null=True, blank=True)
-    state = models.CharField(max_length=60,null=True, blank=True)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    address = models.CharField(max_length=60, null=True)
+    city = models.CharField(max_length=60, null=True, blank=True)
+    state = models.CharField(max_length=60, null=True, blank=True)
     information = models.CharField(
-        max_length=1, choices=INFORMATION_CHOICES,null=True,blank=True
+        max_length=1, choices=INFORMATION_CHOICES, null=True, blank=True
     )
     identification_number = models.PositiveBigIntegerField(default=0)
-    identification_image = models.ImageField(upload_to="user/staff", blank=True, null=True)
+    identification_image = models.ImageField(
+        upload_to="user/staff", blank=True, null=True)
     added_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
@@ -131,6 +133,25 @@ class StaffDetail(CommonInfo):
     class Meta:
         ordering = ["-id"]
         db_table = "staff_detail"
+
+
+class AdminProfile(CommonInfo):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="admin")
+    full_name = models.CharField(max_length=20)
+    image = models.ImageField(upload_to="user/admin", blank=True, null=True)
+    phone = models.CharField(max_length=15, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user}"
+
+    def save(self, *args, **kwargs):
+        group, created = Group.objects.get_or_create(name="Admin")
+        self.user.groups.add(group)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ["-id"]
+        db_table = "admin_profile"
 
 
 class Contact(models.Model):

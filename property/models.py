@@ -2,7 +2,7 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
 from django.contrib.postgres.fields import ArrayField
 from common.models import CommonInfo
-from user.models import UserProfile, AgentDetail, StaffDetail
+from user.models import AdminProfile, UserProfile, AgentDetail, StaffDetail
 
 
 class City(CommonInfo):
@@ -148,6 +148,13 @@ class PropertyInfo(CommonInfo):
         blank=True,
         null=True,
     )
+    admin = models.ForeignKey(
+        AdminProfile,
+        related_name='admin_profile',
+        on_delete=models.CASCADE, 
+        blank=True, 
+        null=True,
+        )
 
     # displaying the exact location using map
     location = models.PointField(null=True, blank=True)

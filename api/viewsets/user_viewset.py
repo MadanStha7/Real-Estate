@@ -1,10 +1,6 @@
 import random
 import uuid
-from rest_framework import viewsets, generics
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
 from rest_framework.renderers import JSONRenderer
-from django.contrib.auth import authenticate
 from django.contrib.auth import login, authenticate, logout
 from api.serializers.user_serializer import (
     UserProfileSerializer,
@@ -15,10 +11,11 @@ from api.serializers.user_serializer import (
     ContactSerializer,
     OtpSerializer,
     UserLoginSerializer,
-    StaffDetailSerializer
+    StaffDetailSerializer,
+    AdminProfileSerializer
 )
 from rest_framework.authtoken.models import Token
-from user.models import UserProfile, User, AgentDetail, Contact
+from user.models import UserProfile, User, AgentDetail, Contact, AdminProfile
 from rest_framework.views import APIView
 from django.core.mail import send_mail, EmailMessage
 from project.settings import EMAIL_HOST_USER
@@ -27,12 +24,6 @@ from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
 from rest_framework import viewsets, generics, views, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.contrib.auth import authenticate
-from rest_framework.response import Response
-
-from api.serializers.user_serializer import AgentDetailSerializer, ChangePasswordSerializer, \
-    UserSerializer, UserRegisterSerializer, ContactSerializer
-from user.models import UserProfile, User, AgentDetail, Contact,StaffDetail
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -42,6 +33,11 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+
+
+class AdminViewSet(viewsets.ModelViewSet):
+    queryset = AdminProfile.objects.all()
+    serializer_class = AdminProfileSerializer
 
 
 class AgentDetailViewSet(viewsets.ModelViewSet):
@@ -68,7 +64,6 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 
-
 class StaffDetailViewset(viewsets.ModelViewSet):
     """
     This view returns the list and creation of staff
@@ -78,7 +73,7 @@ class StaffDetailViewset(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer = StaffDetailSerializer(data=self.request.data)
-        print("serialzer",serializer)
+        print("serialzer", serializer)
         if serializer.is_valid():
             print("hello eevrtone")
             serializer.save()
