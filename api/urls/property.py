@@ -21,6 +21,7 @@ from api.viewsets.property_viewset import (
     CityListView,
     PropertyRequestViewSet,
     PropertyFilterView,
+    DetailPropertyView
 )
 
 
