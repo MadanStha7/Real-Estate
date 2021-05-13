@@ -1,12 +1,24 @@
 import uuid
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from user.models import AgentDetail, UserProfile, Contact, StaffDetail
+from user.models import (
+    AgentDetail,
+    UserProfile,
+    Contact,
+    StaffDetail,
+    AdminProfile,
+)
 from project.settings import EMAIL_HOST_USER
 from rest_framework.response import Response
 from django.core.mail import send_mail, EmailMessage
 from django.contrib.auth import authenticate
 from django.db import transaction
+
+
+class AdminProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdminProfile
+        fields = ["id", "user", "full_name", "image", "phone"]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -165,10 +177,9 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserSerializer(write_only=True)
 
     class Meta:
-        read_only_fields = ["user.username"]
         model = UserProfile
         fields = ("id", "full_name", "user", "phone_number", "address")
 
