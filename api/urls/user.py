@@ -10,11 +10,13 @@ from api.viewsets.user_viewset import (
     OtpVerify,
     UserLoginView,
     StaffDetailViewset,
+    AdminViewSet,
 )
 
 router = routers.DefaultRouter()
-router.register(r"user-profile", UserProfileViewSet)  # buyer and seller profile
-router.register(r"agent-detail", AgentDetailViewSet)
+router.register(r"user_profile", UserProfileViewSet)
+router.register(r"agent_detail", AgentDetailViewSet)
+router.register(r"admin", AdminViewSet)
 router.register(r"staff", StaffDetailViewset)
 router.register(r"all_users", UserViewSet)
 router.register(r"contact", ContactViewSet)
