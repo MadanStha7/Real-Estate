@@ -202,6 +202,11 @@ class PropertyFilterView(viewsets.ModelViewSet):
         return super().get_queryset()
 
 
+class DetailPropertyView(generics.ListCreateAPIView):
+    queryset = PropertyInfo.objects.all()
+    serializer_class = DetailPropertySerializer
+
+
 class PropertyRequestViewSet(viewsets.ModelViewSet):
     queryset = PropertyRequest.objects.all()
     serializer_class = PropertyRequestSerializer
