@@ -30,6 +30,7 @@ class AgentDetail(CommonInfo):
     )
     accept_terms_and_condition = models.BooleanField(default=False)
     added_at = models.DateTimeField(auto_now_add=True)
+    is_verified = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         group, created = Group.objects.get_or_create(name="Agent")
@@ -129,6 +130,25 @@ class StaffDetail(CommonInfo):
     class Meta:
         ordering = ["-id"]
         db_table = "staff_detail"
+
+
+class AdminProfile(CommonInfo):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="admin")
+    full_name = models.CharField(max_length=20)
+    image = models.ImageField(upload_to="user/admin", blank=True, null=True)
+    phone = models.CharField(max_length=15, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user}"
+
+    def save(self, *args, **kwargs):
+        group, created = Group.objects.get_or_create(name="Admin")
+        self.user.groups.add(group)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ["-id"]
+        db_table = "admin_profile"
 
 
 class Contact(models.Model):

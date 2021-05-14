@@ -11,9 +11,10 @@ from api.serializers.user_serializer import (
     OtpSerializer,
     UserLoginSerializer,
     StaffDetailSerializer,
+    AdminProfileSerializer,
 )
 from rest_framework.authtoken.models import Token
-from user.models import UserProfile, AgentDetail, Contact, StaffDetail
+from user.models import UserProfile, AgentDetail, Contact, StaffDetail, AdminProfile
 from rest_framework.views import APIView
 from django.core.mail import send_mail, EmailMessage
 from project.settings import EMAIL_HOST_USER
@@ -31,6 +32,11 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+
+
+class AdminViewSet(viewsets.ModelViewSet):
+    queryset = AdminProfile.objects.all()
+    serializer_class = AdminProfileSerializer
 
 
 class AgentDetailViewSet(viewsets.ModelViewSet):
@@ -84,42 +90,41 @@ class UserLoginView(APIView):
             try:
                 u_name = data.get("username_or_email", None)
                 pword = data.get("password", None)
-
-                # if "@" in u_name:
-                #     get_user = User.objects.get(email=u_name)
-
-                # else:
-                #     get_user = User.objects.get(username=u_name)
-
                 user = authenticate(username=u_name, password=pword)
-
-                try:
-                    token = Token.objects.get(user=user.id)
-                except Token.DoesnoDoesNotExist:
-                    return Response(
-                        {"Invalid": "Unauthenticated user"},
-                        status=status.HTTP_404_NOT_FOUND,
-                    )
-                if user is not None:
-                    if user.is_active:
+                if user:
+                    try:
+                        token = Token.objects.get(user=user.id)
+                        print("token", token)
+                    except Token.DoesnoDoesNotExist:
                         return Response(
-                            {
-                                "Success": "User successfully logged in.",
-                                "token": token.key,
-                                "id": user.id,
-                            },
-                            status=status.HTTP_200_OK,
+                            {"Invalid": "Unauthenticated user"},
+                            status=status.HTTP_404_NOT_FOUND,
                         )
+                    if user is not None:
+                        if user.is_active:
+                            return Response(
+                                {
+                                    "Success": "User successfully logged in.",
+                                    "token": token.key,
+                                    "id": user.id,
+                                },
+                                status=status.HTTP_200_OK,
+                            )
+                        else:
+                            return Response(status=status.HTTP_404_NOT_FOUND)
                     else:
-                        return Response(status=status.HTTP_404_NOT_FOUND)
+                        return Response(
+                            "User doesn't exist", status=status.HTTP_404_NOT_FOUND
+                        )
                 else:
                     return Response(
-                        "User doesn't exist", status=status.HTTP_404_NOT_FOUND
+                        {"error": "User doesn't exist"},
+                        status=status.HTTP_404_NOT_FOUND,
                     )
 
-            except data.DoesNotExist:
+            except User.DoesNotExist:
                 return Response(
-                    {"Invalid": "Invalid Credential"}, status=status.HTTP_404_NOT_FOUND
+                    {"error": "Invalid Credential"}, status=status.HTTP_404_NOT_FOUND
                 )
         else:
             return Response("Field is required", status=status.HTTP_404_NOT_FOUND)
