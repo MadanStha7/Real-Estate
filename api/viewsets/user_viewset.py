@@ -15,7 +15,7 @@ from api.serializers.user_serializer import (
     AdminProfileSerializer
 )
 from rest_framework.authtoken.models import Token
-from user.models import UserProfile, User, AgentDetail, Contact, AdminProfile
+from user.models import UserProfile, User, AgentDetail, Contact, AdminProfile, StaffDetail
 from rest_framework.views import APIView
 from django.core.mail import send_mail, EmailMessage
 from project.settings import EMAIL_HOST_USER
@@ -47,6 +47,13 @@ class AgentDetailViewSet(viewsets.ModelViewSet):
 
     queryset = AgentDetail.objects.all()
     serializer_class = AgentDetailSerializer
+    
+    def perform_create(self, serializer):
+        serializer = AdminProfileSerializer(data=self.request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"True"}, status=status.HTTP_201_CREATED)
+        return Response("serializer errors", status=status.HTTP_400_BAD_REQUEST)
 
 
 class ChangePasswordView(generics.UpdateAPIView):
