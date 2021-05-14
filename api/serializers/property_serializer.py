@@ -58,7 +58,7 @@ class PropertySerializer(serializers.ModelSerializer):
             "condition_type",
             "description",
             "price",
-            "created_on"
+            "created_on",
         )
 
 

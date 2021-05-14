@@ -158,7 +158,7 @@ class PropertySearchView(generics.ListAPIView):
     filterset_fields = ["city", "locality"]
 
 
-class CityListView(generics.ListAPIView):
+class CityListView(generics.ListCreateAPIView):
     queryset = City.objects.all()
     serializer_class = CitySerializer
 

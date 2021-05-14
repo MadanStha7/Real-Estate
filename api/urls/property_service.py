@@ -7,6 +7,6 @@ router = routers.DefaultRouter()
 
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
     path("property_service/", PropertyServiceDetailAPIView.as_view()),
 ]

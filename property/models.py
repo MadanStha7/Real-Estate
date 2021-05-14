@@ -150,11 +150,11 @@ class PropertyInfo(CommonInfo):
     )
     admin = models.ForeignKey(
         AdminProfile,
-        related_name='admin_profile',
-        on_delete=models.CASCADE, 
-        blank=True, 
+        related_name="admin_profile",
+        on_delete=models.CASCADE,
+        blank=True,
         null=True,
-        )
+    )
 
     # displaying the exact location using map
     location = models.PointField(null=True, blank=True)

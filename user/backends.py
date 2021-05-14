@@ -2,16 +2,12 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 
-
 class AuthenticationEmailBackend(object):
     def authenticate(self, username=None, password=None):
-        print("ram is",username)
-        
+
         if "@" in username:
-            print("email^^^^^^^^^^^^^",email)
             kwargs = {"email": username}
         else:
-            print("user################",username)
             kwargs = {"username": username}
         try:
             user = User.objects.get(**kwargs)
