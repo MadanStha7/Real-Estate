@@ -15,12 +15,6 @@ from django.contrib.auth import authenticate
 from django.db import transaction
 
 
-class AdminProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AdminProfile
-        fields = ["id", "user", "full_name", "image", "phone"]
-
-
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
     email = serializers.CharField(required=True)
@@ -74,6 +68,7 @@ class StaffDetailSerializer(serializers.ModelSerializer):
     information_display = serializers.CharField(
         source="get_information_display", read_only=True
     )
+    state_display = serializers.CharField(source="get_state_display", read_only=True)
     # identification_image = serializers.ImageField(required=False)
 
     class Meta:
@@ -91,6 +86,7 @@ class StaffDetailSerializer(serializers.ModelSerializer):
             "phone_number",
             "address",
             "city",
+            "state_display",
             "state",
             "identification_number",
         ]
@@ -102,18 +98,7 @@ class StaffDetailSerializer(serializers.ModelSerializer):
         users = User.objects.create_user(
             username=user["username"], email=user["email"], password=user["password"]
         )
-        StaffDetail.objects.create(
-            user_id=users.id,
-            designation=validated_data["designation"],
-            gender=validated_data["gender"],
-            information=validated_data["information"],
-            full_name=validated_data["full_name"],
-            phone_number=validated_data["phone_number"],
-            address=validated_data["address"],
-            city=validated_data["city"],
-            state=validated_data["state"],
-            identification_number=validated_data["identification_number"],
-        )
+        StaffDetail.objects.create(user_id=users.id, **validated_data)
         return True
 
     def update(self, instance, validated_data):
@@ -177,7 +162,7 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(write_only=True)
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = UserProfile
@@ -226,6 +211,49 @@ class UserProfileSerializer(serializers.ModelSerializer):
         user.username = user_data.get("username", user.username)
         user.save()
         return instance
+
+
+class AdminProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(write_only=True)
+
+    class Meta:
+        model = AdminProfile
+        fields = ["id", "user", "full_name", "image", "phone"]
+
+    @transaction.atomic
+    def create(self, validated_data):
+        user_data = validated_data.pop("user")
+        user = User.objects.create_user(
+            username=user_data["username"],
+            email=user_data["email"],
+            password=user_data["password"],
+        )
+        admin_profile = AdminProfile.objects.create(user_id=user.id, **validated_data)
+        return admin_profile
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop("user")
+        user = instance.user
+        user.email = user_data.get("email", user.email)
+        user.username = user_data.get("username", user.username)
+        user.save()
+        return super(AdminProfileSerializer, self).update(instance, validated_data)
+        # # UserProfile model
+        # instance.full_name = validated_data.get("full_name", instance.full_name)
+        # instance.profile_picture = validated_data.get(
+        #     "profile_picture", instance.profile_picture
+        # )
+        # instance.phone_number = validated_data.get(
+        #     "phone_number", instance.phone_number
+        # )
+        # instance.address = validated_data.get("profile_picture", instance.address)
+        # instance.save()
+        # # User model
+        # user.email = user_data.get("email", user.email)
+        # user.username = user_data.get("username", user.username)
+        # user.save()
+        # return instance
 
 
 class UserLoginSerializer(serializers.Serializer):
