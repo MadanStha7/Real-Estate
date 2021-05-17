@@ -80,13 +80,18 @@ class UserProfile(CommonInfo):
 
 class StaffDetail(CommonInfo):
     """
-    Employee staff detail
+    Employee/staff detail
     """
 
     DESIGNATION_CHOICES = (
         ("F", "Field Manager"),
         ("E", "Engineer"),
         ("C", "Cameraman"),
+    )
+    STATE_CHOICES = (
+        ("P", "Pokhara"),
+        ("K", "Kathmandu"),
+        ("L", "Lalitpur"),
     )
     GENDER_CHOICES = (("M", "Male"), ("F", "Female"), ("O", "Other"))
     INFORMATION_CHOICES = (
@@ -98,18 +103,22 @@ class StaffDetail(CommonInfo):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="staff_detail"
     )
-    designation = models.CharField(
-        max_length=1, choices=DESIGNATION_CHOICES, null=True, blank=True
-    )
+    designation = models.CharField(max_length=1, choices=DESIGNATION_CHOICES, null=True)
     full_name = models.CharField(max_length=60, null=True)
 
     gender = models.CharField(
-        max_length=1, choices=GENDER_CHOICES, null=True, blank=True
+        max_length=1,
+        choices=GENDER_CHOICES,
+        null=True,
     )
-    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    phone_number = models.CharField(max_length=15, null=True)
     address = models.CharField(max_length=60, null=True)
     city = models.CharField(max_length=60, null=True, blank=True)
-    state = models.CharField(max_length=60, null=True, blank=True)
+    state = models.CharField(
+        max_length=60,
+        choices=STATE_CHOICES,
+        null=True,
+    )
     information = models.CharField(
         max_length=1, choices=INFORMATION_CHOICES, null=True, blank=True
     )
@@ -139,7 +148,7 @@ class AdminProfile(CommonInfo):
     phone = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.user}"
+        return f"{self.full_name}"
 
     def save(self, *args, **kwargs):
         group, created = Group.objects.get_or_create(name="Admin")
