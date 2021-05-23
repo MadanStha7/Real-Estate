@@ -13,35 +13,91 @@ from rest_framework.response import Response
 from django.core.mail import send_mail, EmailMessage
 from django.contrib.auth import authenticate
 from django.db import transaction
+from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
+from django.core.exceptions import ValidationError
+
+
+class UsernameValidator(object):
+    """
+    validate the username and check if it already exist in add and update method
+    """
+
+    def set_context(self, serializer_field):
+        # Determine the existing instance, if this is an update operation.
+        self.instance = getattr(serializer_field.parent, "instance", None)
+        if not self.instance:
+            # try to get user from other model:
+            root_instance = getattr(serializer_field.root, "instance", None)
+            self.instance = getattr(root_instance, "user", None)
+
+    def __call__(self, value):
+        if (
+            self.instance
+            and User.objects.filter(username=value)
+            .exclude(id=self.instance.id)
+            .exists()
+        ):
+            raise ValidationError("Username already exists.")
+
+        if not self.instance and User.objects.filter(username=value).exists():
+            raise ValidationError("Username already exists.")
+
+
+class EmailValidator(object):
+    """
+    validate the email and check if it already exist in add and update method
+    """
+
+    def set_context(self, serializer_field):
+        """
+        This hook is called by the serializer instance,
+        prior to the validation call being made.
+        """
+        # Determine the existing instance, if this is an update operation.
+        self.instance = getattr(serializer_field.parent, "instance", None)
+        if not self.instance:
+            # try to get user from other model:
+            root_instance = getattr(serializer_field.root, "instance", None)
+            self.instance = getattr(root_instance, "user", None)
+
+    def __call__(self, value):
+        if (
+            self.instance
+            and User.objects.filter(email=value).exclude(id=self.instance.id).exists()
+        ):
+            raise ValidationError("Email already exists.")
+
+        if not self.instance and User.objects.filter(email=value).exists():
+            raise ValidationError("Email already exists.")
 
 
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    email = serializers.CharField(required=True)
-    password = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
+    username = serializers.CharField(required=True, validators=[UsernameValidator()])
+    email = serializers.CharField(required=True, validators=[EmailValidator()])
+    password = serializers.CharField(
+        write_only=True,
+        min_length=6,
+        max_length=68,
+    )
+    password2 = serializers.CharField(
+        write_only=True,
+        min_length=6,
+        max_length=68,
+    )
 
     class Meta:
         model = User
         fields = ["id", "username", "email", "password", "password2"]
 
-    def validate_username(self, username):
-        user_old = User.objects.filter(username=username).exists()
-        if user_old:
-            raise serializers.ValidationError("User already exists")
-        return username
-
-    def validate_email(self, email):
-        email_old = User.objects.filter(email=email).exists()
-        if email_old:
-            raise serializers.ValidationError("Email already exists")
-        return email
-
     def validate(self, attrs):
-        if attrs["password"] != attrs["password2"]:
-            raise serializers.ValidationError(
-                {"password": "Password fields didn't match."}
-            )
+        print("attrs", attrs)
+        request = self.context.get("request")
+        if request == "POST":
+            print("ram")
+            if attrs["password"] != attrs["password2"]:
+                raise serializers.ValidationError(
+                    {"password": "Password fields didn't match."}
+                )
         return attrs
 
 
@@ -69,7 +125,6 @@ class StaffDetailSerializer(serializers.ModelSerializer):
         source="get_information_display", read_only=True
     )
     state_display = serializers.CharField(source="get_state_display", read_only=True)
-    # identification_image = serializers.ImageField(required=False)
 
     class Meta:
         model = StaffDetail
@@ -89,6 +144,7 @@ class StaffDetailSerializer(serializers.ModelSerializer):
             "state_display",
             "state",
             "identification_number",
+            "identification_image",
         ]
 
     @transaction.atomic
@@ -123,9 +179,9 @@ class StaffDetailSerializer(serializers.ModelSerializer):
         )
         instance.save()
         # update user
-        user.username = user_data.get("username", user.username)
-        user.email = user_data.get("email", user.email)
-
+        userSerializer = UserSerializer(user, data=user_data, partial=True)
+        if userSerializer.is_valid(raise_exception=True):
+            userSerializer.save()
         return instance
 
 
@@ -162,7 +218,7 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = UserSerializer()
 
     class Meta:
         model = UserProfile
@@ -214,7 +270,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class AdminProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(write_only=True)
+    user = UserSerializer()
 
     class Meta:
         model = AdminProfile
@@ -235,25 +291,15 @@ class AdminProfileSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user_data = validated_data.pop("user")
         user = instance.user
-        user.email = user_data.get("email", user.email)
-        user.username = user_data.get("username", user.username)
-        user.save()
-        return super(AdminProfileSerializer, self).update(instance, validated_data)
-        # # UserProfile model
-        # instance.full_name = validated_data.get("full_name", instance.full_name)
-        # instance.profile_picture = validated_data.get(
-        #     "profile_picture", instance.profile_picture
-        # )
-        # instance.phone_number = validated_data.get(
-        #     "phone_number", instance.phone_number
-        # )
-        # instance.address = validated_data.get("profile_picture", instance.address)
-        # instance.save()
-        # # User model
-        # user.email = user_data.get("email", user.email)
-        # user.username = user_data.get("username", user.username)
-        # user.save()
-        # return instance
+        userSerializer = UserSerializer(user, data=user_data, partial=True)
+        if userSerializer.is_valid(raise_exception=True):
+            userSerializer.save()
+        # Update Admin data
+        instance.full_name = validated_data.get("full_name", instance.full_name)
+        instance.image = validated_data.get("image", instance.image)
+        instance.phone = validated_data.get("phone", instance.phone)
+        instance.save()
+        return instance
 
 
 class UserLoginSerializer(serializers.Serializer):
