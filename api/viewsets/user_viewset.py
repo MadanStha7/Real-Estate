@@ -38,6 +38,29 @@ class AdminViewSet(viewsets.ModelViewSet):
     queryset = AdminProfile.objects.all()
     serializer_class = AdminProfileSerializer
 
+    def perform_create(self, serializer):
+        print("executed")
+        serializer = AdminProfileSerializer(data=self.request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"True"}, status=status.HTTP_201_CREATED)
+        return Response("serializer errors", status=status.HTTP_400_BAD_REQUEST)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request.method, "user": self.request.user})
+        print("context", context)
+        return context
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.data)
+
 
 class AgentDetailViewSet(viewsets.ModelViewSet):
     """
@@ -84,6 +107,15 @@ class StaffDetailViewset(viewsets.ModelViewSet):
             serializer.save()
             return Response({"True"}, status=status.HTTP_201_CREATED)
         return Response("serializer errors", status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.data)
 
 
 class UserLoginView(APIView):
