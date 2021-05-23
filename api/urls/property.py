@@ -34,7 +34,7 @@ router.register(r"gallery", GalleryViewSet)
 router.register(r"amenities", AmentitesViewSet)
 router.register(r"schedule", ScheduleViewSet)
 router.register(r"property_request", PropertyRequestViewSet)
-router.register(r"property-filter", PropertyFilterView)
+router.register(r"property_filter", PropertyFilterView)
 
 
 urlpatterns = [

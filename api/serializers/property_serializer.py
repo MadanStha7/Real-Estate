@@ -97,11 +97,16 @@ class LocationSerializer(serializers.ModelSerializer):
     Location of property info
     """
 
+    city_id = serializers.PrimaryKeyRelatedField(
+        queryset=City.objects.all(),
+        source="city",
+        write_only=True,
+    )
     city = CitySerializer(read_only=True)
 
     class Meta:
         model = Location
-        fields = ("id", "city", "locality", "street", "property_info")
+        fields = ("id", "city", "city_id", "locality", "street", "property_info")
 
 
 class GallerySerializer(serializers.ModelSerializer):
@@ -308,6 +313,10 @@ class DetailPropertySerializer(serializers.ModelSerializer):
 
 
 class PropertyRequestSerializer(serializers.ModelSerializer):
+    request_type_display = serializers.CharField(source="get_request_type_display")
+    property_type_display = serializers.CharField(source="get_property_type_display")
+    urgent_display = serializers.CharField(source="get_urgent_display")
+
     class Meta:
         model = PropertyRequest
         fields = (
@@ -315,7 +324,10 @@ class PropertyRequestSerializer(serializers.ModelSerializer):
             "phone",
             "email",
             "request_type",
+            "request_type_display",
             "property_type",
+            "property_type_display",
+            "urgent_display",
             "urgent",
             "place",
             "price_range",
