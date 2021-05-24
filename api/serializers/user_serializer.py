@@ -1,5 +1,6 @@
 import uuid
 from django.contrib.auth.models import User
+from django.db.models import fields
 from rest_framework import serializers
 from user.models import (
     AgentDetail,
@@ -222,7 +223,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ("id", "full_name", "user", "phone_number", "address")
+        fields = ("id", "full_name", "user", "phone_number", "address", "profile_picture", "email")
 
     @transaction.atomic
     def create(self, validated_data):
@@ -318,7 +319,7 @@ class ContactSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Contact
-        fields = ("name", "email", "phone", "message")
+        fields = ("id" ,"name", "email", "phone", "message")
 
 
 class OtpSerializer(serializers.Serializer):

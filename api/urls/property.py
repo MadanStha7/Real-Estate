@@ -19,9 +19,9 @@ from api.viewsets.property_viewset import (
     PropertyFeatured,
     PropertySearchView,
     CityListView,
-    DetailPropertyView,
     PropertyRequestViewSet,
     PropertyFilterView,
+    DetailPropertyView
 )
 
 
@@ -35,12 +35,13 @@ router.register(r"gallery", GalleryViewSet)
 router.register(r"amenities", AmentitesViewSet)
 router.register(r"schedule", ScheduleViewSet)
 router.register(r"property_request", PropertyRequestViewSet)
-router.register(r"property_filter", PropertyFilterView)
+router.register(r"property-filter", PropertyFilterView)
+router.register(r"property-list", PropertyList)
 
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("property-list/", PropertyList.as_view(), name="list_property"),
+    # path("property-list/", PropertyList.as_view(), name="list_property"),
     path(
         "property-detail/<int:pk>/",
         PropertyDetailsView.as_view(),

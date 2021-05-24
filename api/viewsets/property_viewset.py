@@ -6,7 +6,6 @@ from itertools import chain
 import django_filters.rest_framework
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-
 from rest_framework.response import Response
 
 from property.models import (
@@ -43,13 +42,15 @@ class PropertyViewSet(viewsets.ModelViewSet):
     serializer_class = PropertySerializer
 
 
-class PropertyList(generics.ListAPIView):
+class PropertyList(viewsets.ModelViewSet):
     """
     This views returns listing of property in homepage
     """
 
     serializer_class = PropertyDetailSerializer
     queryset = PropertyInfo.objects.filter(publish=True)
+
+    
 
 
 class PropertyTop(generics.ListAPIView):
@@ -178,6 +179,7 @@ class PropertyFilterView(viewsets.ModelViewSet):
         verified_property = PropertyInfo.objects.filter(publish=True)
         city = self.request.query_params.get("city", None)
         bhk_type = self.request.query_params.get("bhk_type", None)
+        print(bhk_type)
         facing = self.request.query_params.get("facing", None)
         property_size = self.request.query_params.get("property_size", None)
         property_adtype = self.request.query_params.get("property_adtype", None)
