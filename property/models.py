@@ -101,6 +101,10 @@ class PropertyInfo(CommonInfo):
         ("N", "New"),
         ("U", "Used"),
     )
+    STATUS_CHOICES=(
+        ("N", "Negotation"),
+        ("P", "Pending")
+    )
     city = models.ForeignKey(
         City, on_delete=models.CASCADE, related_name="city_property", null=True
     )
@@ -127,6 +131,7 @@ class PropertyInfo(CommonInfo):
     facing = models.CharField(max_length=2, choices=FACING_CHOICES)
     property_size = models.FloatField(default=0.00)  # size in sq.m
     price = models.FloatField(default=0.00)
+    status= models.CharField(max_length=2, choices=STATUS_CHOICES, null=True)
     owner = models.ForeignKey(
         UserProfile,
         related_name="userprofile",

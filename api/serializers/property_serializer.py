@@ -1,3 +1,4 @@
+from django.db.models.query import QuerySet
 from rest_framework import serializers
 from property.models import (
     PropertyInfo,
@@ -19,6 +20,18 @@ class CitySerializer(serializers.ModelSerializer):
         model = City
         fields = ("id", "name")
 
+class LocationSerializer(serializers.ModelSerializer):
+    """
+    Location of property info
+    """
+
+    city_id = serializers.PrimaryKeyRelatedField(
+        queryset=City.objects.all(), source="city", write_only=True)
+    city = CitySerializer(read_only=True)
+
+    class Meta:
+        model = Location
+        fields = ("id", "city_id", "city", "locality", "street", "property_info")
 
 class PropertySerializer(serializers.ModelSerializer):
     """
@@ -29,6 +42,7 @@ class PropertySerializer(serializers.ModelSerializer):
     membership_plan = serializers.CharField(required=False)
     condition_type = serializers.CharField(required=False)
     created_on = serializers.CharField(read_only=True)
+    locations=LocationSerializer(read_only=True)
 
     class Meta:
         model = PropertyInfo
@@ -48,7 +62,7 @@ class PropertySerializer(serializers.ModelSerializer):
             "owner",
             "agent",
             "staff",
-            "location",
+            "locations",
             "latitude",
             "longitude",
             "publish",
@@ -58,6 +72,7 @@ class PropertySerializer(serializers.ModelSerializer):
             "condition_type",
             "description",
             "price",
+            "status",
             "created_on",
         )
 
@@ -199,12 +214,6 @@ class RentalSerializer(serializers.ModelSerializer):
         )
 
 
-class FieldVisitSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FieldVisit
-        fields = ("id", "name", "email", "phone", "property_type")
-
-
 class PropertyDiscussionSerializer(serializers.ModelSerializer):
     tags = serializers.ListField(child=serializers.CharField())
 
@@ -289,8 +298,17 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             "membership_plan",
             "views",
             "price",
+            "status",
             "created_on",
         )
+
+
+class FieldVisitSerializer(serializers.ModelSerializer):
+    property_type = PropertyDetailSerializer()
+
+    class Meta:
+        model = FieldVisit
+        fields = ("id", "name", "email", "phone", "property_type")
 
 
 class DetailPropertySerializer(serializers.ModelSerializer):
