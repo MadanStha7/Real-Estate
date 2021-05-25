@@ -20,18 +20,21 @@ class CitySerializer(serializers.ModelSerializer):
         model = City
         fields = ("id", "name")
 
+
 class LocationSerializer(serializers.ModelSerializer):
     """
     Location of property info
     """
 
     city_id = serializers.PrimaryKeyRelatedField(
-        queryset=City.objects.all(), source="city", write_only=True)
+        queryset=City.objects.all(), source="city", write_only=True
+    )
     city = CitySerializer(read_only=True)
 
     class Meta:
         model = Location
         fields = ("id", "city_id", "city", "locality", "street", "property_info")
+
 
 class PropertySerializer(serializers.ModelSerializer):
     """
@@ -42,7 +45,7 @@ class PropertySerializer(serializers.ModelSerializer):
     membership_plan = serializers.CharField(required=False)
     condition_type = serializers.CharField(required=False)
     created_on = serializers.CharField(read_only=True)
-    locations=LocationSerializer(read_only=True)
+    locations = LocationSerializer(read_only=True)
 
     class Meta:
         model = PropertyInfo
@@ -352,3 +355,13 @@ class PropertyRequestSerializer(serializers.ModelSerializer):
             "size",
             "description",
         )
+
+
+class PropertyTypeFilteredSerialzers(serializers.Serializer):
+    """Serialzers fields for sending fileterd data in response for admin dashboard"""
+
+    property_type_commercial = serializers.IntegerField()
+    property_type_residential = serializers.IntegerField()
+    total_property = serializers.IntegerField()
+    sellers = serializers.IntegerField()
+    buyers = serializers.IntegerField()
