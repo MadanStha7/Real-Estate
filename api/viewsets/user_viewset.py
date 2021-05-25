@@ -48,8 +48,12 @@ class AdminViewSet(viewsets.ModelViewSet):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context.update({"request": self.request.method, "user": self.request.user})
-        print("context", context)
+        if self.request.method == "POST":
+            context.update(
+                {
+                    "request": self.request.method,
+                }
+            )
         return context
 
     def update(self, request, *args, **kwargs):
@@ -69,13 +73,24 @@ class AgentDetailViewSet(viewsets.ModelViewSet):
 
     queryset = AgentDetail.objects.all()
     serializer_class = AgentDetailSerializer
-    
+
     def perform_create(self, serializer):
-        serializer = AdminProfileSerializer(data=self.request.data)
+        serializer = AgentDetailSerializer(data=self.request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({"True"}, status=status.HTTP_201_CREATED)
         return Response("serializer errors", status=status.HTTP_400_BAD_REQUEST)
+
+    def get_serializer_context(self):
+        print("data****************", self.request.data)
+        context = super().get_serializer_context()
+        context.update(
+            {
+                "request": self.request.method,
+            }
+        )
+        print("context", context)
+        return context
 
 
 class ChangePasswordView(generics.UpdateAPIView):
@@ -102,11 +117,24 @@ class StaffDetailViewset(viewsets.ModelViewSet):
     serializer_class = StaffDetailSerializer
 
     def perform_create(self, serializer):
+        print("data", self.request.data)
         serializer = StaffDetailSerializer(data=self.request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({"True"}, status=status.HTTP_201_CREATED)
         return Response("serializer errors", status=status.HTTP_400_BAD_REQUEST)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if self.request.method == "POST":
+            print("ram thapa")
+            context.update(
+                {
+                    "request": self.request.method,
+                }
+            )
+            print("context", context)
+        return context
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()

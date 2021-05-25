@@ -7,6 +7,8 @@ import django_filters.rest_framework
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
+from rest_framework.decorators import action
+
 
 from property.models import (
     PropertyInfo,
@@ -44,13 +46,18 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
 class PropertyList(viewsets.ModelViewSet):
     """
-    This views returns listing of property in homepage
+    This views returns listing of property in client side
     """
 
     serializer_class = PropertyDetailSerializer
     queryset = PropertyInfo.objects.filter(publish=True)
 
-    
+    def retrieve(self, request, *args, **kwargs):
+        obj = self.get_object()
+        print("Obj", obj)
+        obj.views = obj.views + 1
+        obj.save(update_fields=("views",))
+        return super().retrieve(request, *args, **kwargs)
 
 
 class PropertyTop(generics.ListAPIView):

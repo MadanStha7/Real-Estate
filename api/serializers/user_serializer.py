@@ -1,14 +1,7 @@
 import uuid
 from django.contrib.auth.models import User
-from django.db.models import fields
 from rest_framework import serializers
-from user.models import (
-    AgentDetail,
-    UserProfile,
-    Contact,
-    StaffDetail,
-    AdminProfile,
-)
+from user.models import AgentDetail, UserProfile, Contact, StaffDetail, AdminProfile
 from project.settings import EMAIL_HOST_USER
 from rest_framework.response import Response
 from django.core.mail import send_mail, EmailMessage
@@ -39,7 +32,6 @@ class UsernameValidator(object):
             .exists()
         ):
             raise ValidationError("Username already exists.")
-
         if not self.instance and User.objects.filter(username=value).exists():
             raise ValidationError("Username already exists.")
 
@@ -72,14 +64,58 @@ class EmailValidator(object):
             raise ValidationError("Email already exists.")
 
 
+class Base64ImageField(serializers.ImageField):
+    """
+    A Django REST framework field for handling image-uploads through raw post data.
+    It uses base64 for encoding and decoding the contents of the file.
+    """
+
+    def to_internal_value(self, data):
+        from django.core.files.base import ContentFile
+        import base64
+        import six
+        import uuid
+
+        # Check if this is a base64 string
+        if isinstance(data, six.string_types):
+            # Check if the base64 string is in the "data:" format
+            if "data:" in data and ";base64," in data:
+                # Break out the header from the base64 content
+                header, data = data.split(";base64,")
+
+            # Try to decode the file. Return validation error if it fails.
+            try:
+                decoded_file = base64.b64decode(data)
+            except TypeError:
+                self.fail("invalid_image")
+
+            # Generate file name:
+            file_name = str(uuid.uuid4())[:12]  # 12 characters are more than enough.
+            # Get the file name extension:
+            file_extension = self.get_file_extension(file_name, decoded_file)
+
+            complete_file_name = "%s.%s" % (
+                file_name,
+                file_extension,
+            )
+
+            data = ContentFile(decoded_file, name=complete_file_name)
+
+        return super(Base64ImageField, self).to_internal_value(data)
+
+    def get_file_extension(self, file_name, decoded_file):
+        import imghdr
+
+        extension = imghdr.what(file_name, decoded_file)
+        extension = "jpg" if extension == "jpeg" else extension
+
+        return extension
+
+
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True, validators=[UsernameValidator()])
     email = serializers.CharField(required=True, validators=[EmailValidator()])
-    password = serializers.CharField(
-        write_only=True,
-        min_length=6,
-        max_length=68,
-    )
+    password = serializers.CharField(write_only=True, min_length=6, max_length=68)
     password2 = serializers.CharField(
         write_only=True,
         min_length=6,
@@ -92,9 +128,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         print("attrs", attrs)
-        request = self.context.get("request")
-        if request == "POST":
-            print("ram")
+        if self.context.get("request") == "POST":
             if attrs["password"] != attrs["password2"]:
                 raise serializers.ValidationError(
                     {"password": "Password fields didn't match."}
@@ -103,6 +137,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AgentDetailSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
     class Meta:
         model = AgentDetail
         fields = [
@@ -114,6 +150,17 @@ class AgentDetailSerializer(serializers.ModelSerializer):
             "identification_file",
             "accept_terms_and_condition",
         ]
+
+    @transaction.atomic
+    def create(self, validated_data):
+        # create user
+        user = validated_data.pop("user")
+        print("user", user)
+        users = User.objects.create_user(
+            username=user["username"], email=user["email"], password=user["password"]
+        )
+        AgentDetail.objects.create(user_id=users.id, **validated_data)
+        return True
 
 
 class StaffDetailSerializer(serializers.ModelSerializer):
@@ -223,7 +270,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ("id", "full_name", "user", "phone_number", "address", "profile_picture", "email")
+        fields = (
+            "id",
+            "full_name",
+            "user",
+            "phone_number",
+            "address",
+            "profile_picture",
+            "email",
+        )
 
     @transaction.atomic
     def create(self, validated_data):
@@ -319,7 +374,7 @@ class ContactSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Contact
-        fields = ("id" ,"name", "email", "phone", "message")
+        fields = ("id", "name", "email", "phone", "message")
 
 
 class OtpSerializer(serializers.Serializer):
