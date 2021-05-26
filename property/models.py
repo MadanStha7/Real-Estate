@@ -201,6 +201,7 @@ class Location(CommonInfo):
     )
     locality = models.TextField()
     street = models.TextField()
+    listing= models.CharField(max_length=20, default="")
     property_info = models.OneToOneField(
         PropertyInfo, related_name="locations", on_delete=models.CASCADE
     )

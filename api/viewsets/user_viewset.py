@@ -34,6 +34,33 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
 
 
+# class AdminViewSet(viewsets.ModelViewSet):
+#     queryset = AdminProfile.objects.all()
+#     serializer_class = AdminProfileSerializer
+
+#     def perform_create(self, serializer):
+#         print("executed")
+#         serializer = AdminProfileSerializer(data=self.request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response({"True"}, status=status.HTTP_201_CREATED)
+#         return Response("serializer errors", status=status.HTTP_400_BAD_REQUEST)
+
+#     def get_serializer_context(self):
+#         context = super().get_serializer_context()
+#         context.update({"request": self.request.method, "user": self.request.user})
+#         print("context", context)
+#         return context
+
+#     def update(self, request, *args, **kwargs):
+#         instance = self.get_object()
+#         serializer = self.get_serializer(instance, data=request.data, partial=True)
+#         serializer.is_valid(raise_exception=True)
+#         self.perform_update(serializer)
+#         if serializer.is_valid():
+#             serializer.save()
+#         return Response(serializer.data)
+
 class AdminViewSet(viewsets.ModelViewSet):
     queryset = AdminProfile.objects.all()
     serializer_class = AdminProfileSerializer
@@ -46,15 +73,11 @@ class AdminViewSet(viewsets.ModelViewSet):
             return Response({"True"}, status=status.HTTP_201_CREATED)
         return Response("serializer errors", status=status.HTTP_400_BAD_REQUEST)
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        if self.request.method == "POST":
-            context.update(
-                {
-                    "request": self.request.method,
-                }
-            )
-        return context
+    # def get_serializer_context(self):
+    #     context = super().get_serializer_context()
+    #     context.update({"request": self.request.method, "user": self.request.user})
+    #     print("context", context)
+    #     return context
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -65,6 +88,20 @@ class AdminViewSet(viewsets.ModelViewSet):
             serializer.save()
         return Response(serializer.data)
 
+class AdminProfileViewSet(viewsets.ModelViewSet):
+    queryset = AdminProfile.objects.all()
+    serializer_class = AdminProfileSerializer
+    
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+    # def get_object(self):
+    #     pk = self.kwargs.get('id')
+
+    #     if pk == "current":
+    #         return self.request.user
+
+    #     return super(AdminProfileViewSet, self).get_object()
 
 class AgentDetailViewSet(viewsets.ModelViewSet):
     """

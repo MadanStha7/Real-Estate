@@ -124,7 +124,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
-        fields = ("id", "city", "city_id", "locality", "street", "property_info")
+        fields = ("id", "city", "city_id", "locality", "street", "listing", "property_info")
 
 
 class GallerySerializer(serializers.ModelSerializer):

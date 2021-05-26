@@ -10,6 +10,7 @@ from api.viewsets.user_viewset import (
     OtpVerify,
     UserLoginView,
     StaffDetailViewset,
+    AdminProfileViewSet,
     AdminViewSet,
 )
 
@@ -20,6 +21,8 @@ router.register(r"admin", AdminViewSet)
 router.register(r"staff", StaffDetailViewset)
 router.register(r"all_users", UserViewSet)
 router.register(r"contact", ContactViewSet)
+router.register(r"admin_profile", AdminProfileViewSet)
+
 
 
 urlpatterns = [
