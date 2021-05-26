@@ -8,6 +8,7 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.views import APIView
 
 
 from property.models import (
@@ -36,6 +37,7 @@ from api.serializers.property_serializer import (
     PropertyListingSerializer,
     DetailPropertySerializer,
     PropertyRequestSerializer,
+    PropertyTypeFilteredSerialzers,
 )
 
 
@@ -219,3 +221,26 @@ class DetailPropertyView(generics.ListCreateAPIView):
 class PropertyRequestViewSet(viewsets.ModelViewSet):
     queryset = PropertyRequest.objects.all()
     serializer_class = PropertyRequestSerializer
+
+
+class AdminDashboardView(APIView):
+    def get(self, request):
+        property_type_commercial = len(PropertyInfo.objects.filter(property_type="C"))
+        property_type_residential = len(PropertyInfo.objects.filter(property_type="R"))
+
+        # list of sellers,total property,buyers
+        total_property = len(PropertyInfo.objects.filter(publish=True))
+        sellers = len(PropertyInfo.objects.filter(publish=False))
+        buyers = len(PropertyRequest.objects.all())
+
+        data = [
+            {
+                "property_type_commercial": property_type_commercial,
+                "property_type_residential": property_type_residential,
+                "total_property": total_property,
+                "sellers": sellers,
+                "buyers": buyers,
+            }
+        ]
+        results = PropertyTypeFilteredSerialzers(data, many=True).data
+        return Response(results)
