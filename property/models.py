@@ -101,10 +101,8 @@ class PropertyInfo(CommonInfo):
         ("N", "New"),
         ("U", "Used"),
     )
-    STATUS_CHOICES=(
-        ("N", "Negotation"),
-        ("P", "Pending")
-    )
+    STATUS_CHOICES = (("N", "negotiation"), ("P", "Pending"))
+
     city = models.ForeignKey(
         City, on_delete=models.CASCADE, related_name="city_property", null=True
     )
@@ -131,7 +129,7 @@ class PropertyInfo(CommonInfo):
     facing = models.CharField(max_length=2, choices=FACING_CHOICES)
     property_size = models.FloatField(default=0.00)  # size in sq.m
     price = models.FloatField(default=0.00)
-    status= models.CharField(max_length=2, choices=STATUS_CHOICES, null=True)
+    status = models.CharField(max_length=2, choices=STATUS_CHOICES, null=True)
     owner = models.ForeignKey(
         UserProfile,
         related_name="userprofile",
@@ -398,6 +396,10 @@ class PropertyDiscussionBoard(CommonInfo):
 
 
 class PropertyRequest(CommonInfo):
+    """
+    This model refers to the request of property if someone wants
+    """
+
     REQUEST_TYPE_CHOICES = (
         ("B", "Buy"),
         ("R", "Rent"),

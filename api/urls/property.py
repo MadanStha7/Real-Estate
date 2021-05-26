@@ -21,7 +21,8 @@ from api.viewsets.property_viewset import (
     CityListView,
     PropertyRequestViewSet,
     PropertyFilterView,
-    DetailPropertyView
+    DetailPropertyView,
+    AdminDashboardView,
 )
 
 
@@ -60,4 +61,6 @@ urlpatterns = [
     # search
     path("locations/", PropertySearchView.as_view(), name="search_property"),
     path("city/", CityListView.as_view(), name="city"),
+    # admin dashboard
+    path("admin_dashboard/", AdminDashboardView.as_view(), name="admin_dashboard"),
 ]
