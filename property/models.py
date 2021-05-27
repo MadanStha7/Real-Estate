@@ -15,6 +15,10 @@ class City(CommonInfo):
         verbose_name_plural = "City"
         ordering = ["-created_on"]
 
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower()
+        return super().save(*args, **kwargs)
+
 
 class PropertyInfo(CommonInfo):
     """
@@ -201,7 +205,7 @@ class Location(CommonInfo):
     )
     locality = models.TextField()
     street = models.TextField()
-    listing= models.CharField(max_length=20, default="")
+    listing = models.CharField(max_length=20, default="")
     property_info = models.OneToOneField(
         PropertyInfo, related_name="locations", on_delete=models.CASCADE
     )
