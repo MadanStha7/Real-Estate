@@ -113,7 +113,7 @@ class Base64ImageField(serializers.ImageField):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True, validators=[UsernameValidator()])
+    username = serializers.CharField(required=False, validators=[UsernameValidator()])
     email = serializers.CharField(required=True, validators=[EmailValidator()])
     password = serializers.CharField(write_only=True, min_length=6, max_length=68)
     password2 = serializers.CharField(
@@ -138,6 +138,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 class AgentDetailSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    identification_type = serializers.CharField(required=False)
+    identification_number = serializers.CharField(required=False)
 
     class Meta:
         model = AgentDetail
@@ -145,6 +147,7 @@ class AgentDetailSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "location",
+            "phone_number",
             "identification_type",
             "identification_number",
             "identification_file",
@@ -270,13 +273,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ("id", "full_name", "user", "phone_number", "address", "profile_picture")
+        fields = ("id", "full_name", "user", "phone_number",
+                  "address", "profile_picture")
 
     @transaction.atomic
     def create(self, validated_data):
         user_data = validated_data.pop("user")
         user = User.objects.create_user(
-            username=user_data["username"],
+            username=user_data["email"],
             email=user_data["email"],
             password=user_data["password"],
         )
@@ -317,38 +321,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
-# class AdminProfileSerializer(serializers.ModelSerializer):
-#     user = UserSerializer()
-
-#     class Meta:
-#         model = AdminProfile
-#         fields = ["id", "user", "full_name", "image", "phone"]
-
-#     @transaction.atomic
-#     def create(self, validated_data):
-#         user_data = validated_data.pop("user")
-#         user = User.objects.create_user(
-#             username=user_data["username"],
-#             email=user_data["email"],
-#             password=user_data["password"],
-#         )
-#         admin_profile = AdminProfile.objects.create(user_id=user.id, **validated_data)
-#         return admin_profile
-
-#     @transaction.atomic
-#     def update(self, instance, validated_data):
-#         user_data = validated_data.pop("user")
-#         user = instance.user
-#         userSerializer = UserSerializer(user, data=user_data, partial=True)
-#         if userSerializer.is_valid(raise_exception=True):
-#             userSerializer.save()
-#         # Update Admin data
-#         instance.full_name = validated_data.get("full_name", instance.full_name)
-#         instance.image = validated_data.get("image", instance.image)
-#         instance.phone = validated_data.get("phone", instance.phone)
-#         instance.save()
-#         return instance
-
 class AdminProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
 
@@ -380,6 +352,7 @@ class AdminProfileSerializer(serializers.ModelSerializer):
         instance.phone = validated_data.get("phone", instance.phone)
         instance.save()
         return instance
+
 
 class UserLoginSerializer(serializers.Serializer):
     username_or_email = serializers.CharField(
