@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from django.core.mail import send_mail, EmailMessage
 from project.settings import EMAIL_HOST_USER
 from rest_framework.decorators import api_view
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from rest_framework import viewsets, generics, views, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -34,33 +34,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
 
 
-# class AdminViewSet(viewsets.ModelViewSet):
-#     queryset = AdminProfile.objects.all()
-#     serializer_class = AdminProfileSerializer
-
-#     def perform_create(self, serializer):
-#         print("executed")
-#         serializer = AdminProfileSerializer(data=self.request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response({"True"}, status=status.HTTP_201_CREATED)
-#         return Response("serializer errors", status=status.HTTP_400_BAD_REQUEST)
-
-#     def get_serializer_context(self):
-#         context = super().get_serializer_context()
-#         context.update({"request": self.request.method, "user": self.request.user})
-#         print("context", context)
-#         return context
-
-#     def update(self, request, *args, **kwargs):
-#         instance = self.get_object()
-#         serializer = self.get_serializer(instance, data=request.data, partial=True)
-#         serializer.is_valid(raise_exception=True)
-#         self.perform_update(serializer)
-#         if serializer.is_valid():
-#             serializer.save()
-#         return Response(serializer.data)
-
 class AdminViewSet(viewsets.ModelViewSet):
     queryset = AdminProfile.objects.all()
     serializer_class = AdminProfileSerializer
@@ -73,12 +46,6 @@ class AdminViewSet(viewsets.ModelViewSet):
             return Response({"True"}, status=status.HTTP_201_CREATED)
         return Response("serializer errors", status=status.HTTP_400_BAD_REQUEST)
 
-    # def get_serializer_context(self):
-    #     context = super().get_serializer_context()
-    #     context.update({"request": self.request.method, "user": self.request.user})
-    #     print("context", context)
-    #     return context
-
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
@@ -88,20 +55,17 @@ class AdminViewSet(viewsets.ModelViewSet):
             serializer.save()
         return Response(serializer.data)
 
+
 class AdminProfileViewSet(viewsets.ModelViewSet):
+    """
+    Profile of Logged in Admin
+    """
     queryset = AdminProfile.objects.all()
     serializer_class = AdminProfileSerializer
-    
+
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
-    # def get_object(self):
-    #     pk = self.kwargs.get('id')
-
-    #     if pk == "current":
-    #         return self.request.user
-
-    #     return super(AdminProfileViewSet, self).get_object()
 
 class AgentDetailViewSet(viewsets.ModelViewSet):
     """
@@ -194,36 +158,36 @@ class UserLoginView(APIView):
             try:
                 u_name = data.get("username_or_email", None)
                 pword = data.get("password", None)
-                user = authenticate(username=u_name, password=pword)
-                if user:
-                    try:
-                        token = Token.objects.get(user=user.id)
-                        print("token", token)
-                    except Token.DoesnoDoesNotExist:
+
+                if "@" in u_name:
+                    get_user = User.objects.get(email=u_name)
+                else:
+                    get_user = User.objects.get(username=u_name)
+                user = authenticate(username=get_user, password=pword)
+                try:
+                    token = Token.objects.get(user=user.id)
+                except Token.DoesNotExist:
+                    return Response(
+                        {"Invalid": "Unauthenticated user"},
+                        status=status.HTTP_404_NOT_FOUND,
+                    )
+                if user is not None:
+                    if user.is_active:
+                        group_name=Group.objects.filter(user=user).values()
                         return Response(
-                            {"Invalid": "Unauthenticated user"},
-                            status=status.HTTP_404_NOT_FOUND,
+                            {
+                                "Success": "User successfully logged in.",
+                                "token": token.key,
+                                "id": user.id,
+                                "group": group_name,
+                            },
+                            status=status.HTTP_200_OK,
                         )
-                    if user is not None:
-                        if user.is_active:
-                            return Response(
-                                {
-                                    "Success": "User successfully logged in.",
-                                    "token": token.key,
-                                    "id": user.id,
-                                },
-                                status=status.HTTP_200_OK,
-                            )
-                        else:
-                            return Response(status=status.HTTP_404_NOT_FOUND)
                     else:
-                        return Response(
-                            "User doesn't exist", status=status.HTTP_404_NOT_FOUND
-                        )
+                        return Response(status=status.HTTP_404_NOT_FOUND)
                 else:
                     return Response(
-                        {"error": "User doesn't exist"},
-                        status=status.HTTP_404_NOT_FOUND,
+                        "User doesn't exist", status=status.HTTP_404_NOT_FOUND
                     )
 
             except User.DoesNotExist:

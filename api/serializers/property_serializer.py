@@ -363,9 +363,10 @@ class DetailPropertySerializer(serializers.ModelSerializer):
 
 
 class PropertyRequestSerializer(serializers.ModelSerializer):
-    request_type_display = serializers.CharField(source="get_request_type_display")
-    property_type_display = serializers.CharField(source="get_property_type_display")
-    urgent_display = serializers.CharField(source="get_urgent_display")
+    request_type_display = serializers.CharField(source="get_request_type_display", required=False)
+    property_type_display = serializers.CharField(source="get_property_type_display", required=False)
+    urgent_display = serializers.CharField(source="get_urgent_display", required=False)
+    urgent=serializers.CharField(required=False)
 
     class Meta:
         model = PropertyRequest
