@@ -46,6 +46,7 @@ class PropertySerializer(serializers.ModelSerializer):
     condition_type = serializers.CharField(required=False)
     created_on = serializers.CharField(read_only=True)
     locations = LocationSerializer(read_only=True)
+    facing = serializers.CharField(required=False)
 
     class Meta:
         model = PropertyInfo
@@ -124,7 +125,8 @@ class LocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
-        fields = ("id", "city", "city_id", "locality", "street", "listing", "property_info")
+        fields = ("id", "city", "city_id", "locality",
+                  "street", "listing", "property_info")
 
 
 class GallerySerializer(serializers.ModelSerializer):
@@ -136,7 +138,8 @@ class GallerySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Gallery
-        fields = ("id", "image", "property_info", "property_info_value")
+        fields = ("id", "title", "image", "link",
+                  "property_info", "property_info_value")
 
 
 class AmenitiesSerializer(serializers.ModelSerializer):
@@ -334,10 +337,12 @@ class DetailPropertySerializer(serializers.ModelSerializer):
 
 
 class PropertyRequestSerializer(serializers.ModelSerializer):
-    request_type_display = serializers.CharField(source="get_request_type_display", required=False)
-    property_type_display = serializers.CharField(source="get_property_type_display", required=False)
+    request_type_display = serializers.CharField(
+        source="get_request_type_display", required=False)
+    property_type_display = serializers.CharField(
+        source="get_property_type_display", required=False)
     urgent_display = serializers.CharField(source="get_urgent_display", required=False)
-    urgent=serializers.CharField(required=False)
+    urgent = serializers.CharField(required=False)
 
     class Meta:
         model = PropertyRequest
