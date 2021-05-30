@@ -37,7 +37,7 @@ router.register(r"amenities", AmentitesViewSet)
 router.register(r"schedule", ScheduleViewSet)
 router.register(r"property_request", PropertyRequestViewSet)
 router.register(r"property-filter", PropertyFilterView)
-router.register(r"property-list", PropertyList)
+router.register(r"property-list", PropertyList)  # for client side
 router.register(r"city", CityViewset)
 
 
