@@ -116,6 +116,14 @@ class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
 
+    def get_queryset(self):
+        city_name = self.request.query_params.get("name", None)
+        if city_name is not None:
+            city = City.objects.get(name=city_name)
+            queryset = Location.objects.select_related("city").filter(city=city.id)
+            return queryset
+        return super().get_queryset()
+
 
 class GalleryViewSet(viewsets.ModelViewSet):
     queryset = Gallery.objects.all()
@@ -170,9 +178,38 @@ class PropertySearchView(generics.ListAPIView):
     filterset_fields = ["city", "locality"]
 
 
-class CityListView(generics.ListCreateAPIView):
+class CityViewset(viewsets.ModelViewSet):
     queryset = City.objects.all()
     serializer_class = CitySerializer
+
+    def get_queryset(self):
+        city_name = self.request.query_params.get("name", None)
+        print("city_name", city_name)
+        if city_name is not None:
+            city = City.objects.get(name=city_name)
+            print("city", city)
+            queryset = Location.objects.select_related("city").filter(city=city.id)
+            return queryset
+        return super().get_queryset()
+
+    # @action(detail=False, methods=["get"], url_path="mycity")
+    # def get_all_city_locations(self, request):
+    #     city_name = self.request.query_params.get("name", None)
+    #     if city_name is not None:
+    #         city = City.objects.get(name=city_name)
+    #         print("city", city)
+    #         locations = city.city_locations.all()
+    #         print("locations1111111111111111111111111", type(locations))
+    #         self.request.data.update({"locations": locations})
+    #         print("serializer_data1")
+
+    #         city_serializer = CitySerializer(self.request.data)
+    #         print("serializer_data2", type(city_serializer))
+    #         serializer_data = dict(city_serializer.data)
+    #         return Response(serializer_data, status=status.HTTP_200_OK)
+
+    #     else:
+    #         pass
 
 
 class PropertyFilterView(viewsets.ModelViewSet):
