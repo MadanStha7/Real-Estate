@@ -39,13 +39,13 @@ from api.serializers.property_serializer import (
     DetailPropertySerializer,
     PropertyRequestSerializer,
     PropertyTypeFilteredSerialzers,
-    ContactAgentSerializer
+    ContactAgentSerializer,
 )
 
 
-class PropertyViewSet(viewsets.ModelViewSet):
-    queryset = PropertyInfo.objects.all()
-    serializer_class = PropertySerializer
+"""===================================
+-- Property model on client side starts ---
+======================================"""
 
 
 class PropertyList(viewsets.ModelViewSet):
@@ -62,6 +62,15 @@ class PropertyList(viewsets.ModelViewSet):
         obj.views = obj.views + 1
         obj.save(update_fields=("views",))
         return super().retrieve(request, *args, **kwargs)
+
+    @action(detail=True, methods=["GET"])
+    def similar_property(self, request, pk=None):
+        property_obj = self.get_object()
+        similar_pro = PropertyInfo.objects.filter(
+            property_type=property_obj.property_type, publish=True
+        )
+        serializer = self.get_serializer(similar_pro, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class PropertyTop(generics.ListAPIView):
@@ -106,6 +115,56 @@ class PropertyFeatured(generics.ListAPIView):
         return featured_category
 
 
+class PropertyFilterView(viewsets.ModelViewSet):
+    """
+    This views returns filtered property
+    """
+
+    queryset = PropertyInfo.objects.all()
+    serializer_class = PropertyDetailSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    ordering_fields = ["price", "created_on"]
+    search_fields = ["city", "bhk_type", "facing", "property_size", "property_adtype"]
+
+    def get_queryset(self):
+        verified_property = PropertyInfo.objects.filter(publish=True)
+        city = self.request.query_params.get("city", None)
+        bhk_type = self.request.query_params.get("bhk_type", None)
+        print(bhk_type)
+        facing = self.request.query_params.get("facing", None)
+        property_size = self.request.query_params.get("property_size", None)
+        property_adtype = self.request.query_params.get("property_adtype", None)
+        if city:
+            queryset = verified_property.filter(city__name=city)
+            return queryset
+        if bhk_type:
+            queryset = verified_property.filter(bhk_type=bhk_type)
+            return queryset
+        elif facing:
+            queryset = verified_property.filter(facing=facing)
+            return queryset
+        elif property_size:
+            queryset = verified_property.filter(property_size=property_size)
+            return queryset
+        elif property_adtype:
+            queryset = verified_property.filter(property_adtype=property_adtype)
+            return queryset
+
+        else:
+            pass
+        return super().get_queryset()
+
+
+"""=========================================
+----- Property model on admin side starts ---
+============================================"""
+
+
+class PropertyViewSet(viewsets.ModelViewSet):
+    queryset = PropertyInfo.objects.all()
+    serializer_class = PropertySerializer
+
+
 class RentalViewSet(viewsets.ModelViewSet):
     queryset = RentalInfo.objects.all()
     serializer_class = RentalSerializer
@@ -117,9 +176,9 @@ class LocationViewSet(viewsets.ModelViewSet):
     serializer_class = LocationSerializer
 
     def get_queryset(self):
-        city_name = self.request.query_params.get("name", None)
-        if city_name is not None:
-            city = City.objects.get(name=city_name)
+        city_id = self.request.query_params.get("id", None)
+        if city_id is not None:
+            city = City.objects.get(id=city_id)
             queryset = Location.objects.select_related("city").filter(city=city.id)
             return queryset
         return super().get_queryset()
@@ -192,65 +251,6 @@ class CityViewset(viewsets.ModelViewSet):
             return queryset
         return super().get_queryset()
 
-    # @action(detail=False, methods=["get"], url_path="mycity")
-    # def get_all_city_locations(self, request):
-    #     city_name = self.request.query_params.get("name", None)
-    #     if city_name is not None:
-    #         city = City.objects.get(name=city_name)
-    #         print("city", city)
-    #         locations = city.city_locations.all()
-    #         print("locations1111111111111111111111111", type(locations))
-    #         self.request.data.update({"locations": locations})
-    #         print("serializer_data1")
-
-    #         city_serializer = CitySerializer(self.request.data)
-    #         print("serializer_data2", type(city_serializer))
-    #         serializer_data = dict(city_serializer.data)
-    #         return Response(serializer_data, status=status.HTTP_200_OK)
-
-    #     else:
-    #         pass
-
-
-class PropertyFilterView(viewsets.ModelViewSet):
-    """
-    This views returns filtered property
-    """
-
-    queryset = PropertyInfo.objects.all()
-    serializer_class = PropertyDetailSerializer
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    ordering_fields = ["price", "created_on"]
-    search_fields = ["city", "bhk_type", "facing", "property_size", "property_adtype"]
-
-    def get_queryset(self):
-        verified_property = PropertyInfo.objects.filter(publish=True)
-        city = self.request.query_params.get("city", None)
-        bhk_type = self.request.query_params.get("bhk_type", None)
-        print(bhk_type)
-        facing = self.request.query_params.get("facing", None)
-        property_size = self.request.query_params.get("property_size", None)
-        property_adtype = self.request.query_params.get("property_adtype", None)
-        if city:
-            queryset = verified_property.filter(city__name=city)
-            return queryset
-        if bhk_type:
-            queryset = verified_property.filter(bhk_type=bhk_type)
-            return queryset
-        elif facing:
-            queryset = verified_property.filter(facing=facing)
-            return queryset
-        elif property_size:
-            queryset = verified_property.filter(property_size=property_size)
-            return queryset
-        elif property_adtype:
-            queryset = verified_property.filter(property_adtype=property_adtype)
-            return queryset
-
-        else:
-            pass
-        return super().get_queryset()
-
 
 class DetailPropertyView(generics.ListCreateAPIView):
     queryset = PropertyInfo.objects.all()
@@ -284,6 +284,7 @@ class AdminDashboardView(APIView):
         results = PropertyTypeFilteredSerialzers(data, many=True).data
         return Response(results)
 
+
 class ContactAgentViewSet(viewsets.ModelViewSet):
-    queryset=ContactAgent.objects.all()
-    serializer_class=ContactAgentSerializer
+    queryset = ContactAgent.objects.all()
+    serializer_class = ContactAgentSerializer
