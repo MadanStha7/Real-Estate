@@ -11,6 +11,7 @@ from .models import (
     FieldVisit,
     PropertyDiscussionBoard,
     Schedule,
+    ContactAgent
 )
 
 # Register your models here.
@@ -26,5 +27,6 @@ admin.site.register(
         FieldVisit,
         PropertyDiscussionBoard,
         Schedule,
+        ContactAgent
     ]
 )

@@ -11,6 +11,7 @@ from property.models import (
     Location,
     City,
     PropertyRequest,
+    ContactAgent
 )
 from user.models import UserProfile, AgentDetail
 from django.db import transaction
@@ -399,3 +400,9 @@ class PropertyTypeFilteredSerialzers(serializers.Serializer):
     total_property = serializers.IntegerField()
     sellers = serializers.IntegerField()
     buyers = serializers.IntegerField()
+
+
+class ContactAgentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactAgent
+        fields = ("id", "name", "email", "property_info", "agent")

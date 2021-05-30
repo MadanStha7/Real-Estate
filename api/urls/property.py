@@ -22,6 +22,7 @@ from api.viewsets.property_viewset import (
     PropertyFilterView,
     DetailPropertyView,
     AdminDashboardView,
+    ContactAgentViewSet,
     CityViewset,
 )
 
@@ -38,7 +39,10 @@ router.register(r"schedule", ScheduleViewSet)
 router.register(r"property_request", PropertyRequestViewSet)
 router.register(r"property-filter", PropertyFilterView)
 router.register(r"property-list", PropertyList)
+router.register(r"contact_agent", ContactAgentViewSet)
+
 router.register(r"city", CityViewset)
+
 
 
 urlpatterns = [

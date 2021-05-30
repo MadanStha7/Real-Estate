@@ -445,3 +445,20 @@ class PropertyRequest(CommonInfo):
     class Meta:
         verbose_name_plural = "Property Request"
         db_table = "property_request"
+
+class ContactAgent(models.Model):
+    """
+    Contact Agent from Property Detail Page
+    """
+    name = models.CharField(max_length=25, null=True)
+    email = models.EmailField()
+    phone = models.CharField(max_length=15)
+    property_info = models.ForeignKey(PropertyInfo, on_delete=models.CASCADE, related_name="property_info")
+    agent = models.ForeignKey(AgentDetail, on_delete=models.CASCADE, related_name="agent")
+
+    class Meta:
+        ordering = ["-id"]
+        verbose_name_plural = "Contact Agent"
+
+    def __str__(self):
+        return self.name
