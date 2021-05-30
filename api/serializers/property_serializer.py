@@ -13,12 +13,18 @@ from property.models import (
     PropertyRequest,
 )
 from user.models import UserProfile, AgentDetail
+from django.db import transaction
 
 
 class CitySerializer(serializers.ModelSerializer):
     class Meta:
         model = City
         fields = ("id", "name")
+
+    def validate_name(self, name):
+        if City.objects.filter(name=name.lower()).exists():
+            raise serializers.ValidationError("City name already exists!")
+        return name
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -125,8 +131,15 @@ class LocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
-        fields = ("id", "city", "city_id", "locality",
-                  "street", "listing", "property_info")
+        fields = (
+            "id",
+            "city",
+            "city_id",
+            "locality",
+            "street",
+            "listing",
+            "property_info",
+        )
 
 
 class GallerySerializer(serializers.ModelSerializer):
@@ -310,11 +323,26 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
 
 
 class FieldVisitSerializer(serializers.ModelSerializer):
-    property_type = PropertyDetailSerializer()
+    property_type = PropertyDetailSerializer(read_only=True)
+    property_type_id = serializers.PrimaryKeyRelatedField(
+        queryset=PropertyInfo.objects.all(),
+        source="property_type",
+        write_only=True,
+    )
 
     class Meta:
         model = FieldVisit
-        fields = ("id", "name", "email", "phone", "property_type")
+        fields = ("id", "name", "email", "phone", "property_type", "property_type_id")
+
+    @transaction.atomic
+    def create(self, validated_data):
+        print("validated data", validated_data)
+        property_type_data = validated_data.pop("property_type")
+        fieldvisit = FieldVisit.objects.create(
+            property_type=property_type_data,
+            **validated_data,
+        )
+        return fieldvisit
 
 
 class DetailPropertySerializer(serializers.ModelSerializer):

@@ -15,6 +15,10 @@ class City(CommonInfo):
         verbose_name_plural = "City"
         ordering = ["-created_on"]
 
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower()
+        return super().save(*args, **kwargs)
+
 
 class PropertyInfo(CommonInfo):
     """
