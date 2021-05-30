@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth import get_user_model
 from common.models import CommonInfo
 from django.dispatch import receiver
@@ -146,7 +147,7 @@ class AdminProfile(CommonInfo):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="admin")
     full_name = models.CharField(max_length=20)
     image = models.ImageField(upload_to="user/admin", blank=True, null=True)
-    phone = models.CharField(max_length=15, blank=True, null=True)
+    phone = ArrayField(models.CharField(max_length=32), blank=True, null=True)
 
     def __str__(self):
         return f"{self.full_name}"

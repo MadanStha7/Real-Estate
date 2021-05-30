@@ -269,11 +269,12 @@ class Gallery(CommonInfo):
     """
     property info Gallery
     """
-
+    title = models.CharField(max_length=100, null=True,blank=True)
     image = models.ImageField(upload_to="property/images")
     property_info = models.ForeignKey(
         PropertyInfo, related_name="gallery", on_delete=models.CASCADE
     )
+    link = models.URLField(max_length=400, null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Gallery"
