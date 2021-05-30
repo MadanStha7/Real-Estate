@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 
 
 from property.models import (
+    ContactAgent,
     PropertyInfo,
     Gallery,
     FieldVisit,
@@ -38,6 +39,7 @@ from api.serializers.property_serializer import (
     DetailPropertySerializer,
     PropertyRequestSerializer,
     PropertyTypeFilteredSerialzers,
+    ContactAgentSerializer
 )
 
 
@@ -244,3 +246,7 @@ class AdminDashboardView(APIView):
         ]
         results = PropertyTypeFilteredSerialzers(data, many=True).data
         return Response(results)
+
+class ContactAgentViewSet(viewsets.ModelViewSet):
+    queryset=ContactAgent.objects.all()
+    serializer_class=ContactAgentSerializer

@@ -24,7 +24,7 @@ class AgentDetail(CommonInfo):
         User, on_delete=models.CASCADE, related_name="agent_detail"
     )
     location = models.TextField()
-    phone_number=models.CharField(max_length=20, blank=True)
+    phone_number = models.CharField(max_length=20, blank=True)
     identification_type = models.CharField(choices=IDENTIFICATION_TYPE, max_length=20)
     identification_number = models.CharField(max_length=20)
     identification_file = models.FileField(
