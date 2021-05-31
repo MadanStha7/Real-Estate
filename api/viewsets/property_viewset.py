@@ -68,7 +68,7 @@ class PropertyList(viewsets.ModelViewSet):
         property_obj = self.get_object()
         similar_pro = PropertyInfo.objects.filter(
             property_type=property_obj.property_type, publish=True
-        )
+        ).exclude(id=property_obj.id)
         serializer = self.get_serializer(similar_pro, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

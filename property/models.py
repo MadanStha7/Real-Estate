@@ -269,7 +269,8 @@ class Gallery(CommonInfo):
     """
     property info Gallery
     """
-    title = models.CharField(max_length=100, null=True,blank=True)
+
+    title = models.CharField(max_length=100, null=True, blank=True)
     image = models.ImageField(upload_to="property/images")
     property_info = models.ForeignKey(
         PropertyInfo, related_name="gallery", on_delete=models.CASCADE
@@ -403,7 +404,7 @@ class PropertyDiscussionBoard(CommonInfo):
 
 class PropertyRequest(CommonInfo):
     """
-    This model refers to the request of property if someone wants
+    This model refers to the request of property if someone wants to buy
     """
 
     REQUEST_TYPE_CHOICES = (
@@ -446,19 +447,45 @@ class PropertyRequest(CommonInfo):
         verbose_name_plural = "Property Request"
         db_table = "property_request"
 
+
+class FloorPlan(CommonInfo):
+    """
+    This model includes the architecture of property including map
+    """
+
+    property_type = models.ForeignKey(
+        PropertyInfo, related_name="floor_plan", on_delete=models.CASCADE
+    )
+    name = models.CharField(max_length=40, blank=True, null=True)
+    file = models.FileField(upload_to="floorplan/images", null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["-id"]
+        verbose_name_plural = "Floorplan"
+        db_table = "Floor plan"
+
+
 class ContactAgent(models.Model):
     """
-    Contact Agent from Property Detail Page
+    This model refers the contact of agent after someone wants a property
     """
+
     name = models.CharField(max_length=25, null=True)
     email = models.EmailField()
     phone = models.CharField(max_length=15)
-    property_info = models.ForeignKey(PropertyInfo, on_delete=models.CASCADE, related_name="property_info")
-    agent = models.ForeignKey(AgentDetail, on_delete=models.CASCADE, related_name="agent")
+    property_info = models.ForeignKey(
+        PropertyInfo, on_delete=models.CASCADE, related_name="property_info"
+    )
+    agent = models.ForeignKey(
+        AgentDetail, on_delete=models.CASCADE, related_name="agent"
+    )
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         ordering = ["-id"]
         verbose_name_plural = "Contact Agent"
-
-    def __str__(self):
-        return self.name
