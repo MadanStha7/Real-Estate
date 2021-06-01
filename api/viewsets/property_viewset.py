@@ -78,7 +78,7 @@ class PropertyTop(generics.ListAPIView):
     This views returns listing of top listing property
     """
 
-    serializer_class = PropertyListingSerializer
+    serializer_class = PropertyDetailSerializer
 
     def get_queryset(self):
         top_category = PropertyInfo.objects.filter(
@@ -92,7 +92,7 @@ class PropertyPremium(generics.ListAPIView):
     This views returns listing of premium property
     """
 
-    serializer_class = PropertyListingSerializer
+    serializer_class = PropertyDetailSerializer
 
     def get_queryset(self):
         premium_category = PropertyInfo.objects.filter(listing_type="P").filter(
@@ -106,7 +106,7 @@ class PropertyFeatured(generics.ListAPIView):
     This views returns featured property
     """
 
-    serializer_class = PropertyListingSerializer
+    serializer_class = PropertyDetailSerializer
 
     def get_queryset(self):
         featured_category = PropertyInfo.objects.filter(listing_type="F").filter(
