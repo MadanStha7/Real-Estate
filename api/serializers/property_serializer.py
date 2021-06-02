@@ -12,10 +12,30 @@ from property.models import (
     City,
     PropertyRequest,
     ContactAgent,
-    FloorPlan,
 )
+from .user_serializer import UserProfileSerializer, AdminProfileSerializer
 from user.models import UserProfile, AgentDetail
 from django.db import transaction
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+class PropertyUserSerializer(serializers.ModelSerializer):
+    """
+    created to display name of user in property
+    """
+
+    username = serializers.CharField(required=False)
+    email = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+        ]
 
 
 class CitySerializer(serializers.ModelSerializer):
@@ -46,7 +66,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
 class PropertySerializer(serializers.ModelSerializer):
     """
-    return the property details in homepage
+    return the property details in homepage in client side
     """
 
     listing_type = serializers.CharField(required=False)
@@ -54,6 +74,9 @@ class PropertySerializer(serializers.ModelSerializer):
     condition_type = serializers.CharField(required=False)
     created_on = serializers.CharField(read_only=True)
     locations = LocationSerializer(read_only=True)
+    gallery = serializers.HyperlinkedRelatedField(
+        many=True, read_only=True, view_name="gallery-detail"
+    )
     facing = serializers.CharField(required=False)
 
     class Meta:
@@ -86,6 +109,7 @@ class PropertySerializer(serializers.ModelSerializer):
             "price",
             "status",
             "created_on",
+            "gallery",
         )
 
 
@@ -119,29 +143,29 @@ class PropertyListingSerializer(serializers.ModelSerializer):
         ]
 
 
-class LocationSerializer(serializers.ModelSerializer):
-    """
-    Location of property info
-    """
+# class LocationSerializer(serializers.ModelSerializer):
+#     """
+#     Location of property info
+#     """
 
-    city_id = serializers.PrimaryKeyRelatedField(
-        queryset=City.objects.all(),
-        source="city",
-        write_only=True,
-    )
-    city = CitySerializer(read_only=True)
+#     city_id = serializers.PrimaryKeyRelatedField(
+#         queryset=City.objects.all(),
+#         source="city",
+#         write_only=True,
+#     )
+#     city = CitySerializer(read_only=True)
 
-    class Meta:
-        model = Location
-        fields = (
-            "id",
-            "city",
-            "city_id",
-            "locality",
-            "street",
-            "listing",
-            "property_info",
-        )
+#     class Meta:
+#         model = Location
+#         fields = (
+#             "id",
+#             "city",
+#             "city_id",
+#             "locality",
+#             "street",
+#             "listing",
+#             "property_info",
+#         )
 
 
 class GallerySerializer(serializers.ModelSerializer):
@@ -153,8 +177,14 @@ class GallerySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Gallery
-        fields = ("id", "title", "image", "link",
-                  "property_info", "property_info_value")
+        fields = (
+            "id",
+            "title",
+            "image",
+            "link",
+            "property_info",
+            "property_info_value",
+        )
 
 
 class AmenitiesSerializer(serializers.ModelSerializer):
@@ -237,10 +267,23 @@ class RentalSerializer(serializers.ModelSerializer):
 
 class PropertyDiscussionSerializer(serializers.ModelSerializer):
     tags = serializers.ListField(child=serializers.CharField())
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source="user", write_only=True
+    )
+    user = PropertyUserSerializer(read_only=True)
 
     class Meta:
         model = PropertyDiscussionBoard
-        fields = ("id", "discussion", "title", "tags", "comments", "property_type")
+        fields = (
+            "id",
+            "discussion",
+            "title",
+            "tags",
+            "comments",
+            "property_type",
+            "user",
+            "user_id",
+        )
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -288,6 +331,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
     rental_info = RentalSerializer(read_only=True, many=True)
     gallery = GallerySerializer(read_only=True, many=True)
     amenities = AmenitiesSerializer(read_only=True, many=True)
+    city = CitySerializer(read_only=True)
 
     class Meta:
         model = PropertyInfo
@@ -368,9 +412,11 @@ class DetailPropertySerializer(serializers.ModelSerializer):
 
 class PropertyRequestSerializer(serializers.ModelSerializer):
     request_type_display = serializers.CharField(
-        source="get_request_type_display", required=False)
+        source="get_request_type_display", required=False
+    )
     property_type_display = serializers.CharField(
-        source="get_property_type_display", required=False)
+        source="get_property_type_display", required=False
+    )
     urgent_display = serializers.CharField(source="get_urgent_display", required=False)
     urgent = serializers.CharField(required=False)
 
