@@ -12,6 +12,7 @@ from property.models import (
     City,
     PropertyRequest,
     ContactAgent,
+    FloorPlan,
 )
 from .user_serializer import UserProfileSerializer, AdminProfileSerializer
 from user.models import UserProfile, AgentDetail
@@ -454,7 +455,8 @@ class ContactAgentSerializer(serializers.ModelSerializer):
         model = ContactAgent
         fields = ("id", "name", "email", "property_info", "agent")
 
+
 class FloorPlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = FloorPlan
-        fields = "__all__"
+        fields = ("id", "property_type", "name", "file")
