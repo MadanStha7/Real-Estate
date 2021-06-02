@@ -42,7 +42,7 @@ router.register(r"property-filter", PropertyFilterView)
 router.register(r"contact_agent", ContactAgentViewSet)
 router.register(r"property-list", PropertyList)  # for client sides
 router.register(r"city", CityViewset)
-router.register(r"floor-list", FloorPlanViewSet)
+router.register(r"floorplan", FloorPlanViewSet)
 
 
 urlpatterns = [
