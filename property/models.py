@@ -3,6 +3,9 @@ from django.contrib.gis.geos import Point
 from django.contrib.postgres.fields import ArrayField
 from common.models import CommonInfo
 from user.models import AdminProfile, UserProfile, AgentDetail, StaffDetail
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class City(CommonInfo):
@@ -393,9 +396,16 @@ class PropertyDiscussionBoard(CommonInfo):
     property_type = models.ForeignKey(
         PropertyInfo, related_name="discussion", on_delete=models.CASCADE
     )
+    user = models.ForeignKey(
+        User,
+        models.SET_NULL,
+        related_name="discussion_user",
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
-        return self.title
+        return self.title + " " + str(self.id)
 
     class Meta:
         verbose_name_plural = "Property Discussion Board"
@@ -460,7 +470,7 @@ class FloorPlan(CommonInfo):
     file = models.FileField(upload_to="floorplan/images", null=True)
 
     def __str__(self):
-        return self.name
+        return str(self.id)
 
     class Meta:
         ordering = ["-id"]
