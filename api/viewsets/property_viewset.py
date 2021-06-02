@@ -23,6 +23,7 @@ from property.models import (
     City,
     Location,
     PropertyRequest,
+    FloorPlan,
 )
 from api.serializers.property_serializer import (
     PropertySerializer,
@@ -40,6 +41,7 @@ from api.serializers.property_serializer import (
     PropertyRequestSerializer,
     PropertyTypeFilteredSerialzers,
     ContactAgentSerializer,
+    FloorPlanSerializer,
 )
 
 
@@ -288,3 +290,10 @@ class AdminDashboardView(APIView):
 class ContactAgentViewSet(viewsets.ModelViewSet):
     queryset = ContactAgent.objects.all()
     serializer_class = ContactAgentSerializer
+
+class FloorPlanViewSet(viewsets.ModelViewSet):
+   
+    
+
+    queryset = FloorPlan.objects.all()
+    serializer_class = FloorPlanSerializer
