@@ -11,7 +11,8 @@ from property.models import (
     Location,
     City,
     PropertyRequest,
-    ContactAgent
+    ContactAgent,
+    FloorPlan,
 )
 from user.models import UserProfile, AgentDetail
 from django.db import transaction
@@ -406,3 +407,8 @@ class ContactAgentSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactAgent
         fields = ("id", "name", "email", "property_info", "agent")
+
+class FloorPlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FloorPlan
+        fields = "__all__"
