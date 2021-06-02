@@ -24,6 +24,7 @@ from api.viewsets.property_viewset import (
     AdminDashboardView,
     ContactAgentViewSet,
     CityViewset,
+    FloorPlanViewSet,
 )
 
 
@@ -42,6 +43,7 @@ router.register(r"property-list", PropertyList)
 router.register(r"contact_agent", ContactAgentViewSet)
 router.register(r"property-list", PropertyList)  # for client sides
 router.register(r"city", CityViewset)
+router.register(r"floor-list", FloorPlanViewSet)
 
 
 urlpatterns = [
