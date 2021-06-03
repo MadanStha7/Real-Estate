@@ -9,8 +9,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.views import APIView
-
-
 from property.models import (
     ContactAgent,
     PropertyInfo,
@@ -206,7 +204,12 @@ class PropertyDiscussionViewSet(viewsets.ModelViewSet):
     queryset = PropertyDiscussionBoard.objects.all()
     serializer_class = PropertyDiscussionSerializer
     filterset_fields = ["discussion"]
-
+    
+    @action(detail=True, methods=["POST"])
+    def perform_create(self, serializer):
+        user= self.request.user
+        print(user)
+        serializer.save(user=user)
 
 class ScheduleViewSet(viewsets.ModelViewSet):
     queryset = Schedule.objects.all()

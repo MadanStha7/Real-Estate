@@ -267,10 +267,10 @@ class RentalSerializer(serializers.ModelSerializer):
 
 
 class PropertyDiscussionSerializer(serializers.ModelSerializer):
-    tags = serializers.ListField(child=serializers.CharField())
-    user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source="user", write_only=True
-    )
+    tags = serializers.ListField(child=serializers.CharField(), required=False)
+    # user_id = serializers.PrimaryKeyRelatedField(
+    #     queryset=User.objects.all(), source="user", write_only=True
+    # )
     user = PropertyUserSerializer(read_only=True)
 
     class Meta:
@@ -283,7 +283,7 @@ class PropertyDiscussionSerializer(serializers.ModelSerializer):
             "comments",
             "property_type",
             "user",
-            "user_id",
+            # "user_id",
         )
 
 
