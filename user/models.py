@@ -6,6 +6,10 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.contrib.auth.models import Group
 
+# from colossus.apps.notifications.constants import Actions
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+
 User = get_user_model()
 
 IDENTIFICATION_TYPE = (
@@ -160,6 +164,53 @@ class AdminProfile(CommonInfo):
     class Meta:
         ordering = ["-id"]
         db_table = "admin_profile"
+
+
+class Notificatons(CommonInfo):
+    """This model returns the different notifications of different users"""
+
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="notifications"
+    )
+    content_type = models.ForeignKey(
+        ContentType,
+        models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+    object_id = models.PositiveIntegerField(null=True)
+    content_object = GenericForeignKey()
+    text = models.TextField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-id"]
+        verbose_name_plural = "Notifications"
+
+    def __str__(self):
+        return str(self.id) + " " + self.user.username
+
+
+class NotificationActivity(CommonInfo):
+    """
+    This model shows the notifications read and seen by the users
+    """
+
+    notification = models.ForeignKey(
+        Notificatons,
+        models.SET_NULL,
+        related_name="notifications",
+        blank=True,
+        null=True,
+    )
+    is_seen = models.BooleanField(default=False)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-id"]
+        verbose_name_plural = "Notification Activity"
+
+    def __str__(self):
+        return str(self.id)
 
 
 class Contact(models.Model):
