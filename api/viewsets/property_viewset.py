@@ -22,6 +22,7 @@ from property.models import (
     Location,
     PropertyRequest,
     FloorPlan,
+    Comment,
 )
 from api.serializers.property_serializer import (
     PropertySerializer,
@@ -40,6 +41,7 @@ from api.serializers.property_serializer import (
     PropertyTypeFilteredSerialzers,
     ContactAgentSerializer,
     FloorPlanSerializer,
+    CommentSerializer,
 )
 
 
@@ -130,7 +132,6 @@ class PropertyFilterView(viewsets.ModelViewSet):
         verified_property = PropertyInfo.objects.filter(publish=True)
         city = self.request.query_params.get("city", None)
         bhk_type = self.request.query_params.get("bhk_type", None)
-        print(bhk_type)
         facing = self.request.query_params.get("facing", None)
         property_size = self.request.query_params.get("property_size", None)
         property_adtype = self.request.query_params.get("property_adtype", None)
@@ -149,6 +150,8 @@ class PropertyFilterView(viewsets.ModelViewSet):
         elif property_adtype:
             queryset = verified_property.filter(property_adtype=property_adtype)
             return queryset
+
+        # for both city and locality
 
         else:
             pass
@@ -177,9 +180,32 @@ class LocationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         city_id = self.request.query_params.get("id", None)
+        city = self.request.query_params.get("city", None)
+        locality = self.request.query_params.get("locality", None)
+        print("locality", locality)
+        print("city", city)
+
+        # for admin purposes to display all locations based on the cities
         if city_id is not None:
             city = City.objects.get(id=city_id)
             queryset = Location.objects.select_related("city").filter(city=city.id)
+            return queryset
+
+        # for client side search
+        if (city and locality) is not None:
+            city_name = City.objects.get(name=city)
+            queryset = Location.objects.filter(
+                city=city_name.id, locality__icontains=locality
+            )
+            return queryset
+
+        if city is not None:
+            city = City.objects.get(name=city)
+            queryset = Location.objects.select_related("city").filter(city=city.id)
+            return queryset
+
+        if locality is not None:
+            queryset = Location.objects.filter(locality__icontains=locality)
             return queryset
         return super().get_queryset()
 
@@ -204,12 +230,30 @@ class PropertyDiscussionViewSet(viewsets.ModelViewSet):
     queryset = PropertyDiscussionBoard.objects.all()
     serializer_class = PropertyDiscussionSerializer
     filterset_fields = ["discussion"]
-    
-    @action(detail=True, methods=["POST"])
-    def perform_create(self, serializer):
-        user= self.request.user
-        print(user)
-        serializer.save(user=user)
+
+    # @action(detail=True, methods=["POST"])
+    # def perform_create(self, serializer):
+    #     user = self.request.user
+    #     print(user, "###############################")
+    #     if user is not None:
+    #         return Response(
+    #             {"Invalid": "Unauthenticated user"},
+    #             status=status.HTTP_404_NOT_FOUND,
+    #         )
+    #     print(user)
+    #     serializer.save(user=user)
+
+    @action(detail=True, methods=["GET"])
+    def total_discussion(self, request, pk=None):
+        """Total number of comments in a single property"""
+        property_obj = self.get_object()
+        discussion = PropertyDiscussionBoard.objects.select_related(
+            "property_type"
+        ).filter(property_type=property_obj.id)
+        # return queryset
+        serializer = self.get_serializer(discussion, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class ScheduleViewSet(viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
@@ -241,20 +285,12 @@ class PropertySearchView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["city", "locality"]
 
+    # for homepage city and locality search
+
 
 class CityViewset(viewsets.ModelViewSet):
     queryset = City.objects.all()
     serializer_class = CitySerializer
-
-    def get_queryset(self):
-        city_name = self.request.query_params.get("name", None)
-        print("city_name", city_name)
-        if city_name is not None:
-            city = City.objects.get(name=city_name)
-            print("city", city)
-            queryset = Location.objects.select_related("city").filter(city=city.id)
-            return queryset
-        return super().get_queryset()
 
 
 class DetailPropertyView(generics.ListCreateAPIView):
@@ -298,3 +334,10 @@ class ContactAgentViewSet(viewsets.ModelViewSet):
 class FloorPlanViewSet(viewsets.ModelViewSet):
     queryset = FloorPlan.objects.all()
     serializer_class = FloorPlanSerializer
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """This view shows the comment on discussion board"""
+
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer

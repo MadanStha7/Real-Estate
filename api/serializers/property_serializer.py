@@ -13,6 +13,7 @@ from property.models import (
     PropertyRequest,
     ContactAgent,
     FloorPlan,
+    Comment,
 )
 from .user_serializer import UserProfileSerializer, AdminProfileSerializer
 from user.models import UserProfile, AgentDetail
@@ -268,9 +269,9 @@ class RentalSerializer(serializers.ModelSerializer):
 
 class PropertyDiscussionSerializer(serializers.ModelSerializer):
     tags = serializers.ListField(child=serializers.CharField(), required=False)
-    # user_id = serializers.PrimaryKeyRelatedField(
-    #     queryset=User.objects.all(), source="user", write_only=True
-    # )
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source="user", write_only=True
+    )
     user = PropertyUserSerializer(read_only=True)
 
     class Meta:
@@ -283,8 +284,18 @@ class PropertyDiscussionSerializer(serializers.ModelSerializer):
             "comments",
             "property_type",
             "user",
-            # "user_id",
+            "user_id",
         )
+
+    @transaction.atomic
+    def create(self, validated_data):
+        discussion_board = PropertyDiscussionBoard.objects.create(**validated_data)
+        Comment.objects.create(
+            discussion_board=discussion_board,
+            user=validated_data["user"],
+            text=validated_data["comments"],
+        )
+        return discussion_board
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -460,3 +471,32 @@ class FloorPlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = FloorPlan
         fields = ("id", "property_type", "name", "file")
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source="user", write_only=True
+    )
+    user = PropertyUserSerializer(read_only=True)
+    discussion_board_id = serializers.PrimaryKeyRelatedField(
+        queryset=PropertyDiscussionBoard.objects.all(),
+        source="discussion_board",
+        write_only=True,
+    )
+    discussion_board = PropertyDiscussionSerializer(read_only=True)
+    # user_details = serializers.SerializerMethodField(read_only=True)
+
+    # def get_user_details(self, obj):
+
+    #     return
+
+    class Meta:
+        model = Comment
+        fields = (
+            "id",
+            "user_id",
+            "discussion_board_id",
+            "text",
+            "user",
+            "discussion_board",
+        )

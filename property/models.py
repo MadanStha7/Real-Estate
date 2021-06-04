@@ -408,8 +408,32 @@ class PropertyDiscussionBoard(CommonInfo):
         return self.title + " " + str(self.id)
 
     class Meta:
+        ordering = ["-id"]
         verbose_name_plural = "Property Discussion Board"
         db_table = "property_discussionboard"
+
+
+class Comment(CommonInfo):
+    """This model defines the comment appeared on property discussion board"""
+
+    user = models.ForeignKey(
+        User,
+        models.SET_NULL,
+        related_name="comment_user",
+        blank=True,
+        null=True,
+    )
+    discussion_board = models.ForeignKey(
+        PropertyDiscussionBoard, on_delete=models.CASCADE, null=True
+    )
+    text = models.TextField(null=True)
+
+    def __str__(self):
+        return str(self.id)
+
+    class Meta:
+        ordering = ["-id"]
+        verbose_name_plural = "Comment"
 
 
 class PropertyRequest(CommonInfo):
