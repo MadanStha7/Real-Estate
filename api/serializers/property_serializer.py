@@ -16,7 +16,7 @@ from property.models import (
     Comment,
 )
 from .user_serializer import UserProfileSerializer, AdminProfileSerializer
-from user.models import UserProfile, AgentDetail
+from user.models import UserProfile, AgentDetail, StaffDetail, AdminProfile
 from django.db import transaction
 from django.contrib.auth import get_user_model
 
@@ -477,18 +477,43 @@ class CommentSerializer(serializers.ModelSerializer):
     user_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), source="user", write_only=True
     )
-    user = PropertyUserSerializer(read_only=True)
     discussion_board_id = serializers.PrimaryKeyRelatedField(
         queryset=PropertyDiscussionBoard.objects.all(),
         source="discussion_board",
         write_only=True,
     )
     discussion_board = PropertyDiscussionSerializer(read_only=True)
-    # user_details = serializers.SerializerMethodField(read_only=True)
+    user_details = serializers.SerializerMethodField(read_only=True)
 
-    # def get_user_details(self, obj):
+    created_on = serializers.DateTimeField(read_only=True)
+    reply = serializers.CharField(required=False)
 
-    #     return
+    def get_user_details(self, obj):
+        if obj:
+            user_obj = obj.user
+            try:
+                user_details = user_obj.agent_detail.full_name
+                return user_details
+            except AgentDetail.DoesNotExist:
+                pass
+            try:
+                user_details = user_obj.buyer_seller_profile.full_name
+                return user_details
+            except UserProfile.DoesNotExist:
+                pass
+
+            try:
+                user_details = user_obj.staff_detail.full_name
+                return user_details
+            except StaffDetail.DoesNotExist:
+                pass
+            try:
+                user_details = user_obj.admin.full_name
+                return user_details
+
+            except AdminProfile.DoesNotExist:
+                pass
+            # return
 
     class Meta:
         model = Comment
@@ -499,4 +524,13 @@ class CommentSerializer(serializers.ModelSerializer):
             "text",
             "user",
             "discussion_board",
+            "created_on",
+            "user_details",
+            "reply",
         )
+
+    # @transaction.atomic
+    # def create(self, validated_data):
+    #     print("validated data", validated_data)
+    #     reply = validated_data.pop("reply")
+    #     return Comment.objects.create(**validated_data)
