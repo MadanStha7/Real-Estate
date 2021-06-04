@@ -13,6 +13,7 @@ from .models import (
     Schedule,
     ContactAgent,
     FloorPlan,
+    Comment,
 )
 
 # Register your models here.
@@ -30,5 +31,6 @@ admin.site.register(
         Schedule,
         ContactAgent,
         FloorPlan,
+        Comment,
     ]
 )
