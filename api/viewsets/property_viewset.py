@@ -243,17 +243,6 @@ class PropertyDiscussionViewSet(viewsets.ModelViewSet):
     #     print(user)
     #     serializer.save(user=user)
 
-    @action(detail=True, methods=["GET"])
-    def total_discussion(self, request, pk=None):
-        """Total number of comments in a single property"""
-        property_obj = self.get_object()
-        discussion = PropertyDiscussionBoard.objects.select_related(
-            "property_type"
-        ).filter(property_type=property_obj.id)
-        # return queryset
-        serializer = self.get_serializer(discussion, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 class ScheduleViewSet(viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
@@ -341,3 +330,16 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+
+    @action(detail=True, methods=["GET"])
+    def total_discussion(self, request, pk=None):
+        """Total number of comments in a single property"""
+        property_obj = self.get_object()
+        if property_obj:
+            comment = Comment.objects.filter(
+                discussion_board__property_type__id=property_obj.id
+            )
+            serializer = self.get_serializer(comment, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"data": "No data to display"}, status=status.HTTP_200_OK)

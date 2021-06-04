@@ -427,9 +427,12 @@ class Comment(CommonInfo):
         PropertyDiscussionBoard, on_delete=models.CASCADE, null=True
     )
     text = models.TextField(null=True)
+    reply = models.ForeignKey(
+        "self", related_name="replies", on_delete=models.CASCADE, null=True, blank=True
+    )
 
     def __str__(self):
-        return str(self.id)
+        return str(self.text)
 
     class Meta:
         ordering = ["-id"]
