@@ -9,6 +9,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
+from user.models import AgentDetail, UserProfile, AdminProfile
+
 from property.models import (
     ContactAgent,
     PropertyInfo,
@@ -23,6 +28,7 @@ from property.models import (
     PropertyRequest,
     FloorPlan,
     Comment,
+    Reply,
 )
 from api.serializers.property_serializer import (
     PropertySerializer,
@@ -42,6 +48,7 @@ from api.serializers.property_serializer import (
     ContactAgentSerializer,
     FloorPlanSerializer,
     CommentSerializer,
+    ReplySerializer,
 )
 
 
@@ -166,6 +173,24 @@ class PropertyFilterView(viewsets.ModelViewSet):
 class PropertyViewSet(viewsets.ModelViewSet):
     queryset = PropertyInfo.objects.all()
     serializer_class = PropertySerializer
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
+    def perform_create(self, serializer):
+        get_group = self.request.user.groups.all()
+        for group in get_group:
+            if group.name == "BuyerOrSeller":
+                owner = self.request.user
+                admin = None
+            elif group.name == "Admin":
+                admin = self.request.user
+                owner = None
+            else:
+                pass
+        serializer.save(owner=owner, admin=admin)
 
 
 class RentalViewSet(viewsets.ModelViewSet):
@@ -334,12 +359,26 @@ class CommentViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["GET"])
     def total_discussion(self, request, pk=None):
         """Total number of comments in a single property"""
-        property_obj = self.get_object()
-        if property_obj:
-            comment = Comment.objects.filter(
-                discussion_board__property_type__id=property_obj.id
-            )
-            serializer = self.get_serializer(comment, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        property_obj = get_object_or_404(PropertyInfo.objects.filter(id=pk))
+        if property_obj is not None:
+            try:
+                comment = Comment.objects.filter(
+                    discussion_board__property_type__id=property_obj.id
+                )
+                print("comment", comment)
+                serializer = self.get_serializer(comment, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            except Comment.DoesNotExist:
+                raise ValidationError({"error": "No data to display"})
         else:
             return Response({"data": "No data to display"}, status=status.HTTP_200_OK)
+
+        # property_obj = self.get_object()
+
+
+class ReplyViewSet(viewsets.ModelViewSet):
+    """This view shows the reply on comment"""
+
+    queryset = Reply.objects.all()
+    serializer_class = ReplySerializer

@@ -26,6 +26,7 @@ from api.viewsets.property_viewset import (
     CityViewset,
     FloorPlanViewSet,
     CommentViewSet,
+    ReplyViewSet,
 )
 
 
@@ -45,6 +46,8 @@ router.register(r"property-list", PropertyList)  # for client sides
 router.register(r"city", CityViewset)
 router.register(r"floorplan", FloorPlanViewSet)
 router.register(r"comment", CommentViewSet)
+router.register(r"reply", ReplyViewSet)
+
 
 urlpatterns = [
     path("", include(router.urls)),

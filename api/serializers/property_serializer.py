@@ -14,6 +14,7 @@ from property.models import (
     ContactAgent,
     FloorPlan,
     Comment,
+    Reply,
 )
 from .user_serializer import UserProfileSerializer, AdminProfileSerializer
 from user.models import UserProfile, AgentDetail, StaffDetail, AdminProfile
@@ -473,6 +474,50 @@ class FloorPlanSerializer(serializers.ModelSerializer):
         fields = ("id", "property_type", "name", "file")
 
 
+class ReplySerializer(serializers.ModelSerializer):
+    created_on = serializers.DateTimeField(read_only=True)
+    full_name = serializers.SerializerMethodField(read_only=True)
+    # reply_ = serializers.SerializerMethodField(read_only=True)
+
+    def get_full_name(self, obj):
+        if obj:
+            user_obj = obj.reply_madeby
+            try:
+                user_details = user_obj.agent_detail.full_name
+                return user_details
+            except AgentDetail.DoesNotExist:
+                pass
+            try:
+                user_details = user_obj.buyer_seller_profile.full_name
+                return user_details
+            except UserProfile.DoesNotExist:
+                pass
+
+            try:
+                user_details = user_obj.staff_detail.full_name
+                return user_details
+            except StaffDetail.DoesNotExist:
+                pass
+            try:
+                user_details = user_obj.admin.full_name
+                return user_details
+
+            except AdminProfile.DoesNotExist:
+                pass
+
+    class Meta:
+        model = Reply
+        fields = (
+            "id",
+            "reply_madeby",
+            "reply_madeto",
+            "comment",
+            "reply",
+            "created_on",
+            "full_name",
+        )
+
+
 class CommentSerializer(serializers.ModelSerializer):
     user_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), source="user", write_only=True
@@ -484,9 +529,9 @@ class CommentSerializer(serializers.ModelSerializer):
     )
     discussion_board = PropertyDiscussionSerializer(read_only=True)
     user_details = serializers.SerializerMethodField(read_only=True)
+    reply = ReplySerializer(many=True, read_only=True)
 
     created_on = serializers.DateTimeField(read_only=True)
-    reply = serializers.CharField(required=False)
 
     def get_user_details(self, obj):
         if obj:
@@ -528,9 +573,3 @@ class CommentSerializer(serializers.ModelSerializer):
             "user_details",
             "reply",
         )
-
-    # @transaction.atomic
-    # def create(self, validated_data):
-    #     print("validated data", validated_data)
-    #     reply = validated_data.pop("reply")
-    #     return Comment.objects.create(**validated_data)

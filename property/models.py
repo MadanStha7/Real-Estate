@@ -138,28 +138,28 @@ class PropertyInfo(CommonInfo):
     price = models.FloatField(default=0.00)
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, null=True)
     owner = models.ForeignKey(
-        UserProfile,
+        User,
         related_name="userprofile",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
     )
     agent = models.ForeignKey(
-        AgentDetail,
+        User,
         related_name="agentdetail",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
     )
     staff = models.ForeignKey(
-        StaffDetail,
+        User,
         related_name="staffdetail",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
     )
     admin = models.ForeignKey(
-        AdminProfile,
+        User,
         related_name="admin_profile",
         on_delete=models.CASCADE,
         blank=True,
@@ -427,9 +427,6 @@ class Comment(CommonInfo):
         PropertyDiscussionBoard, on_delete=models.CASCADE, null=True
     )
     text = models.TextField(null=True)
-    reply = models.ForeignKey(
-        "self", related_name="replies", on_delete=models.CASCADE, null=True, blank=True
-    )
 
     def __str__(self):
         return str(self.text)
@@ -437,6 +434,38 @@ class Comment(CommonInfo):
     class Meta:
         ordering = ["-id"]
         verbose_name_plural = "Comment"
+
+
+class Reply(CommonInfo):
+    """Reply of the particular comment"""
+
+    reply_madeby = models.ForeignKey(
+        User,
+        models.SET_NULL,
+        related_name="reply_madeby",
+        blank=True,
+        null=True,
+        help_text="Reply made by user",
+    )
+    reply_madeto = models.ForeignKey(
+        User,
+        models.SET_NULL,
+        related_name="reply_madeto",
+        blank=True,
+        null=True,
+        help_text="Reply done to specific user comment",
+    )
+    comment = models.ForeignKey(
+        Comment, related_name="reply", on_delete=models.CASCADE, null=True
+    )
+    reply = models.TextField()
+
+    def __str__(self):
+        return str(self.id) + " " + self.reply
+
+    class Meta:
+        ordering = ["-id"]
+        verbose_name_plural = "Reply"
 
 
 class PropertyRequest(CommonInfo):
