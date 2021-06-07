@@ -52,6 +52,10 @@ class CitySerializer(serializers.ModelSerializer):
         return name
 
 
+class FloorPlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FloorPlan
+        fields = ("id", "property_type", "name", "file")
 class LocationSerializer(serializers.ModelSerializer):
     """
     Location of property info
@@ -345,6 +349,8 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
     gallery = GallerySerializer(read_only=True, many=True)
     amenities = AmenitiesSerializer(read_only=True, many=True)
     city = CitySerializer(read_only=True)
+    # floor_plan = serializers.SlugRelatedField(many=True, read_only=True, slug_field="file")
+    floor_plan= FloorPlanSerializer(read_only=True, many=True)
 
     class Meta:
         model = PropertyInfo
@@ -377,6 +383,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             "views",
             "price",
             "status",
+            "floor_plan",
             "created_on",
         )
 
