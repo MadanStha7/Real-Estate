@@ -526,7 +526,7 @@ class FloorPlan(CommonInfo):
     file = models.FileField(upload_to="floorplan/images", null=True)
 
     def __str__(self):
-        return str(self.id)
+        return str(self.name)
 
     class Meta:
         ordering = ["-id"]
