@@ -5,7 +5,6 @@ from common.models import CommonInfo
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.contrib.auth.models import Group
-
 # from colossus.apps.notifications.constants import Actions
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType

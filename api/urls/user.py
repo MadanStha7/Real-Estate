@@ -12,6 +12,8 @@ from api.viewsets.user_viewset import (
     StaffDetailViewset,
     AdminProfileViewSet,
     AdminViewSet,
+    LogoutView,
+    MyProfileView
 )
 
 router = routers.DefaultRouter()
@@ -22,7 +24,7 @@ router.register(r"staff", StaffDetailViewset)
 router.register(r"all_users", UserViewSet)
 router.register(r"contact", ContactViewSet)
 router.register(r"admin_profile", AdminProfileViewSet)
-
+router.register(r"my_profile", MyProfileView)
 
 
 urlpatterns = [
@@ -37,4 +39,5 @@ urlpatterns = [
     ),
     # contact page for sending email
     path("send-mail/", SendMailView.as_view(), name="send-mail"),
+    path('logout/', LogoutView.as_view(), name="logout")
 ]
