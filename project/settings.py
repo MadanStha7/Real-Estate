@@ -83,6 +83,7 @@ WSGI_APPLICATION = "project.wsgi.application"
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
+    'user.backends.EmailBackend',
     # "user.backends.EmailOrUsernameModelBackend",
 )
 
