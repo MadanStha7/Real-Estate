@@ -273,8 +273,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ("id", "full_name", "user", "phone_number",
-                  "address", "profile_picture")
+        fields = (
+            "id",
+            "full_name",
+            "user",
+            "phone_number",
+            "address",
+            "profile_picture",
+        )
 
     @transaction.atomic
     def create(self, validated_data):
@@ -332,7 +338,7 @@ class AdminProfileSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_data = validated_data.pop("user")
         user = User.objects.create_user(
-            username=user_data["username"],
+            username=user_data["email"],
             email=user_data["email"],
             password=user_data["password"],
         )

@@ -13,7 +13,7 @@ from api.viewsets.user_viewset import (
     AdminProfileViewSet,
     AdminViewSet,
     LogoutView,
-    MyProfileView
+    MyProfileView,
 )
 
 router = routers.DefaultRouter()
@@ -39,5 +39,5 @@ urlpatterns = [
     ),
     # contact page for sending email
     path("send-mail/", SendMailView.as_view(), name="send-mail"),
-    path('logout/', LogoutView.as_view(), name="logout")
+    path("logout/", LogoutView.as_view(), name="logout"),
 ]
