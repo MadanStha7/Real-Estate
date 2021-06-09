@@ -23,6 +23,9 @@ from django.contrib.auth.models import Group, User
 from rest_framework import viewsets, generics, views, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import AnonymousUser
+from property.models import PropertyInfo
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -173,7 +176,7 @@ class UserLoginView(APIView):
                     )
                 if user is not None:
                     if user.is_active:
-                        group_name=Group.objects.filter(user=user).values()
+                        group_name = Group.objects.filter(user=user).values()
                         return Response(
                             {
                                 "Success": "User successfully logged in.",
@@ -226,7 +229,7 @@ class OtpVerify(APIView):
                         status=status.HTTP_202_ACCEPTED,
                     )
 
-            except UserProfile.DoesnotExist:
+            except UserProfile.DoesNotExist:
                 return Response(
                     {
                         "No User": "Invalid otp OR No any inactive user found for given otp"
@@ -263,3 +266,39 @@ class SendMailView(APIView):
             Contact.objects.create(name=name, email=email, phone=phone, message=message)
             return Response({"success": "Message sent successfully"})
         return Response({"success": "Failed"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MyProfileView(viewsets.ModelViewSet):
+    """
+    This view returns the profile of logged in user.
+    """
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+
+    def get_queryset(self):
+        my_profile = UserProfile.objects.filter(user=self.request.user.id)
+        print(my_profile)
+        if my_profile == None:
+            return Response({"message": "Please login to view profile."})
+        else:
+            return my_profile
+
+
+class LogoutView(APIView):
+    """
+    View to logout the username
+    """
+
+    def post(self, request):
+        return self.logout(request)
+
+    def logout(self, request):
+        try:
+            request.user.auth_token.delete()
+        except (AttributeError, ObjectDoesNotExist):
+            pass
+
+        logout(request)
+
+        return Response({"success": ("Successfully logged out.")},
+                        status=status.HTTP_200_OK)
