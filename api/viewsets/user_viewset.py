@@ -42,7 +42,6 @@ class AdminViewSet(viewsets.ModelViewSet):
     serializer_class = AdminProfileSerializer
 
     def perform_create(self, serializer):
-        print("executed")
         serializer = AdminProfileSerializer(data=self.request.data)
         if serializer.is_valid():
             serializer.save()
@@ -63,6 +62,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     """
     Profile of Logged in Admin
     """
+
     queryset = AdminProfile.objects.all()
     serializer_class = AdminProfileSerializer
 
@@ -86,14 +86,12 @@ class AgentDetailViewSet(viewsets.ModelViewSet):
         return Response("serializer errors", status=status.HTTP_400_BAD_REQUEST)
 
     def get_serializer_context(self):
-        print("data****************", self.request.data)
         context = super().get_serializer_context()
         context.update(
             {
                 "request": self.request.method,
             }
         )
-        print("context", context)
         return context
 
 
@@ -121,7 +119,6 @@ class StaffDetailViewset(viewsets.ModelViewSet):
     serializer_class = StaffDetailSerializer
 
     def perform_create(self, serializer):
-        print("data", self.request.data)
         serializer = StaffDetailSerializer(data=self.request.data)
         if serializer.is_valid():
             serializer.save()
@@ -131,13 +128,11 @@ class StaffDetailViewset(viewsets.ModelViewSet):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         if self.request.method == "POST":
-            print("ram thapa")
             context.update(
                 {
                     "request": self.request.method,
                 }
             )
-            print("context", context)
         return context
 
     def update(self, request, *args, **kwargs):
@@ -272,33 +267,24 @@ class MyProfileView(viewsets.ModelViewSet):
     """
     This view returns the profile of logged in user.
     """
+
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
 
     def get_queryset(self):
         my_profile = UserProfile.objects.filter(user=self.request.user.id)
-        print(my_profile)
-        if my_profile == None:
+        if my_profile is None:
             return Response({"message": "Please login to view profile."})
         else:
             return my_profile
 
 
 class LogoutView(APIView):
-    """
-    View to logout the username
-    """
+    """expires the logg in session of user"""
 
-    def post(self, request):
-        return self.logout(request)
-
-    def logout(self, request):
-        try:
-            request.user.auth_token.delete()
-        except (AttributeError, ObjectDoesNotExist):
-            pass
-
+    def get(self, request, format=None):
+        # using Django logout
         logout(request)
-
-        return Response({"success": ("Successfully logged out.")},
-                        status=status.HTTP_200_OK)
+        return Response(
+            {"success": ("Successfully logged out.")}, status=status.HTTP_200_OK
+        )

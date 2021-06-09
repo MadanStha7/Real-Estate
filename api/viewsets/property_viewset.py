@@ -12,9 +12,14 @@ from rest_framework.decorators import action
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
 from user.models import AgentDetail, UserProfile, AdminProfile
-
+from api.permissions.user_permission import (
+    UserIsAuthenticated,
+    UserIsAdmin,
+    UserIsStaffDetail,
+    UserIsBuyerOrSeller,
+    UserIsAgentDetail,
+)
 from property.models import (
     ContactAgent,
     PropertyInfo,
@@ -81,14 +86,12 @@ class PropertyList(viewsets.ModelViewSet):
         ).exclude(id=property_obj.id)
         serializer = self.get_serializer(similar_pro, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     @action(detail=True, methods=["GET"])
     def get_gallery(self, request):
-        property= PropertyInfo.objects.get(id= self.id)
-        gallery= Gallery.objects.filter(property_info= property.id)
+        property = PropertyInfo.objects.get(id=self.id)
+        gallery = Gallery.objects.filter(property_info=property.id)
         return gallery
-        
-    
 
 
 class PropertyTop(generics.ListAPIView):
@@ -184,7 +187,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
     serializer_class = PropertySerializer
 
     def get_permissions(self):
-        if self.request.method == "POST":
+        if self.action in ["create"]:
             return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
@@ -288,18 +291,18 @@ class PropertyDiscussionViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(discussion, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    
-    @action(detail=True, methods=["POST"])
-    def perform_create(self, serializer):
-        user = self.request.user
-        print(user, "###############################")
-        if user is not None:
-            return Response(
-                {"Invalid": "Unauthenticated user"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        print(user)
-        serializer.save(user=user)
+    # @action(detail=True, methods=["POST"])
+    # def perform_create(self, serializer):
+    #     user = self.request.user
+    #     print(user, "###############################")
+    #     if user is not None:
+    #         return Response(
+    #             {"Invalid": "Unauthenticated user"},
+    #             status=status.HTTP_404_NOT_FOUND,
+    #         )
+    #     print(user)
+    #     serializer.save(user=user)
+
 
 class ScheduleViewSet(viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
