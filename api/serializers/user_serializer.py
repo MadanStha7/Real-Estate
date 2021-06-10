@@ -297,8 +297,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "Here is the message. {}".format(
                 "Your 4 Digit Verification Pin" + str(ran_num_upper)
             ),
-            user_data["email"],
-            [EMAIL_HOST_USER],
+            EMAIL_HOST_USER,
+            [user_data["email"]],
             fail_silently=False,
         )
         user_profile = UserProfile.objects.create(
