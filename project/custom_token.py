@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from user.models import AgentDetail, UserProfile, AdminProfile, StaffDetail
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from rest_framework import status
 
 User = get_user_model()
 
@@ -33,6 +34,13 @@ class CustomAuthToken(ObtainAuthToken):
         try:
             user_details = UserProfile.objects.get(user=user_obj)
             full_name = user_details.full_name
+            if user_details.is_email:
+                pass
+            else:
+                return Response(
+                    {"Invalid": "Unauthenticated user"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
             if user_details.profile_picture:
                 image = user_details.profile_picture.url
             else:

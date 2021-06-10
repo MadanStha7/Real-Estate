@@ -161,6 +161,7 @@ class UserLoginView(APIView):
                     get_user = User.objects.get(email=u_name)
                 else:
                     get_user = User.objects.get(username=u_name)
+
                 user = authenticate(username=get_user, password=pword)
                 try:
                     token = Token.objects.get(user=user.id)
