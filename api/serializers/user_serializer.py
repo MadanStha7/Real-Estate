@@ -386,3 +386,15 @@ class OtpSerializer(serializers.Serializer):
 
     otp_code = serializers.CharField(write_only=True, required=True)
     user_id = serializers.IntegerField(write_only=True, required=True)
+
+class AgentSearchSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = AgentDetail
+        fields = ("user", "location", "full_name", "phone_number", "identification_type", "identification_number","identification_file", "accept_terms_and_condition", "added_at", "is_verified")
+
+
+
+
+

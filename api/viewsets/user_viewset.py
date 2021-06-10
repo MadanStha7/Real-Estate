@@ -12,7 +12,9 @@ from api.serializers.user_serializer import (
     UserLoginSerializer,
     StaffDetailSerializer,
     AdminProfileSerializer,
+    AgentSearchSerializer,
 )
+from rest_framework import filters
 from rest_framework.authtoken.models import Token
 from user.models import UserProfile, AgentDetail, Contact, StaffDetail, AdminProfile
 from rest_framework.views import APIView
@@ -289,3 +291,32 @@ class LogoutView(APIView):
         return Response(
             {"success": ("Successfully logged out.")}, status=status.HTTP_200_OK
         )
+
+
+
+
+class AgentSearchViewSet(viewsets.ModelViewSet):
+   
+    queryset = AgentDetail.objects.all()
+    serializer_class = AgentSearchSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ['full_name', 'location']
+
+    def get_queryset(self):
+        verified_agent  = AgentDetail.objects.filter(is_verified=True)
+        location = self.request.query_params.get("location", None)
+        full_name = self.request.query_params.get("full_name", None)
+       
+       
+        if full_name:
+            queryset = verified_agent.filter(full_name=full_name)
+            return queryset
+       
+        elif location:
+            queryset = verified_agent.filter(location=location)
+            return queryset
+
+
+        else:
+            pass
+        return super().get_queryset()

@@ -14,6 +14,7 @@ from api.viewsets.user_viewset import (
     AdminViewSet,
     LogoutView,
     MyProfileView,
+    AgentSearchViewSet,
 )
 
 router = routers.DefaultRouter()
@@ -25,6 +26,7 @@ router.register(r"all_users", UserViewSet)
 router.register(r"contact", ContactViewSet)
 router.register(r"admin_profile", AdminProfileViewSet)
 router.register(r"my_profile", MyProfileView)
+router.register(r"agent-search", AgentSearchViewSet)
 
 
 urlpatterns = [
