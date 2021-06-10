@@ -187,7 +187,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
     serializer_class = PropertySerializer
 
     def get_permissions(self):
-        if self.action in ["create"]:
+        if self.action in ["create", "partial_update", "finish"]:
             return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
@@ -210,10 +210,20 @@ class RentalViewSet(viewsets.ModelViewSet):
     serializer_class = RentalSerializer
     filterset_fields = ["available_for", "tenants", "parking"]
 
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "finish"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
 
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "finish"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
         city_id = self.request.query_params.get("id", None)
@@ -251,10 +261,20 @@ class GalleryViewSet(viewsets.ModelViewSet):
     queryset = Gallery.objects.all()
     serializer_class = GallerySerializer
 
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "finish"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
 
 class AmentitesViewSet(viewsets.ModelViewSet):
     queryset = Amenities.objects.all()
     serializer_class = AmenitiesSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "finish"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
 
 
 class FieldVisitViewSet(viewsets.ModelViewSet):
@@ -262,23 +282,21 @@ class FieldVisitViewSet(viewsets.ModelViewSet):
     serializer_class = FieldVisitSerializer
     filterset_fields = ["name", "email", "phone"]
 
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "finish"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
 
 class PropertyDiscussionViewSet(viewsets.ModelViewSet):
     queryset = PropertyDiscussionBoard.objects.all()
     serializer_class = PropertyDiscussionSerializer
     filterset_fields = ["discussion"]
 
-    # @action(detail=True, methods=["POST"])
-    # def perform_create(self, serializer):
-    #     user = self.request.user
-    #     print(user, "###############################")
-    #     if user is not None:
-    #         return Response(
-    #             {"Invalid": "Unauthenticated user"},
-    #             status=status.HTTP_404_NOT_FOUND,
-    #         )
-    #     print(user)
-    #     serializer.save(user=user)
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "finish"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
 
     @action(detail=True, methods=["GET"])
     def total_discussion(self, request, pk=None):
@@ -291,27 +309,25 @@ class PropertyDiscussionViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(discussion, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # @action(detail=True, methods=["POST"])
-    # def perform_create(self, serializer):
-    #     user = self.request.user
-    #     print(user, "###############################")
-    #     if user is not None:
-    #         return Response(
-    #             {"Invalid": "Unauthenticated user"},
-    #             status=status.HTTP_404_NOT_FOUND,
-    #         )
-    #     print(user)
-    #     serializer.save(user=user)
-
 
 class ScheduleViewSet(viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
 
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "finish"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
 
 class ScheduleList(generics.ListCreateAPIView):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "finish"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -341,6 +357,11 @@ class CityViewset(viewsets.ModelViewSet):
     queryset = City.objects.all()
     serializer_class = CitySerializer
 
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "finish"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
 
 class DetailPropertyView(generics.ListCreateAPIView):
     queryset = PropertyInfo.objects.all()
@@ -350,6 +371,11 @@ class DetailPropertyView(generics.ListCreateAPIView):
 class PropertyRequestViewSet(viewsets.ModelViewSet):
     queryset = PropertyRequest.objects.all()
     serializer_class = PropertyRequestSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "finish"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
 
 
 class AdminDashboardView(APIView):
@@ -379,10 +405,20 @@ class ContactAgentViewSet(viewsets.ModelViewSet):
     queryset = ContactAgent.objects.all()
     serializer_class = ContactAgentSerializer
 
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "finish"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
 
 class FloorPlanViewSet(viewsets.ModelViewSet):
     queryset = FloorPlan.objects.all()
     serializer_class = FloorPlanSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "finish"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -417,3 +453,8 @@ class ReplyViewSet(viewsets.ModelViewSet):
 
     queryset = Reply.objects.all()
     serializer_class = ReplySerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "finish"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]

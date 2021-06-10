@@ -51,7 +51,6 @@ router.register(r"reply", ReplyViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
-    # path("property-list/", PropertyList.as_view(), name="list_property"),
     path(
         "property-detail/<int:pk>/",
         PropertyDetailsView.as_view(),
