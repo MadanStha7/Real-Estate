@@ -180,6 +180,8 @@ class PropertyInfo(CommonInfo):
     )  # sell type
 
     def __str__(self):
+        return f"property information of {self.city}, with id {self.id}"
+
         return str(self.id)
 
     def save(self, *args, **kwargs):
@@ -214,7 +216,7 @@ class Location(CommonInfo):
     )
 
     def __str__(self):
-        return str(self.city)
+        return f"property located at {self.city}"
 
     class Meta:
         verbose_name_plural = "Property Location"
@@ -285,7 +287,8 @@ class Gallery(CommonInfo):
         db_table = "propertys_gallery"
 
     def __str__(self):
-        return str(self.id)
+        # return str(self.id)
+        return f"gallery {str(self.id)}"
 
 
 class Amenities(CommonInfo):
@@ -526,7 +529,7 @@ class FloorPlan(CommonInfo):
     file = models.FileField(upload_to="floorplan/images", null=True)
 
     def __str__(self):
-        return str(self.name)
+        return str(self.id)
 
     class Meta:
         ordering = ["-id"]

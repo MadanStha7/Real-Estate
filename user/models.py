@@ -5,6 +5,7 @@ from common.models import CommonInfo
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.contrib.auth.models import Group
+
 # from colossus.apps.notifications.constants import Actions
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -180,7 +181,7 @@ class Notificatons(CommonInfo):
         null=True,
     )
     object_id = models.PositiveIntegerField(null=True)
-    content_object = GenericForeignKey()
+    content_object = GenericForeignKey("content_type", "object_id")
     text = models.TextField(null=True, blank=True)
 
     class Meta:

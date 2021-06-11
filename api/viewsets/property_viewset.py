@@ -13,6 +13,8 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from user.models import AgentDetail, UserProfile, AdminProfile
+from django.contrib.auth.models import Group
+
 from api.permissions.user_permission import (
     UserIsAuthenticated,
     UserIsAdmin,

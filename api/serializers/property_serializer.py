@@ -17,9 +17,16 @@ from property.models import (
     Reply,
 )
 from .user_serializer import UserProfileSerializer, AdminProfileSerializer
-from user.models import UserProfile, AgentDetail, StaffDetail, AdminProfile
+from user.models import (
+    UserProfile,
+    AgentDetail,
+    StaffDetail,
+    AdminProfile,
+    Notificatons,
+)
 from django.db import transaction
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 
 User = get_user_model()
 
@@ -56,6 +63,8 @@ class FloorPlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = FloorPlan
         fields = ("id", "property_type", "name", "file")
+
+
 class LocationSerializer(serializers.ModelSerializer):
     """
     Location of property info
@@ -294,12 +303,21 @@ class PropertyDiscussionSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        print("validated_data", validated_data)
         discussion_board = PropertyDiscussionBoard.objects.create(**validated_data)
-        Comment.objects.create(
+        comment = Comment.objects.create(
             discussion_board=discussion_board,
             user=validated_data["user"],
             text=validated_data["comments"],
         )
+        # get_admin groups
+        if Group.objects.get(name="Admin"):
+            user = User.objects.get(groups__name="Admin")
+            print("user", user)
+            notification = Notificatons(user=user, content_object=comment)
+            notification.save()
+        # print(get_admin1)
+        # notification = Notificatons(user=)
         return discussion_board
 
 
@@ -350,7 +368,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
     amenities = AmenitiesSerializer(read_only=True, many=True)
     city = CitySerializer(read_only=True)
     # floor_plan = serializers.SlugRelatedField(many=True, read_only=True, slug_field="file")
-    floor_plan= FloorPlanSerializer(read_only=True, many=True)
+    floor_plan = FloorPlanSerializer(read_only=True, many=True)
 
     class Meta:
         model = PropertyInfo
