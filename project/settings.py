@@ -102,12 +102,12 @@ DATABASES = {
         "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
     }
 }
-# email field
+
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = True
-EMAIL_HOST = "smtp.example.com"
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "testing@uptechsys.com")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "S*.@19uee}TB")
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "viperthapa6613@gmail.com")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "lzwmozysdwyhklty")
 EMAIL_PORT = 587
 
 # Password validation
@@ -137,6 +137,9 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
+    "PAGE_SIZE": 50,
+    "PAGE_SIZE_PARAM": "page_size",  # overrides, using `?page_size=xxx`.
+    "MAX_PAGE_SIZE": 1000,  # Maximum limit for `?page_size=xxx`.
 }
 
 
