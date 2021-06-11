@@ -102,7 +102,7 @@ DATABASES = {
         "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
     }
 }
-
+# email field
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = True
 EMAIL_HOST = "smtp.example.com"
