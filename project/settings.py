@@ -105,9 +105,9 @@ DATABASES = {
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = True
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "viperthapa6613@gmail.com")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "lzwmozysdwyhklty")
+EMAIL_HOST = "smtp.example.com"
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "testing@uptechsys.com")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "S*.@19uee}TB")
 EMAIL_PORT = 587
 
 # Password validation
@@ -171,7 +171,7 @@ USE_TZ = True
 
 # media files
 MEDIA_URL = "/media/"
-MEDIA_ROOT = "/media/"
+MEDIA_ROOT = "/code/media/"
 
 STATIC_URL = "/static/"
 STATIC_ROOT = "/code/static"
