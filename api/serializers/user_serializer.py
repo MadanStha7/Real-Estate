@@ -165,6 +165,30 @@ class AgentDetailSerializer(serializers.ModelSerializer):
         AgentDetail.objects.create(user_id=users.id, **validated_data)
         return True
 
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop("user")
+        user = instance.user
+        userSerializer = UserSerializer(user, data=user_data, partial=True)
+        if userSerializer.is_valid(raise_exception=True):
+            userSerializer.save()
+        # Update Admin data
+        instance.location = validated_data.get("location", instance.location)
+        instance.phone_number = validated_data.get(
+            "phone_number", instance.phone_number
+        )
+        instance.identification_type = validated_data.get(
+            "identification_type", instance.identification_type
+        )
+        instance.identification_file = validated_data.get(
+            "identification_file", instance.identification_file
+        )
+        instance.accept_terms_and_condition = validated_data.get(
+            "accept_terms_and_condition", instance.accept_terms_and_condition
+        )
+        instance.save()
+        return instance
+
 
 class StaffDetailSerializer(serializers.ModelSerializer):
     user = UserSerializer()
@@ -310,20 +334,18 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user_data = validated_data.pop("user")
         user = instance.user
-        # UserProfile model
-        instance.full_name = validated_data.get("full_name", instance.full_name)
+        userSerializer = UserSerializer(user, data=user_data, partial=True)
+        if userSerializer.is_valid(raise_exception=True):
+            userSerializer.save()
+        # Update Admin data
         instance.profile_picture = validated_data.get(
             "profile_picture", instance.profile_picture
         )
         instance.phone_number = validated_data.get(
             "phone_number", instance.phone_number
         )
-        instance.address = validated_data.get("profile_picture", instance.address)
+        instance.address = validated_data.get("address", instance.address)
         instance.save()
-        # User model
-        user.email = user_data.get("email", user.email)
-        user.username = user_data.get("username", user.username)
-        user.save()
         return instance
 
 
