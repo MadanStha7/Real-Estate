@@ -27,6 +27,7 @@ from user.models import (
 from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from datetime import datetime, timezone
 
 User = get_user_model()
 
@@ -94,6 +95,9 @@ class PropertySerializer(serializers.ModelSerializer):
         many=True, read_only=True, view_name="gallery-detail"
     )
     facing = serializers.CharField(required=False)
+    property_size= serializers.CharField(required=True)
+    apartment_name= serializers.CharField(required=True)
+    # posted_days= serializers.DateTimeField()
 
     class Meta:
         model = PropertyInfo
@@ -126,6 +130,7 @@ class PropertySerializer(serializers.ModelSerializer):
             "status",
             "created_on",
             "gallery",
+            # "posted_days"
         )
 
 
@@ -157,31 +162,6 @@ class PropertyListingSerializer(serializers.ModelSerializer):
             "locations",
             "listing_type",
         ]
-
-
-# class LocationSerializer(serializers.ModelSerializer):
-#     """
-#     Location of property info
-#     """
-
-#     city_id = serializers.PrimaryKeyRelatedField(
-#         queryset=City.objects.all(),
-#         source="city",
-#         write_only=True,
-#     )
-#     city = CitySerializer(read_only=True)
-
-#     class Meta:
-#         model = Location
-#         fields = (
-#             "id",
-#             "city",
-#             "city_id",
-#             "locality",
-#             "street",
-#             "listing",
-#             "property_info",
-#         )
 
 
 class GallerySerializer(serializers.ModelSerializer):
@@ -367,8 +347,14 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
     gallery = GallerySerializer(read_only=True, many=True)
     amenities = AmenitiesSerializer(read_only=True, many=True)
     city = CitySerializer(read_only=True)
-    # floor_plan = serializers.SlugRelatedField(many=True, read_only=True, slug_field="file")
     floor_plan = FloorPlanSerializer(read_only=True, many=True)
+    no_of_days = serializers.SerializerMethodField(read_only=True)
+    
+    def get_no_of_days(self, obj):
+        today_date=datetime.now(timezone.utc)
+        posted_date=(today_date- obj.created_on).days  
+        return posted_date
+    
 
     class Meta:
         model = PropertyInfo
@@ -403,7 +389,10 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             "status",
             "floor_plan",
             "created_on",
+            "no_of_days"
         )
+        
+       
 
 
 class FieldVisitSerializer(serializers.ModelSerializer):
