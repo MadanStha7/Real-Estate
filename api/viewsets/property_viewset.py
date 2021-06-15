@@ -78,7 +78,7 @@ class PropertyList(viewsets.ModelViewSet):
         print("Obj", obj)
         obj.views = obj.views + 1
         obj.save(update_fields=("views",))
-       
+
         return super().retrieve(request, *args, **kwargs)
 
     @action(detail=True, methods=["GET"])
@@ -215,7 +215,7 @@ class RentalViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated(), UserIsBuyerOrSeller(), UserIsAdmin()]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
 
@@ -225,7 +225,7 @@ class LocationViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated(), UserIsBuyerOrSeller(), UserIsAdmin()]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
