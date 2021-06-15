@@ -266,7 +266,7 @@ class GalleryViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated(), UserIsBuyerOrSeller(), UserIsAdmin()]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
 
@@ -276,7 +276,7 @@ class AmentitesViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated(), UserIsBuyerOrSeller(), UserIsAdmin()]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
 
@@ -287,7 +287,7 @@ class FieldVisitViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated(), UserIsBuyerOrSeller(), UserIsAdmin()]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
 
@@ -298,7 +298,7 @@ class PropertyDiscussionViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated(), UserIsBuyerOrSeller(), UserIsAdmin()]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
     @action(detail=True, methods=["GET"])
@@ -319,7 +319,7 @@ class ScheduleViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated(), UserIsBuyerOrSeller(), UserIsAdmin()]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
 
@@ -329,7 +329,7 @@ class ScheduleList(generics.ListCreateAPIView):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated(), UserIsBuyerOrSeller(), UserIsAdmin()]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
     def list(self, request):
@@ -362,7 +362,7 @@ class CityViewset(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated(), UserIsAdmin()]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
 
@@ -377,7 +377,7 @@ class PropertyRequestViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated(), UserIsBuyerOrSeller(), UserIsAdmin()]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
 
@@ -410,7 +410,7 @@ class ContactAgentViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated(), UserIsBuyerOrSeller(), UserIsAdmin()]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
 
@@ -420,7 +420,7 @@ class FloorPlanViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated(), UserIsBuyerOrSeller(), UserIsAdmin()]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
 
@@ -432,7 +432,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated(), UserIsBuyerOrSeller(), UserIsAdmin()]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
     @action(detail=True, methods=["GET"])
@@ -462,5 +462,5 @@ class ReplyViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated(), UserIsBuyerOrSeller(), UserIsAdmin()]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
