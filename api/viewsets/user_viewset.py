@@ -14,6 +14,8 @@ from api.serializers.user_serializer import (
     AdminProfileSerializer,
 )
 from rest_framework.authtoken.models import Token
+
+from user.authentication import ExpiringTokenAuthentication
 from user.models import UserProfile, AgentDetail, Contact, StaffDetail, AdminProfile
 from rest_framework.views import APIView
 from django.core.mail import send_mail, EmailMessage
@@ -106,6 +108,8 @@ class ChangePasswordView(generics.UpdateAPIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    authentication_classes = (ExpiringTokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
 

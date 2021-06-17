@@ -1,3 +1,4 @@
+import pytz
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -5,6 +6,7 @@ from user.models import AgentDetail, UserProfile, AdminProfile, StaffDetail
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from rest_framework import status
+from datetime import datetime, timedelta
 
 User = get_user_model()
 
@@ -57,7 +59,15 @@ class CustomAuthToken(ObtainAuthToken):
         except AdminProfile.DoesNotExist:
             pass
 
+        utc_now = datetime.utcnow()
+        utc_now = utc_now.replace(tzinfo=pytz.utc)
+        Token.objects.filter(user=user, created=utc_now-timedelta(seconds=60)).delete()
         token, created = Token.objects.get_or_create(user=user)
+        if not created:
+            # update the created time of the token to keep it valid
+            token.created = datetime.utcnow()
+            print("Not Created")
+            token.save()
         group_name = Group.objects.filter(user=user).values()
         return Response(
             {
