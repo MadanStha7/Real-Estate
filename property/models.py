@@ -29,9 +29,9 @@ class PropertyInfo(CommonInfo):
     """
 
     APARTMENT_CHOICES = (
-        ("A", "Apartment"),
-        ("I", "Independent House/Villa"),
-        ("G", "Gated Community/Villa"),
+        ("Apartment", "Apartment"),
+        ("Independent House/Villa", "Independent House/Villa"),
+        ("Gated Community/Villa", "Gated Community/Villa"),
     )
     BHK_CHOICES = (
         ("1 RK", "1 RK"),
@@ -42,7 +42,7 @@ class PropertyInfo(CommonInfo):
         ("4+ BHK", "4+ BHK"),
     )
     NUMBER_OF_FLOOR_CHOICES = (
-        ("G", "Ground"),
+        ("Ground", "Ground"),
         ("1", "1"),
         ("2", "2"),
         ("3", "3"),
@@ -65,78 +65,78 @@ class PropertyInfo(CommonInfo):
         ("20", "20"),
     )
     AGE_CHOICES = (
-        ("U", "Under Construction"),
-        ("L", "Less than a year"),
-        ("1", "1 to 3 year"),
-        ("3", "3 to 5 year"),
-        ("5", "5 to 10 year"),
-        ("M", "More than 10 year"),
+        ("Under Construction", "Under Construction"),
+        ("Less than a year", "Less than a year"),
+        ("1 to 3 year", "1 to 3 year"),
+        ("3 to 5 year", "3 to 5 year"),
+        ("5 to 10 year", "5 to 10 year"),
+        ("More than 10 year", "More than 10 year"),
     )
     FACING_CHOICES = (
-        ("E", "EAST"),
-        ("W", "WEST"),
-        ("N", "North"),
-        ("S", "South"),
-        ("NE", "North-East"),
-        ("SE", "South-East"),
-        ("NW", "North-West"),
-        ("SW", "South-West"),
-        ("D", "Don't Know"),
+        ("East", "East"),
+        ("West", "West"),
+        ("North", "North"),
+        ("South", "South"),
+        ("North-East", "North-East"),
+        ("South-East", "South-East"),
+        ("North-West", "North-West"),
+        ("South-West", "South-West"),
+        ("Don't Know", "Don't Know"),
     )
     PROPERTY_TYPE_CHOICES = (
-        ("R", "Residential"),
-        ("C", "Commercial"),
+        ("Residential", "Residential"),
+        ("Commercial", "Commercial"),
     )
     PROPERTYAD_TYPE_CHOICES = (
-        ("R", "Rent"),
-        ("Re", "Resale"),
-        ("P", "Pg/Hostel"),
-        ("F", "Flatmates"),
-        ("S", "Sale"),
+        ("Rent", "Rent"),
+        ("Resale", "Resale"),
+        ("Pg/Hostel", "Pg/Hostel"),
+        ("Flatmates", "Flatmates"),
+        ("Sale", "Sale"),
     )
     MEMBERSHIP_PLAN_CHOICES = (
-        ("S", "Silver"),
-        ("G", "Gold"),
-        ("P", "Platinum"),
+        ("Silver", "Silver"),
+        ("Gold", "Gold"),
+        ("Platinum", "Platinum"),
     )
     LISTING_TYPE_CHOICES = (
-        ("T", "Top"),
-        ("P", "Premium"),
-        ("F", "Featured"),
+        ("Top", "Top"),
+        ("Premium", "Premium"),
+        ("Featured", "Featured"),
     )
     CONDITION_CHOICES = (
-        ("N", "New"),
-        ("U", "Used"),
+        ("New", "New"),
+        ("Used", "Used"),
     )
-    STATUS_CHOICES = (("N", "negotiation"), ("P", "Pending"))
+    STATUS_CHOICES = (("Negotiation", "Negotiation"), ("P", "Pending"))
 
     city = models.ForeignKey(
         City, on_delete=models.CASCADE, related_name="city_property", null=True
     )
     property_type = models.CharField(
-        max_length=1, choices=PROPERTY_TYPE_CHOICES, default="R"
+        max_length=32, choices=PROPERTY_TYPE_CHOICES, default="Residential"
     )
     property_adtype = models.CharField(
-        max_length=2, choices=PROPERTYAD_TYPE_CHOICES, default="R"
+        max_length=32, choices=PROPERTYAD_TYPE_CHOICES, default="R"
     )
     apartment_type = models.CharField(
-        max_length=1, choices=APARTMENT_CHOICES, default="A"
+        max_length=32, choices=APARTMENT_CHOICES, default="A"
     )
     apartment_name = models.CharField(max_length=63, blank=True, null=True)
     bhk_type = models.CharField(
-        max_length=20, choices=BHK_CHOICES, default="F"
+        max_length=32, choices=BHK_CHOICES, default="F"
     )  # bedroom hall kitchen
-    floor = models.CharField(max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G")
+    floor = models.CharField(max_length=32, choices=NUMBER_OF_FLOOR_CHOICES, default="G")
     total_floor = models.CharField(
-        max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G"
+        max_length=32, choices=NUMBER_OF_FLOOR_CHOICES, default="G"
     )
     age = models.CharField(
-        max_length=1, choices=AGE_CHOICES, default="U"
+        max_length=32, choices=AGE_CHOICES, default="U"
     )  # property age
-    facing = models.CharField(max_length=2, choices=FACING_CHOICES)
+    facing = models.CharField(max_length=32, choices=FACING_CHOICES)
     property_size = models.FloatField(default=0.00)  # size in sq.m
     price = models.FloatField(default=0.00)
-    status = models.CharField(max_length=2, choices=STATUS_CHOICES, null=True)
+    status = models.CharField(max_length=32, choices=STATUS_CHOICES, null=True)
     owner = models.ForeignKey(
         User,
         related_name="userprofile",
@@ -173,10 +173,10 @@ class PropertyInfo(CommonInfo):
     publish = models.BooleanField(default=False)
     description = models.TextField(null=True, blank=True)
     views = models.PositiveIntegerField(default=0)
-    listing_type = models.CharField(max_length=1, choices=LISTING_TYPE_CHOICES)
-    membership_plan = models.CharField(max_length=1, choices=MEMBERSHIP_PLAN_CHOICES)
+    listing_type = models.CharField(max_length=32, choices=LISTING_TYPE_CHOICES)
+    membership_plan = models.CharField(max_length=32, choices=MEMBERSHIP_PLAN_CHOICES)
     condition_type = models.CharField(
-        max_length=1, choices=CONDITION_CHOICES
+        max_length=32, choices=CONDITION_CHOICES
     )  # sell type
 
     def __str__(self):
@@ -229,33 +229,38 @@ class RentalInfo(CommonInfo):
     rental details about property
     """
 
-    AVAILABLE_FOR_CHOICES = (("R", "Only Rent"), ("L", "Only Lease"))
-    MAINTENANCE_CHOICES = (("I", "Maintenance Included"), ("E", "Maintenance Extra"))
+    AVAILABLE_FOR_CHOICES = (("Only Rent", "Only Rent"),
+                             ("Only lease", "Only Lease"))
+    MAINTENANCE_CHOICES = (("Maintenance Included", "Maintenance Included"),
+                           ("Maintenance Extra", "Maintenance Extra"))
     TENANTS_CHOICES = (
-        ("D", "Doesn't Matter"),
-        ("F", "Family"),
-        ("B", "Bachelor"),
-        ("C", "Company"),
+        ("Doesn't Matter", "Doesn't Matter"),
+        ("Family", "Family"),
+        ("Bachelor", "Bachelor"),
+        ("Company", "Company"),
     )
     FURNISHING_CHOICES = (
-        ("F", "Fully Furnishing"),
-        ("S", "Semi Furnishing"),
-        ("U", "Unfurnishing"),
+        ("Fully Furnishing", "Fully Furnishing"),
+        ("Semi Furnishing", "Semi Furnishing"),
+        ("Unfurnishing", "Unfurnishing"),
     )
-    PARKING_CHOICES = (("N", "None"), ("M", "Motorbike"), ("C", "Car"), ("B", "Both"))
-    available_for = models.CharField(max_length=1, choices=AVAILABLE_FOR_CHOICES)
+    PARKING_CHOICES = (("None", "None"),
+                       ("Motorbike", "Motorbike"),
+                       ("Car", "Car"),
+                       ("Both", "Both"))
+    available_for = models.CharField(max_length=32, choices=AVAILABLE_FOR_CHOICES)
     expected_rent = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
     expected_deposit = models.DecimalField(
         default=0.00, decimal_places=2, max_digits=10
     )
     negotiable = models.BooleanField(default=False)
     maintenance = models.CharField(
-        max_length=1, choices=MAINTENANCE_CHOICES, default="I", blank=True, null=True
+        max_length=32, choices=MAINTENANCE_CHOICES, default="I", blank=True, null=True
     )
     available_from = models.DateField()
-    tenants = models.CharField(max_length=1, choices=TENANTS_CHOICES, default="D")
-    furnishing = models.CharField(max_length=1, choices=FURNISHING_CHOICES, default="F")
-    parking = models.CharField(max_length=1, choices=PARKING_CHOICES)
+    tenants = models.CharField(max_length=32, choices=TENANTS_CHOICES, default="D")
+    furnishing = models.CharField(max_length=32, choices=FURNISHING_CHOICES, default="F")
+    parking = models.CharField(max_length=32, choices=PARKING_CHOICES)
     description = models.TextField()
     property_info = models.ForeignKey(
         PropertyInfo, related_name="rental_info", on_delete=models.CASCADE
@@ -296,26 +301,28 @@ class Amenities(CommonInfo):
     Amenities
     """
 
-    YES_NO_CHOICES = (("Y", "Yes"), ("N", "No"))
-    WATER_SUPPLY_CHOICES = (("C", "Corporation"), ("W", "Borewell"), ("B", "Both"))
+    YES_NO_CHOICES = (("Yes", "Yes"), ("N0", "No"))
+    WATER_SUPPLY_CHOICES = (("Corporation", "Corporation"),
+                            ("Borewell", "Borewell"),
+                            ("Both", "Both"))
     VIEWER_CHOICES = (
-        ("H", "Need Help"),
-        ("I", "I will show"),
-        ("N", "Neighbours"),
-        ("F", "Friends/Relatives"),
-        ("S", "Security"),
-        ("T", "Tenants"),
-        ("O", "Others"),
+        ("Need Help", "Need Help"),
+        ("I will show", "I will show"),
+        ("Neighbours", "Neighbours"),
+        ("Friends/Relatives", "Friends/Relatives"),
+        ("Security", "Security"),
+        ("Tenants", "Tenants"),
+        ("Others", "Others"),
     )
     bathrooms = models.IntegerField(default=0)
-    balcony = models.CharField(max_length=63, choices=YES_NO_CHOICES, default="Y")
+    balcony = models.CharField(max_length=8, choices=YES_NO_CHOICES, default="Y")
     water_supply = models.CharField(
-        max_length=1, choices=WATER_SUPPLY_CHOICES, default="C"
+        max_length=32, choices=WATER_SUPPLY_CHOICES, default="C"
     )
-    gym = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
-    non_veg = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
-    security = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
-    viewer = models.CharField(max_length=1, choices=VIEWER_CHOICES, default="H")
+    gym = models.CharField(max_length=32, choices=YES_NO_CHOICES, default="Y")
+    non_veg = models.CharField(max_length=32, choices=YES_NO_CHOICES, default="Y")
+    security = models.CharField(max_length=32, choices=YES_NO_CHOICES, default="Y")
+    viewer = models.CharField(max_length=32, choices=VIEWER_CHOICES, default="H")
     secondary_number = models.IntegerField(default=1)
     property_info = models.ForeignKey(
         PropertyInfo, related_name="amenities", on_delete=models.CASCADE
@@ -351,21 +358,21 @@ class FieldVisit(CommonInfo):
 
 
 class Schedule(models.Model):
-    YES_NO_CHOICES = (("Y", "Yes"), ("N", "No"))
+    YES_NO_CHOICES = (("Yes", "Yes"), ("No", "No"))
     AVAILABLE_DAY_CHOICES = (
-        ("E", "Everyday(Sunday - Saturday)"),
-        ("W", "Weekdays(Sunday - Friday)"),
-        ("S", "Weekend(Saturday)"),
+        ("Everyday(Sunday - Saturday", "Everyday(Sunday - Saturday)"),
+        ("Weekdays(Sunday - Friday", "Weekdays(Sunday - Friday)"),
+        ("Weekend(Saturday)", "Weekend(Saturday)"),
     )
 
     paint = models.CharField(
-        max_length=1, choices=YES_NO_CHOICES, default="Y", null=True, blank=True
+        max_length=8, choices=YES_NO_CHOICES, default="Y", null=True, blank=True
     )  # i want my house painted
     cleaned = models.CharField(
-        max_length=1, choices=YES_NO_CHOICES, default="Y", null=True, blank=True
+        max_length=8, choices=YES_NO_CHOICES, default="Y", null=True, blank=True
     )  # i want to get my house cleaned
     available_days = models.CharField(
-        max_length=1, choices=AVAILABLE_DAY_CHOICES, default="E", null=True, blank=True
+        max_length=32, choices=AVAILABLE_DAY_CHOICES, default="E", null=True, blank=True
     )
     start_time = models.TimeField()
     end_time = models.TimeField()
@@ -387,12 +394,12 @@ class PropertyDiscussionBoard(CommonInfo):
     """
 
     DISCUSSION_CHOICES = (
-        ("Q", "Query"),
-        ("R", "Review"),
-        ("S", "Suggestion"),
-        ("C", "Complaint"),
+        ("Query", "Query"),
+        ("Review", "Review"),
+        ("Suggestion", "Suggestion"),
+        ("Complaint", "Complaint"),
     )
-    discussion = models.CharField(max_length=1, choices=DISCUSSION_CHOICES)
+    discussion = models.CharField(max_length=32, choices=DISCUSSION_CHOICES)
     title = models.CharField(max_length=32, blank=True, null=True)
     tags = ArrayField(models.CharField(max_length=32), blank=True)
     comments = models.TextField()
@@ -477,33 +484,33 @@ class PropertyRequest(CommonInfo):
     """
 
     REQUEST_TYPE_CHOICES = (
-        ("B", "Buy"),
-        ("R", "Rent"),
-        ("S", "Sell"),
+        ("Buy", "Buy"),
+        ("Rent", "Rent"),
+        ("Sell", "Sell"),
     )
     PROPERTY_TYPE_CHOICES = (
-        ("B", "House/Bungalow"),
-        ("F", "Flat & Apartment"),
-        ("C", "Commercial Property"),
-        ("L", "land"),
-        ("A", "Agricultural Land"),
-        ("O", "Office Space"),
-        ("S", "Shutter & Shop Space"),
-        ("R", "Restaurant for sale"),
-        ("H", "House in a Colony"),
+        ("House/Bungalow", "House/Bungalow"),
+        ("Flat & Apartment", "Flat & Apartment"),
+        ("Commercial Property", "Commercial Property"),
+        ("Land", "Land"),
+        ("Agricultural Land", "Agricultural Land"),
+        ("Office Space", "Office Space"),
+        ("Shutter & Shop Space", "Shutter & Shop Space"),
+        ("Restaurant for Sale", "Restaurant for sale"),
+        ("House in a Colony", "House in a Colony"),
     )
     URGENT_CHOICES = (
-        ("V", "Very Urgent"),
-        ("W", "Within a few days"),
-        ("M", "Within a month"),
-        ("I", "In few months time"),
+        ("Very Urgent", "Very Urgent"),
+        ("Within a few days", "Within a few days"),
+        ("Within a month", "Within a month"),
+        ("In few months time", "In few months time"),
     )
     name = models.CharField(max_length=32, blank=True, null=True)
     phone = models.CharField(max_length=15)
     email = models.EmailField(max_length=254)
-    request_type = models.CharField(max_length=1, choices=REQUEST_TYPE_CHOICES)
-    property_type = models.CharField(max_length=1, choices=PROPERTY_TYPE_CHOICES)
-    urgent = models.CharField(max_length=1, choices=URGENT_CHOICES)
+    request_type = models.CharField(max_length=32, choices=REQUEST_TYPE_CHOICES)
+    property_type = models.CharField(max_length=32, choices=PROPERTY_TYPE_CHOICES)
+    urgent = models.CharField(max_length=32, choices=URGENT_CHOICES)
     place = models.TextField()
     price_range = models.TextField()
     size = models.DecimalField(default=0.00, decimal_places=4, max_digits=10)
