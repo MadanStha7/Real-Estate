@@ -78,7 +78,6 @@ class PropertyList(viewsets.ModelViewSet):
         print("Obj", obj)
         obj.views = obj.views + 1
         obj.save(update_fields=("views",))
-       
         return super().retrieve(request, *args, **kwargs)
 
     @action(detail=True, methods=["GET"])
@@ -206,6 +205,20 @@ class PropertyViewSet(viewsets.ModelViewSet):
             else:
                 pass
         serializer.save(owner=owner, admin=admin)
+
+    @action(detail=False, methods=["GET"])
+    def verify_property(self, request):
+        property = self.request.query_params.get("property", None)
+        if property:
+            get_property = PropertyInfo.objects.get(id=property)
+            get_property.publish = True
+            get_property.save()
+            return Response(
+                {"message": "property successfully verified"}, status=status.HTTP_200_OK
+            )
+
+        else:
+            raise ValidationError({"error": "property is required"})
 
 
 class RentalViewSet(viewsets.ModelViewSet):
