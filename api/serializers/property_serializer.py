@@ -85,18 +85,33 @@ class PropertySerializer(serializers.ModelSerializer):
     """
     return the property details in homepage in client side
     """
-
-    listing_type = serializers.CharField(required=False)
-    membership_plan = serializers.CharField(required=False)
-    condition_type = serializers.CharField(required=False)
+    listing_type_value = serializers.CharField(
+        source="get_listing_type_display", read_only=True)
+    property_type = serializers.CharField(
+        source="get_property_type_display", read_only=True)
+    property_adtype = serializers.CharField(
+        source="get_property_adtype_display", read_only=True)
+    apartment_type = serializers.CharField(
+        source="get_apartment_type_display", read_only=True)
+    bhk_type_value = serializers.CharField(
+        source="get_bhk_type_display", read_only=True)
+    floor = serializers.CharField(source="get_floor_display", read_only=True)
+    total_floor = serializers.CharField(
+        source="get_total_floor_display", read_only=True)
+    age = serializers.CharField(source="get_age_display", read_only=True)
+    facing_value = serializers.CharField(source="get_facing_display", read_only=True)
+    membership_plan_value = serializers.CharField(
+        source="get_membership_plan_display", read_only=True)
+    condition_type_value = serializers.CharField(
+        source="get_condition_type_display", read_only=True)
+    status_value = serializers.CharField(source="get_status_display", read_only=True)
     created_on = serializers.CharField(read_only=True)
     locations = LocationSerializer(read_only=True)
     gallery = serializers.HyperlinkedRelatedField(
         many=True, read_only=True, view_name="gallery-detail"
     )
-    facing = serializers.CharField(required=False)
-    property_size= serializers.CharField(required=True)
-    apartment_name= serializers.CharField(required=True)
+    property_size = serializers.CharField(required=True)
+    apartment_name = serializers.CharField(required=True)
     # posted_days= serializers.DateTimeField()
 
     class Meta:
@@ -109,10 +124,12 @@ class PropertySerializer(serializers.ModelSerializer):
             "apartment_type",
             "apartment_name",
             "bhk_type",
+            "bhk_type_value",
             "floor",
             "total_floor",
             "age",
             "facing",
+            "facing_value",
             "property_size",
             "owner",
             "agent",
@@ -123,11 +140,15 @@ class PropertySerializer(serializers.ModelSerializer):
             "publish",
             "views",
             "listing_type",
+            "listing_type_value",
             "membership_plan",
+            "membership_plan_value",
             "condition_type",
+            "condition_type_value",
             "description",
             "price",
             "status",
+            "status_value",
             "created_on",
             "gallery",
             # "posted_days"
@@ -341,6 +362,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
     facing = serializers.CharField(source="get_facing_display")
     membership_plan = serializers.CharField(source="get_membership_plan_display")
     condition_type = serializers.CharField(source="get_condition_type_display")
+    status = serializers.CharField(source="get_status_display")
 
     locations = LocationSerializer(read_only=True)
     rental_info = RentalSerializer(read_only=True, many=True)
@@ -349,12 +371,11 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
     city = CitySerializer(read_only=True)
     floor_plan = FloorPlanSerializer(read_only=True, many=True)
     no_of_days = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_no_of_days(self, obj):
-        today_date=datetime.now(timezone.utc)
-        posted_date=(today_date- obj.created_on).days  
+        today_date = datetime.now(timezone.utc)
+        posted_date = (today_date - obj.created_on).days
         return posted_date
-    
 
     class Meta:
         model = PropertyInfo
@@ -391,8 +412,6 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             "created_on",
             "no_of_days"
         )
-        
-       
 
 
 class FieldVisitSerializer(serializers.ModelSerializer):
