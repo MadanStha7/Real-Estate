@@ -23,7 +23,7 @@ class City(CommonInfo):
         return super().save(*args, **kwargs)
 
 
-class PropertyCatgories(CommonInfo):
+class PropertyCategories(CommonInfo):
     """
     This model defines the categories of property
     """
@@ -34,7 +34,7 @@ class PropertyCatgories(CommonInfo):
         return f"property category of {self.name}, {self.id}"
 
     class Meta:
-        verbose_name_plural = "PropertyCatgories"
+        verbose_name_plural = "PropertyCategories"
         ordering = ["-created_on"]
 
 
@@ -144,7 +144,7 @@ class PropertyInfo(CommonInfo):
         City, on_delete=models.CASCADE, related_name="city_property", null=True
     )
     property_categories = models.ForeignKey(
-        PropertyCatgories,
+        PropertyCategories,
         on_delete=models.CASCADE,
         related_name="property_info",
         null=True,
