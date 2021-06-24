@@ -220,6 +220,22 @@ class PropertyViewSet(viewsets.ModelViewSet):
         else:
             raise ValidationError({"error": "property is required"})
 
+    @action(detail=False, methods=["GET"])
+    def listing_type(self, request):
+        """get the property and save as if it is top,premium,or featured"""
+        property = self.request.query_params.get("property", None)
+        property_listing_type = self.request.query_params.get("listing_type", None)
+        if property and property_listing_type:
+            get_property = PropertyInfo.objects.get(id=property, publish=True)
+            get_property.listing_type = property_listing_type
+            get_property.save()
+            return Response(
+                {"message": "Data successfully submitted"}, status=status.HTTP_200_OK
+            )
+
+        else:
+            raise ValidationError({"error": "property is required"})
+
 
 class RentalViewSet(viewsets.ModelViewSet):
     queryset = RentalInfo.objects.all()
