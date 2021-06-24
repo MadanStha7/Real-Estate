@@ -14,7 +14,7 @@ from property.models import (
     ContactAgent,
     FloorPlan,
     Comment,
-    Reply,
+    Reply, PropertyCategories,
 )
 from .user_serializer import UserProfileSerializer, AdminProfileSerializer
 from user.models import (
@@ -58,6 +58,14 @@ class CitySerializer(serializers.ModelSerializer):
         if City.objects.filter(name=name.lower()).exists():
             raise serializers.ValidationError("City name already exists!")
         return name
+
+
+class PropertyCategoriesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyCategories
+        fields = ("id", "name")
+
+
 
 
 class FloorPlanSerializer(serializers.ModelSerializer):
@@ -496,6 +504,7 @@ class PropertyTypeFilteredSerialzers(serializers.Serializer):
 
 
 class ContactAgentSerializer(serializers.ModelSerializer):
+    property_info = PropertyDetailSerializer(read_only=True)
     class Meta:
         model = ContactAgent
         fields = ("id", "name", "email", "property_info", "agent")
