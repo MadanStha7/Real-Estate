@@ -3,7 +3,7 @@ from django.apps import apps
 
 from .models import (
     City,
-    PropertyCatgories,
+    PropertyCategories,
     PropertyTypes,
     PropertyInfo,
     Location,
@@ -24,7 +24,7 @@ from .models import (
 admin.site.register(
     [
         City,
-        PropertyCatgories,
+        PropertyCategories,
         PropertyTypes,
         PropertyInfo,
         Location,
