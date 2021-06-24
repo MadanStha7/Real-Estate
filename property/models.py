@@ -23,6 +23,36 @@ class City(CommonInfo):
         return super().save(*args, **kwargs)
 
 
+class PropertyCatgories(CommonInfo):
+    """
+    This model defines the categories of property
+    """
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"property category of {self.name}, {self.id}"
+
+    class Meta:
+        verbose_name_plural = "PropertyCatgories"
+        ordering = ["-created_on"]
+
+
+class PropertyTypes(CommonInfo):
+    """
+    This model defines the types of property such as residential or commercial
+    """
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"property types of {self.name}, {self.id}"
+
+    class Meta:
+        verbose_name_plural = "PropertyTypes"
+        ordering = ["-created_on"]
+
+
 class PropertyInfo(CommonInfo):
     """
     Info about property
@@ -112,6 +142,20 @@ class PropertyInfo(CommonInfo):
 
     city = models.ForeignKey(
         City, on_delete=models.CASCADE, related_name="city_property", null=True
+    )
+    property_categories = models.ForeignKey(
+        PropertyCatgories,
+        on_delete=models.CASCADE,
+        related_name="property_info",
+        null=True,
+        blank=True,
+    )
+    property_types = models.ForeignKey(
+        PropertyTypes,
+        on_delete=models.CASCADE,
+        related_name="property_info",
+        null=True,
+        blank=True,
     )
     property_type = models.CharField(
         max_length=1, choices=PROPERTY_TYPE_CHOICES, default="R"

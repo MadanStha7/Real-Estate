@@ -137,9 +137,6 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
-    "PAGE_SIZE": 50,
-    "PAGE_SIZE_PARAM": "page_size",  # overrides, using `?page_size=xxx`.
-    "MAX_PAGE_SIZE": 1000,  # Maximum limit for `?page_size=xxx`.
 }
 
 
