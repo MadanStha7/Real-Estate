@@ -217,10 +217,14 @@ class PropertyInfo(CommonInfo):
     publish = models.BooleanField(default=False)
     description = models.TextField(null=True, blank=True)
     views = models.PositiveIntegerField(default=0)
-    listing_type = models.CharField(max_length=1, choices=LISTING_TYPE_CHOICES)
-    membership_plan = models.CharField(max_length=1, choices=MEMBERSHIP_PLAN_CHOICES)
+    listing_type = models.CharField(
+        max_length=1, choices=LISTING_TYPE_CHOICES, null=True, blank=True
+    )
+    membership_plan = models.CharField(
+        max_length=1, choices=MEMBERSHIP_PLAN_CHOICES, null=True, blank=True
+    )
     condition_type = models.CharField(
-        max_length=1, choices=CONDITION_CHOICES
+        max_length=1, choices=CONDITION_CHOICES, null=True, blank=True
     )  # sell type
 
     def __str__(self):
