@@ -1,7 +1,8 @@
 from django.urls import include, path
 from rest_framework import routers
 from property.models import Schedule
-from api.viewsets.property_viewset import ScheduleList
+from api.viewsets.property_viewset import ScheduleList, PropertyCategoryViewset, PropertyTypesViewSet, \
+    PropertyCategoriesFilterViewSet, PropertyTypesFilterViewSet
 
 from api.viewsets.property_viewset import (
     PropertyViewSet,
@@ -44,6 +45,10 @@ router.register(r"property-filter", PropertyFilterView)
 router.register(r"contact_agent", ContactAgentViewSet)
 router.register(r"property-list", PropertyList)  # for client sides
 router.register(r"city", CityViewset)
+router.register(r"property-categories", PropertyCategoryViewset)
+router.register(r"property-types", PropertyTypesViewSet)
+router.register(r"category-filter", PropertyCategoriesFilterViewSet)
+router.register(r"types-filter", PropertyTypesFilterViewSet)
 router.register(r"floorplan", FloorPlanViewSet)
 router.register(r"comment", CommentViewSet)
 router.register(r"reply", ReplyViewSet)

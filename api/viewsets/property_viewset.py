@@ -36,7 +36,7 @@ from property.models import (
     PropertyRequest,
     FloorPlan,
     Comment,
-    Reply,
+    Reply, PropertyCategories, PropertyTypes,
 )
 from api.serializers.property_serializer import (
     PropertySerializer,
@@ -56,7 +56,7 @@ from api.serializers.property_serializer import (
     ContactAgentSerializer,
     FloorPlanSerializer,
     CommentSerializer,
-    ReplySerializer,
+    ReplySerializer, PropertyCategoriesSerializer, PropertyTypeSerializer,
 )
 
 
@@ -493,3 +493,59 @@ class ReplyViewSet(viewsets.ModelViewSet):
         if self.action in ["create", "partial_update", "destroy"]:
             return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
+
+
+class PropertyCategoryViewset(viewsets.ModelViewSet):
+    queryset = PropertyCategories.objects.all()
+    serializer_class = PropertyCategoriesSerializer
+
+
+class PropertyTypesViewSet(viewsets.ModelViewSet):
+    queryset = PropertyTypes.objects.all()
+    serializer_class = PropertyTypeSerializer
+
+
+class PropertyCategoriesFilterViewSet(viewsets.ModelViewSet):
+    queryset = PropertyInfo.objects.all()
+    serializer_class = PropertyDetailSerializer
+
+    def get_queryset(self):
+        property_categories_id = self.request.query_params.get("id", None)
+        property_categories_name = self.request.query_params.get("name", None)
+
+        if property_categories_id is not None:
+            property_categories = PropertyCategories.objects.get(id=property_categories_id)
+            queryset = PropertyInfo.objects.select_related('property_categories').filter(
+                property_categories=property_categories.id)
+            return queryset
+
+        if property_categories_name is not None:
+            property_categories = PropertyCategories.objects.get(name=property_categories_name)
+            queryset = PropertyInfo.objects.select_related('property_categories').filter(
+                property_categories=property_categories.id)
+            return queryset
+
+        return super().get_queryset()
+
+
+class PropertyTypesFilterViewSet(viewsets.ModelViewSet):
+    queryset = PropertyInfo.objects.all()
+    serializer_class = PropertyDetailSerializer
+
+    def get_queryset(self):
+        property_types_id = self.request.query_params.get("id", None)
+        property_types_name = self.request.query_params.get("name", None)
+
+        if property_types_id is not None:
+            property_types = PropertyTypes.objects.get(id=property_types_id)
+            queryset = PropertyInfo.objects.select_related('property_types').filter(
+                property_types=property_types.id)
+            return queryset
+
+        if property_types_name is not None:
+            property_types = PropertyTypes.objects.get(name=property_types_name)
+            queryset = PropertyInfo.objects.select_related('property_types').filter(
+                property_types=property_types.id)
+            return queryset
+
+        return super().get_queryset()
