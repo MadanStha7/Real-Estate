@@ -14,7 +14,7 @@ from property.models import (
     ContactAgent,
     FloorPlan,
     Comment,
-    Reply, PropertyCategories,
+    Reply, PropertyCategories, PropertyTypes,
 )
 from .user_serializer import UserProfileSerializer, AdminProfileSerializer
 from user.models import (
@@ -66,6 +66,10 @@ class PropertyCategoriesSerializer(serializers.ModelSerializer):
         fields = ("id", "name")
 
 
+class PropertyTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyTypes
+        fields = ("id", "name")
 
 
 class FloorPlanSerializer(serializers.ModelSerializer):
@@ -127,6 +131,8 @@ class PropertySerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "city",
+            "property_categories",
+            "property_types",
             "property_type",
             "property_adtype",
             "apartment_type",
@@ -377,6 +383,8 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
     gallery = GallerySerializer(read_only=True, many=True)
     amenities = AmenitiesSerializer(read_only=True, many=True)
     city = CitySerializer(read_only=True)
+    property_categories = PropertyCategoriesSerializer(read_only=True)
+    property_types = PropertyTypeSerializer(read_only=True)
     floor_plan = FloorPlanSerializer(read_only=True, many=True)
     no_of_days = serializers.SerializerMethodField(read_only=True)
 
@@ -390,6 +398,8 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "city",
+            "property_categories",
+            "property_types",
             "property_type",
             "property_adtype",
             "apartment_type",
