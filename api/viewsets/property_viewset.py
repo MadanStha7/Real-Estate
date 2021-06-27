@@ -36,7 +36,9 @@ from property.models import (
     PropertyRequest,
     FloorPlan,
     Comment,
-    Reply, PropertyCategories, PropertyTypes,
+    Reply,
+    PropertyCategories,
+    PropertyTypes,
 )
 from api.serializers.property_serializer import (
     PropertySerializer,
@@ -56,7 +58,9 @@ from api.serializers.property_serializer import (
     ContactAgentSerializer,
     FloorPlanSerializer,
     CommentSerializer,
-    ReplySerializer, PropertyCategoriesSerializer, PropertyTypeSerializer,
+    ReplySerializer,
+    PropertyCategoriesSerializer,
+    PropertyTypeSerializer,
 )
 
 
@@ -514,15 +518,21 @@ class PropertyCategoriesFilterViewSet(viewsets.ModelViewSet):
         property_categories_name = self.request.query_params.get("name", None)
 
         if property_categories_id is not None:
-            property_categories = PropertyCategories.objects.get(id=property_categories_id)
-            queryset = PropertyInfo.objects.select_related('property_categories').filter(
-                property_categories=property_categories.id)
+            property_categories = PropertyCategories.objects.get(
+                id=property_categories_id
+            )
+            queryset = PropertyInfo.objects.select_related(
+                "property_categories"
+            ).filter(property_categories=property_categories.id)
             return queryset
 
         if property_categories_name is not None:
-            property_categories = PropertyCategories.objects.get(name=property_categories_name)
-            queryset = PropertyInfo.objects.select_related('property_categories').filter(
-                property_categories=property_categories.id)
+            property_categories = PropertyCategories.objects.get(
+                name=property_categories_name
+            )
+            queryset = PropertyInfo.objects.select_related(
+                "property_categories"
+            ).filter(property_categories=property_categories.id)
             return queryset
 
         return super().get_queryset()
@@ -538,14 +548,16 @@ class PropertyTypesFilterViewSet(viewsets.ModelViewSet):
 
         if property_types_id is not None:
             property_types = PropertyTypes.objects.get(id=property_types_id)
-            queryset = PropertyInfo.objects.select_related('property_types').filter(
-                property_types=property_types.id)
+            queryset = PropertyInfo.objects.select_related("property_types").filter(
+                property_types=property_types.id
+            )
             return queryset
 
         if property_types_name is not None:
             property_types = PropertyTypes.objects.get(name=property_types_name)
-            queryset = PropertyInfo.objects.select_related('property_types').filter(
-                property_types=property_types.id)
+            queryset = PropertyInfo.objects.select_related("property_types").filter(
+                property_types=property_types.id
+            )
             return queryset
 
         return super().get_queryset()
