@@ -128,6 +128,10 @@ class PropertySerializer(serializers.ModelSerializer):
         source="get_condition_type_display", read_only=True
     )
     status_value = serializers.CharField(source="get_status_display", read_only=True)
+    property_size_type_value = serializers.CharField(
+        source="get_property_size_type_display", read_only=True
+    )
+
     created_on = serializers.CharField(read_only=True)
     locations = LocationSerializer(read_only=True)
     gallery = serializers.HyperlinkedRelatedField(
@@ -170,6 +174,8 @@ class PropertySerializer(serializers.ModelSerializer):
             "membership_plan_value",
             "condition_type",
             "condition_type_value",
+            "property_size_type_value",
+            "property_size_type",
             "description",
             "price",
             "status",
@@ -374,7 +380,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
 class PropertyDetailSerializer(serializers.ModelSerializer):
     """
-    this view returns details of property
+    this serialzer returns details of property
     """
 
     # choicefield for property
