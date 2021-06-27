@@ -276,20 +276,42 @@ class LocationViewSet(viewsets.ModelViewSet):
 
         # for client side search
         if (city and locality) is not None:
-            city_name = City.objects.get(name=city)
-            queryset = Location.objects.filter(
-                city=city_name.id, locality__icontains=locality
-            )
-            return queryset
+            try:
+                city_name = City.objects.get(name=city)
+                try:
+                    queryset = Location.objects.filter(
+                        city=city_name.id, locality__icontains=locality
+                    )
+                    return queryset
+                except Location.DoesNotExist:
+                    raise ValidationError(
+                        {"error": "Location with this city name doesn't exist"}
+                    )
+
+            except City.DoesNotExist:
+                raise ValidationError({"error": "City doesn't exist"})
 
         if city is not None:
-            city = City.objects.get(name=city)
-            queryset = Location.objects.select_related("city").filter(city=city.id)
+            try:
+                city = City.objects.get(name=city)
+                try:
+                    queryset = Location.objects.select_related("city").filter(
+                        city=city.id
+                    )
+                except Location.DoesNotExist:
+                    raise ValidationError(
+                        {"error": "Location with this city name doesn't have"}
+                    )
+            except City.DoesNotExist:
+                raise ValidationError({"error": "City doesn't exist"})
             return queryset
 
         if locality is not None:
-            queryset = Location.objects.filter(locality__icontains=locality)
-            return queryset
+            try:
+                queryset = Location.objects.filter(locality__icontains=locality)
+                return queryset
+            except Location.DoesNotExist:
+                raise ValidationError({"error": "Location doesn't exist"})
         return super().get_queryset()
 
 

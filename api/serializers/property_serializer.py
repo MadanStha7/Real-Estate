@@ -109,7 +109,7 @@ class PropertySerializer(serializers.ModelSerializer):
     property_adtype = serializers.CharField(
         source="get_property_adtype_display", read_only=True
     )
-    apartment_type_value = serializers.CharField(
+    apartment_type = serializers.CharField(
         source="get_apartment_type_display", read_only=True
     )
     bhk_type_value = serializers.CharField(
@@ -151,7 +151,6 @@ class PropertySerializer(serializers.ModelSerializer):
             "property_type",
             "property_adtype",
             "apartment_type",
-            "apartment_type_value",
             "apartment_name",
             "bhk_type",
             "bhk_type_value",
@@ -345,10 +344,12 @@ class PropertyDiscussionSerializer(serializers.ModelSerializer):
         )
         # get_admin groups
         if Group.objects.get(name="Admin"):
-            user = User.objects.get(groups__name="Admin")
-            print("user", user)
-            notification = Notificatons(user=user, content_object=comment)
-            notification.save()
+            print("Group!!!!!!!!!!!!!!!!1", Group.objects.get(name="Admin"))
+            users = User.objects.filter(groups__name="Admin")
+            for user in users:
+                print("user", user)
+                notification = Notificatons(user=user, content_object=comment)
+                notification.save()
         # print(get_admin1)
         # notification = Notificatons(user=)
         return discussion_board
@@ -447,7 +448,6 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             "floor_plan",
             "created_on",
             "no_of_days",
-            "property_size_type",
         )
 
 
