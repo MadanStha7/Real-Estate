@@ -14,7 +14,9 @@ from property.models import (
     ContactAgent,
     FloorPlan,
     Comment,
-    Reply, PropertyCategories, PropertyTypes,
+    Reply,
+    PropertyCategories,
+    PropertyTypes,
 )
 from .user_serializer import UserProfileSerializer, AdminProfileSerializer
 from user.models import (
@@ -97,25 +99,34 @@ class PropertySerializer(serializers.ModelSerializer):
     """
     return the property details in homepage in client side
     """
+
     listing_type_value = serializers.CharField(
-        source="get_listing_type_display", read_only=True)
+        source="get_listing_type_display", read_only=True
+    )
     property_type = serializers.CharField(
-        source="get_property_type_display", read_only=True)
+        source="get_property_type_display", read_only=True
+    )
     property_adtype = serializers.CharField(
-        source="get_property_adtype_display", read_only=True)
+        source="get_property_adtype_display", read_only=True
+    )
     apartment_type = serializers.CharField(
-        source="get_apartment_type_display", read_only=True)
+        source="get_apartment_type_display", read_only=True
+    )
     bhk_type_value = serializers.CharField(
-        source="get_bhk_type_display", read_only=True)
+        source="get_bhk_type_display", read_only=True
+    )
     floor = serializers.CharField(source="get_floor_display", read_only=True)
     total_floor = serializers.CharField(
-        source="get_total_floor_display", read_only=True)
+        source="get_total_floor_display", read_only=True
+    )
     age = serializers.CharField(source="get_age_display", read_only=True)
     facing_value = serializers.CharField(source="get_facing_display", read_only=True)
     membership_plan_value = serializers.CharField(
-        source="get_membership_plan_display", read_only=True)
+        source="get_membership_plan_display", read_only=True
+    )
     condition_type_value = serializers.CharField(
-        source="get_condition_type_display", read_only=True)
+        source="get_condition_type_display", read_only=True
+    )
     status_value = serializers.CharField(source="get_status_display", read_only=True)
     created_on = serializers.CharField(read_only=True)
     locations = LocationSerializer(read_only=True)
@@ -327,10 +338,12 @@ class PropertyDiscussionSerializer(serializers.ModelSerializer):
         )
         # get_admin groups
         if Group.objects.get(name="Admin"):
-            user = User.objects.get(groups__name="Admin")
-            print("user", user)
-            notification = Notificatons(user=user, content_object=comment)
-            notification.save()
+            print("Group!!!!!!!!!!!!!!!!1", Group.objects.get(name="Admin"))
+            users = User.objects.filter(groups__name="Admin")
+            for user in users:
+                print("user", user)
+                notification = Notificatons(user=user, content_object=comment)
+                notification.save()
         # print(get_admin1)
         # notification = Notificatons(user=)
         return discussion_board
@@ -428,7 +441,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             "status",
             "floor_plan",
             "created_on",
-            "no_of_days"
+            "no_of_days",
         )
 
 
@@ -515,6 +528,7 @@ class PropertyTypeFilteredSerialzers(serializers.Serializer):
 
 class ContactAgentSerializer(serializers.ModelSerializer):
     property_info = PropertyDetailSerializer(read_only=True)
+
     class Meta:
         model = ContactAgent
         fields = ("id", "name", "email", "property_info", "agent")
