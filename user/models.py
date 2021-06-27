@@ -189,7 +189,7 @@ class Notificatons(CommonInfo):
         verbose_name_plural = "Notifications"
 
     def __str__(self):
-        return str(self.id) + " " + self.user.username
+        return str(self.user.username)
 
 
 class NotificationActivity(CommonInfo):
