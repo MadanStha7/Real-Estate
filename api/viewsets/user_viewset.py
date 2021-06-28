@@ -169,6 +169,13 @@ class UserLoginView(APIView):
                     get_user = User.objects.get(username=u_name)
 
                 user = authenticate(username=get_user, password=pword)
+
+                if not user:
+                    return Response(
+                        {"error": "Invalid Credential"},
+                        status=status.HTTP_404_NOT_FOUND,
+                    )
+
                 try:
                     token = Token.objects.get(user=user.id)
                 except Token.DoesNotExist:
