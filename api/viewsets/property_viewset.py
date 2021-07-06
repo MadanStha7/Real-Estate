@@ -40,10 +40,13 @@ from property.models import (
     Reply,
 )
 from api.serializers.property_serializer import (
+    AmenitiesSerializer,
     BasicDetailsSerializer,
     CitySerializer,
     PropertyCategoriesSerializer,
     PropertyTypeSerializer,
+    ResaleDetailsSerializer,
+    SellPropertyDetailsSerializer
 )
 
 """===================================
@@ -85,3 +88,33 @@ class BasicDetailsViewset(viewsets.ModelViewSet):
     queryset = BasicDetails.objects.all()
     serializer_class = BasicDetailsSerializer
     pagination_class = None
+
+
+class SellPropertyDetailsViewSet(viewsets.ModelViewSet):
+    queryset = SellPropertyDetails.objects.all()
+    serializer_class = SellPropertyDetailsSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
+
+class ResaleDetailsViewSet(viewsets.ModelViewSet):
+    queryset = ResaleDetails.objects.all()
+    serializer_class = ResaleDetailsSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
+
+class AmenitiesViewSet(viewsets.ModelViewSet):
+    queryset = Amenities.objects.all()
+    serializer_class = AmenitiesSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]

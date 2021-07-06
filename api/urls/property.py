@@ -6,13 +6,20 @@ from api.viewsets.property_viewset import (
     CityViewset,
     PropertyTypesViewSet,
     PropertyCategoryViewset,
+    SellPropertyDetailsViewSet,
+    ResaleDetailsViewSet,
+    AmenitiesViewSet
 )
 
 router = routers.DefaultRouter()
 router.register(r"city", CityViewset)
 router.register(r"property-types", PropertyTypesViewSet)
-router.register(r"category-filter", PropertyCategoryViewset)
+router.register(r"property-category", PropertyCategoryViewset)
 router.register(r"basic-details", BasicDetailsViewset)
+router.register(r"sell-property-details", SellPropertyDetailsViewSet)
+router.register(r"resale-details", ResaleDetailsViewSet)
+router.register(r"sell-amenities", AmenitiesViewSet)
+
 
 
 urlpatterns = [

@@ -462,7 +462,7 @@ class ResaleDetails(CommonInfo):
         return f"property resale details {self.id}"
 
     class Meta:
-        verbose_name_plural = "SellPropertyDetails"
+        verbose_name_plural = "ResaleDetails"
         ordering = ["-created_on"]
 
 
