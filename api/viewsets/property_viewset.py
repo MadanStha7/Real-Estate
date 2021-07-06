@@ -14,7 +14,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from user.models import AgentDetail, UserProfile, AdminProfile
 from django.contrib.auth.models import Group
-
 from api.permissions.user_permission import (
     UserIsAuthenticated,
     UserIsAdmin,
@@ -40,8 +39,49 @@ from property.models import (
     Comment,
     Reply,
 )
-
+from api.serializers.property_serializer import (
+    BasicDetailsSerializer,
+    CitySerializer,
+    PropertyCategoriesSerializer,
+    PropertyTypeSerializer,
+)
 
 """===================================
 -- Property model on client side starts ---
 ======================================"""
+
+
+class CityViewset(viewsets.ModelViewSet):
+    queryset = City.objects.all()
+    serializer_class = CitySerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
+
+class PropertyTypesViewSet(viewsets.ModelViewSet):
+    queryset = PropertyTypes.objects.all()
+    serializer_class = PropertyTypeSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
+
+class PropertyCategoryViewset(viewsets.ModelViewSet):
+    queryset = PropertyCategories.objects.all()
+    serializer_class = PropertyCategoriesSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
+
+class BasicDetailsViewset(viewsets.ModelViewSet):
+    queryset = BasicDetails.objects.all()
+    serializer_class = BasicDetailsSerializer
+    pagination_class = None
