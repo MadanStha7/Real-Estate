@@ -9,6 +9,8 @@ User = get_user_model()
 
 
 class City(CommonInfo):
+    """model to store name of city"""
+
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -24,9 +26,7 @@ class City(CommonInfo):
 
 
 class PropertyCategories(CommonInfo):
-    """
-    This model defines the categories of property
-    """
+    """model to store category of property"""
 
     name = models.CharField(max_length=100)
 
@@ -39,9 +39,7 @@ class PropertyCategories(CommonInfo):
 
 
 class PropertyTypes(CommonInfo):
-    """
-    This model defines the types of property such as residential or commercial
-    """
+    """model to store type of property"""
 
     name = models.CharField(max_length=100)
 
@@ -53,16 +51,110 @@ class PropertyTypes(CommonInfo):
         ordering = ["-created_on"]
 
 
-class PropertyInfo(CommonInfo):
+class BasicDetails(CommonInfo):
     """
-    Info about property
+    model to store  basic details of the property
     """
 
-    APARTMENT_CHOICES = (
-        ("A", "Apartment"),
-        ("I", "Independent House/Villa"),
-        ("G", "Gated Community/Villa"),
+    ADVERTISEMENT_TYPE_CHOICES = (
+        ("", "----"),
+        ("R", "Rent"),
+        ("S", "Sale"),
     )
+    MEMBERSHIP_PLAN_CHOICES = (
+        ("S", "Silver"),
+        ("G", "Gold"),
+        ("P", "Platinum"),
+    )
+    LISTING_TYPE_CHOICES = (
+        ("Fr", "Free"),
+        ("P", "Premium"),
+        ("Fe", "Featured"),
+    )
+    CONDITION_CHOICES = (
+        ("N", "New"),
+        ("U", "Used"),
+    )
+    city = models.ForeignKey(
+        City, on_delete=models.CASCADE, related_name="city_property", null=True
+    )
+    property_categories = models.ForeignKey(
+        PropertyCategories,
+        on_delete=models.CASCADE,
+        related_name="property_info",
+        null=True,
+        blank=True,
+    )
+    property_types = models.ForeignKey(
+        PropertyTypes,
+        on_delete=models.CASCADE,
+        related_name="property_info",
+        null=True,
+        blank=True,
+    )
+    advertisement_type = models.CharField(
+        max_length=2, choices=ADVERTISEMENT_TYPE_CHOICES, default=""
+    )
+    owner = models.ForeignKey(
+        User,
+        related_name="userprofile",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    agent = models.ForeignKey(
+        User,
+        related_name="agentdetail",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    staff = models.ForeignKey(
+        User,
+        related_name="staffdetail",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    admin = models.ForeignKey(
+        User,
+        related_name="admin_profile",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+
+    publish = models.BooleanField(default=False)
+    views = models.PositiveIntegerField(default=0)
+    listing_type = models.CharField(
+        max_length=2, choices=LISTING_TYPE_CHOICES, null=True, blank=True
+    )
+    membership_plan = models.CharField(
+        max_length=1, choices=MEMBERSHIP_PLAN_CHOICES, null=True, blank=True
+    )
+    condition_type = models.CharField(
+        max_length=1, choices=CONDITION_CHOICES, null=True, blank=True
+    )  # sell type
+
+    def __str__(self):
+        return str(self.id)
+
+    class Meta:
+        verbose_name_plural = "Basic Details"
+        db_table = "property_basics"
+        ordering = ["-created_on"]
+
+
+"""=================================================
+------------ Advertisement type Rent  ------------
+====================================================="""
+
+
+class RentPropertyDetails(CommonInfo):
+    """
+    Model to store the property details of rent type
+    """
+
     BHK_CHOICES = (
         ("1 RK", "1 RK"),
         ("1 BHK", "1 BHK"),
@@ -113,127 +205,52 @@ class PropertyInfo(CommonInfo):
         ("SW", "South-West"),
         ("D", "Don't Know"),
     )
-    PROPERTY_TYPE_CHOICES = (
-        ("R", "Residential"),
-        ("C", "Commercial"),
+    basic_details = models.ForeignKey(
+        BasicDetails, on_delete=models.CASCADE, related_name="rent_property", null=True
     )
-    PROPERTYAD_TYPE_CHOICES = (
-        ("R", "Rent"),
-        ("Re", "Resale"),
-        ("P", "Pg/Hostel"),
-        ("F", "Flatmates"),
-        ("S", "Sale"),
-    )
-    MEMBERSHIP_PLAN_CHOICES = (
-        ("S", "Silver"),
-        ("G", "Gold"),
-        ("P", "Platinum"),
-    )
-    LISTING_TYPE_CHOICES = (
-        ("T", "Top"),
-        ("P", "Premium"),
-        ("F", "Featured"),
-    )
-    CONDITION_CHOICES = (
-        ("N", "New"),
-        ("U", "Used"),
-    )
-    STATUS_CHOICES = (("N", "negotiation"), ("P", "Pending"))
-    PROPERTY_SIZE_CHOICES = (("R", "Ropani"), ("A", "Aana"), ("S", "Square Feet"))
-    city = models.ForeignKey(
-        City, on_delete=models.CASCADE, related_name="city_property", null=True
-    )
-    property_categories = models.ForeignKey(
-        PropertyCategories,
-        on_delete=models.CASCADE,
-        related_name="property_info",
-        null=True,
-        blank=True,
-    )
-    property_types = models.ForeignKey(
-        PropertyTypes,
-        on_delete=models.CASCADE,
-        related_name="property_info",
-        null=True,
-        blank=True,
-    )
-    property_type = models.CharField(
-        max_length=1, choices=PROPERTY_TYPE_CHOICES, default="R"
-    )
-    property_adtype = models.CharField(
-        max_length=2, choices=PROPERTYAD_TYPE_CHOICES, default="R"
-    )
-    apartment_type = models.CharField(
-        max_length=1, choices=APARTMENT_CHOICES, default="A"
-    )
-    apartment_name = models.CharField(max_length=63, blank=True, null=True)
     bhk_type = models.CharField(
         max_length=20, choices=BHK_CHOICES, default="F"
     )  # bedroom hall kitchen
-    floor = models.CharField(max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G")
-    total_floor = models.CharField(
+    floor_number = models.CharField(
         max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G"
     )
-    age = models.CharField(
+    total_floors = models.CharField(
+        max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G"
+    )
+    property_age = models.CharField(
         max_length=1, choices=AGE_CHOICES, default="U"
     )  # property age
-    facing = models.CharField(max_length=2, choices=FACING_CHOICES)
+    facing_direction = models.CharField(max_length=2, choices=FACING_CHOICES)
     property_size = models.FloatField(default=0.00)  # size in sq.m
-    property_size_type = models.CharField(
-        max_length=1, choices=PROPERTY_SIZE_CHOICES, null=True
-    )
-    price = models.FloatField(default=0.00)
-    status = models.CharField(max_length=2, choices=STATUS_CHOICES, null=True)
-    owner = models.ForeignKey(
-        User,
-        related_name="userprofile",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
-    agent = models.ForeignKey(
-        User,
-        related_name="agentdetail",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
-    staff = models.ForeignKey(
-        User,
-        related_name="staffdetail",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
-    admin = models.ForeignKey(
-        User,
-        related_name="admin_profile",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
 
+    def __str__(self):
+        return f"property information of rent property with id {self.id}"
+
+    class Meta:
+        verbose_name_plural = "Rent Property Details"
+        db_table = "rent_property_details"
+        ordering = ["-created_on"]
+
+
+class Location(CommonInfo):
+    """
+    Location of rent property
+    """
+
+    basic_details = models.OneToOneField(
+        BasicDetails, on_delete=models.CASCADE, related_name="location", null=True
+    )
+    city = models.ForeignKey(
+        City, on_delete=models.CASCADE, related_name="city_locations", null=True
+    )
+    street = models.TextField()
     # displaying the exact location using map
     location = models.PointField(null=True, blank=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
-    publish = models.BooleanField(default=False)
-    description = models.TextField(null=True, blank=True)
-    views = models.PositiveIntegerField(default=0)
-    listing_type = models.CharField(
-        max_length=1, choices=LISTING_TYPE_CHOICES, null=True, blank=True
-    )
-    membership_plan = models.CharField(
-        max_length=1, choices=MEMBERSHIP_PLAN_CHOICES, null=True, blank=True
-    )
-    condition_type = models.CharField(
-        max_length=1, choices=CONDITION_CHOICES, null=True, blank=True
-    )  # sell type
 
     def __str__(self):
-        return f"property information of {self.city}, with id {self.id}"
-
-        return str(self.id)
+        return f"property located at {self.city.name}"
 
     def save(self, *args, **kwargs):
         if self.location:
@@ -242,32 +259,7 @@ class PropertyInfo(CommonInfo):
 
         elif self.latitude and self.longitude:
             self.location = Point(x=self.longitude, y=self.latitude, srid=4326)
-
-        super(PropertyInfo, self).save(*args, **kwargs)
-
-    class Meta:
-        verbose_name_plural = "Property Info"
-        db_table = "property"
-        ordering = ["-created_on"]
-
-
-class Location(CommonInfo):
-    """
-    Location of property
-    """
-
-    city = models.ForeignKey(
-        City, on_delete=models.CASCADE, related_name="city_locations", null=True
-    )
-    locality = models.TextField()
-    street = models.TextField()
-    listing = models.CharField(max_length=20, default="")
-    property_info = models.OneToOneField(
-        PropertyInfo, related_name="locations", on_delete=models.CASCADE
-    )
-
-    def __str__(self):
-        return f"property located at {self.city}"
+        super(BasicDetails, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = "Property Location"
@@ -275,45 +267,35 @@ class Location(CommonInfo):
         ordering = ["-created_on"]
 
 
-class RentalInfo(CommonInfo):
+class RentalDetails(CommonInfo):
     """
-    rental details about property
+    model to store the rental details of rent
     """
 
-    AVAILABLE_FOR_CHOICES = (("R", "Only Rent"), ("L", "Only Lease"))
-    MAINTENANCE_CHOICES = (("I", "Maintenance Included"), ("E", "Maintenance Extra"))
-    TENANTS_CHOICES = (
-        ("D", "Doesn't Matter"),
-        ("F", "Family"),
-        ("B", "Bachelor"),
-        ("C", "Company"),
-    )
+    PRICE_CHOICES = (("N", "Negotiable"), ("F", "Fixed"))
     FURNISHING_CHOICES = (
         ("F", "Fully Furnishing"),
         ("S", "Semi Furnishing"),
         ("U", "Unfurnishing"),
     )
     PARKING_CHOICES = (("N", "None"), ("M", "Motorbike"), ("C", "Car"), ("B", "Both"))
-    available_for = models.CharField(max_length=1, choices=AVAILABLE_FOR_CHOICES)
+
     expected_rent = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
     expected_deposit = models.DecimalField(
-        default=0.00, decimal_places=2, max_digits=10
+        default=0.00, decimal_places=2, max_digits=10, null=True, blank=True
     )
-    negotiable = models.BooleanField(default=False)
-    maintenance = models.CharField(
-        max_length=1, choices=MAINTENANCE_CHOICES, default="I", blank=True, null=True
-    )
+    price = models.CharField(max_length=1, choices=PRICE_CHOICES, default="N")
+
     available_from = models.DateField()
-    tenants = models.CharField(max_length=1, choices=TENANTS_CHOICES, default="D")
     furnishing = models.CharField(max_length=1, choices=FURNISHING_CHOICES, default="F")
-    parking = models.CharField(max_length=1, choices=PARKING_CHOICES)
+    no_of_parking = models.CharField(max_length=1, choices=PARKING_CHOICES)
     description = models.TextField()
-    property_info = models.ForeignKey(
-        PropertyInfo, related_name="rental_info", on_delete=models.CASCADE
+    basic_details = models.OneToOneField(
+        BasicDetails, on_delete=models.CASCADE, related_name="rental_details", null=True
     )
 
     def __str__(self):
-        return self.available_for
+        return str(self.id)
 
     class Meta:
         verbose_name_plural = "Rental Info"
@@ -323,54 +305,183 @@ class RentalInfo(CommonInfo):
 
 class Gallery(CommonInfo):
     """
-    property info Gallery
+    model to store the gallery
     """
 
     title = models.CharField(max_length=100, null=True, blank=True)
-    image = models.ImageField(upload_to="property/images")
-    property_info = models.ForeignKey(
-        PropertyInfo, related_name="gallery", on_delete=models.CASCADE
+    image = models.ImageField(upload_to="property/gallery")
+    basic_details = models.OneToOneField(
+        BasicDetails, on_delete=models.CASCADE, related_name="gallery", null=True
     )
-    link = models.URLField(max_length=400, null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Gallery"
-        db_table = "propertys_gallery"
+        db_table = "Gallery"
 
     def __str__(self):
         # return str(self.id)
         return f"gallery {str(self.id)}"
 
 
-class Amenities(CommonInfo):
+"""=================================================
+------------ Advertisement type Sale  ------------
+====================================================="""
+
+
+class SellPropertyDetails(CommonInfo):
     """
-    Amenities
+    model to store the sell property details
     """
 
-    YES_NO_CHOICES = (("Y", "Yes"), ("N", "No"))
-    WATER_SUPPLY_CHOICES = (("C", "Corporation"), ("W", "Borewell"), ("B", "Both"))
-    VIEWER_CHOICES = (
-        ("H", "Need Help"),
-        ("I", "I will show"),
-        ("N", "Neighbours"),
-        ("F", "Friends/Relatives"),
-        ("S", "Security"),
-        ("T", "Tenants"),
-        ("O", "Others"),
+    BHK_CHOICES = (
+        ("1 RK", "1 RK"),
+        ("1 BHK", "1 BHK"),
+        ("2 BHK", "2 BHK"),
+        ("3 BHK", "3 BHK"),
+        ("4 BHK", "4 BHK"),
+        ("4+ BHK", "4+ BHK"),
     )
-    bathrooms = models.IntegerField(default=0)
-    balcony = models.CharField(max_length=63, choices=YES_NO_CHOICES, default="Y")
-    water_supply = models.CharField(
-        max_length=1, choices=WATER_SUPPLY_CHOICES, default="C"
+    NUMBER_OF_FLOOR_CHOICES = (
+        ("G", "Ground"),
+        ("1", "1"),
+        ("2", "2"),
+        ("3", "3"),
+        ("4", "4"),
+        ("5", "5"),
+        ("6", "6"),
+        ("7", "7"),
+        ("8", "8"),
+        ("9", "9"),
+        ("10", "10"),
+        ("11", "11"),
+        ("12", "12"),
+        ("13", "13"),
+        ("14", "14"),
+        ("15", "15"),
+        ("16", "16"),
+        ("17", "17"),
+        ("18", "18"),
+        ("19", "19"),
+        ("20", "20"),
     )
-    gym = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
-    non_veg = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
-    security = models.CharField(max_length=1, choices=YES_NO_CHOICES, default="Y")
-    viewer = models.CharField(max_length=1, choices=VIEWER_CHOICES, default="H")
-    secondary_number = models.IntegerField(default=1)
-    property_info = models.ForeignKey(
-        PropertyInfo, related_name="amenities", on_delete=models.CASCADE
+    AGE_CHOICES = (
+        ("U", "Under Construction"),
+        ("L", "Less than a year"),
+        ("1", "1 to 3 year"),
+        ("3", "3 to 5 year"),
+        ("5", "5 to 10 year"),
+        ("M", "More than 10 year"),
     )
+    FACING_CHOICES = (
+        ("E", "EAST"),
+        ("W", "WEST"),
+        ("N", "North"),
+        ("S", "South"),
+        ("NE", "North-East"),
+        ("SE", "South-East"),
+        ("NW", "North-West"),
+        ("SW", "South-West"),
+        ("D", "Don't Know"),
+    )
+    PROPERTY_SIZE_CHOICES = (("R", "Ropani"), ("A", "Aana"), ("S", "Square Feet"))
+    basic_details = models.ForeignKey(
+        BasicDetails,
+        on_delete=models.CASCADE,
+        related_name="sell_property_details",
+        null=True,
+    )
+    bhk_type = models.CharField(
+        max_length=20, choices=BHK_CHOICES, default="F"
+    )  # bedroom hall kitchen
+    total_floors = models.CharField(
+        max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G"
+    )
+    property_age = models.CharField(
+        max_length=1, choices=AGE_CHOICES, default="U"
+    )  # property age
+    built_up_area = models.DecimalField(
+        default=0.00,
+        decimal_places=2,
+        max_digits=10,
+    )
+    property_size = models.DecimalField(
+        default=0.00,
+        decimal_places=2,
+        max_digits=10,
+    )
+    facing_direction = models.CharField(max_length=2, choices=FACING_CHOICES)
+
+    def __str__(self):
+        return f"property information of sell property with id {self.id}"
+
+    class Meta:
+        verbose_name_plural = "SellPropertyDetails"
+        ordering = ["-created_on"]
+
+
+class ResaleDetails(CommonInfo):
+    """
+    This model defines the resale details of property.
+    """
+
+    PRICE_CHOICES = (("N", "Negotiable"), ("F", "Fixed"))
+    FURNISHING_CHOICES = (
+        ("F", "Fully Furnishing"),
+        ("S", "Semi Furnishing"),
+        ("U", "Unfurnishing"),
+    )
+    PARKING_CHOICES = (("N", "None"), ("M", "Motorbike"), ("C", "Car"), ("B", "Both"))
+    KITCHEN_CHOICES = (
+        ("F", "Fully furnished"),
+        ("S", "Semi Furnishing"),
+        ("U", "Unfurnished"),
+    )
+    CONSTRUCTION_CHOICES = (("C", "Completed"), ("N", "Not Completed"))
+
+    expected_price = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
+    price = models.CharField(max_length=1, choices=PRICE_CHOICES, default="N")
+    available_from = models.DateField()
+    kitchen_type = models.CharField(max_length=1, choices=KITCHEN_CHOICES, default="F")
+    furnishing = models.CharField(max_length=1, choices=FURNISHING_CHOICES, default="F")
+    no_of_parking = models.CharField(max_length=1, choices=PARKING_CHOICES)
+    construction_type = models.CharField(
+        max_length=2, choices=CONSTRUCTION_CHOICES, default=""
+    )
+    pillar_size_width1 = models.DecimalField(
+        default=0.00, decimal_places=2, max_digits=10
+    )
+    pillar_size_width2 = models.DecimalField(
+        default=0.00, decimal_places=2, max_digits=10
+    )
+    description = models.TextField()
+    basic_details = models.ForeignKey(
+        BasicDetails, on_delete=models.CASCADE, related_name="resale_details", null=True
+    )
+
+    def __str__(self):
+        return f"property resale details {self.id}"
+
+    class Meta:
+        verbose_name_plural = "SellPropertyDetails"
+        ordering = ["-created_on"]
+
+
+class Amenities(CommonInfo):
+    """
+    Amenities details of property.
+    """
+
+    basic_details = models.ForeignKey(
+        BasicDetails, on_delete=models.CASCADE, related_name="amenities", null=True
+    )
+    total_no_bathrooms = models.IntegerField(default=0)
+    water_supply = models.BooleanField(default=False)  # 24 hours hot water
+    swimming_pool = models.BooleanField(default=False)
+    security = models.BooleanField(default=False)
+    gym = models.BooleanField(default=False)
+    lift = models.BooleanField(default=False)
+    title = models.CharField(max_length=100, null=True, blank=True)
+    image = models.ImageField(upload_to="sale/amenities")
 
     class Meta:
         verbose_name_plural = "Amenities"
@@ -388,8 +499,8 @@ class FieldVisit(CommonInfo):
     name = models.CharField(max_length=64, blank=False, null=False)
     email = models.CharField(max_length=16, blank=False)
     phone = models.CharField(max_length=16)
-    property_type = models.ForeignKey(
-        PropertyInfo, related_name="field_visits", on_delete=models.CASCADE
+    basic_details = models.ForeignKey(
+        BasicDetails, on_delete=models.CASCADE, related_name="field_visit", null=True
     )
 
     def __str__(self):
@@ -399,37 +510,6 @@ class FieldVisit(CommonInfo):
         verbose_name_plural = "Field Visit"
         ordering = ["-name"]
         db_table = "property_field_visit"
-
-
-class Schedule(models.Model):
-    YES_NO_CHOICES = (("Y", "Yes"), ("N", "No"))
-    AVAILABLE_DAY_CHOICES = (
-        ("E", "Everyday(Sunday - Saturday)"),
-        ("W", "Weekdays(Sunday - Friday)"),
-        ("S", "Weekend(Saturday)"),
-    )
-
-    paint = models.CharField(
-        max_length=1, choices=YES_NO_CHOICES, default="Y", null=True, blank=True
-    )  # i want my house painted
-    cleaned = models.CharField(
-        max_length=1, choices=YES_NO_CHOICES, default="Y", null=True, blank=True
-    )  # i want to get my house cleaned
-    available_days = models.CharField(
-        max_length=1, choices=AVAILABLE_DAY_CHOICES, default="E", null=True, blank=True
-    )
-    start_time = models.TimeField()
-    end_time = models.TimeField()
-    property_type = models.ForeignKey(
-        PropertyInfo, related_name="property_schedule", on_delete=models.CASCADE
-    )
-
-    class Meta:
-        verbose_name_plural = "Schedule"
-        db_table = "property_schedule"
-
-    def __str__(self):
-        return self.paint
 
 
 class PropertyDiscussionBoard(CommonInfo):
@@ -447,8 +527,11 @@ class PropertyDiscussionBoard(CommonInfo):
     title = models.CharField(max_length=32, blank=True, null=True)
     tags = ArrayField(models.CharField(max_length=32), blank=True)
     comments = models.TextField()
-    property_type = models.ForeignKey(
-        PropertyInfo, related_name="discussion", on_delete=models.CASCADE
+    basic_details = models.ForeignKey(
+        BasicDetails,
+        on_delete=models.CASCADE,
+        related_name="discussion_board",
+        null=True,
     )
     user = models.ForeignKey(
         User,
@@ -568,26 +651,6 @@ class PropertyRequest(CommonInfo):
         db_table = "property_request"
 
 
-class FloorPlan(CommonInfo):
-    """
-    This model includes the architecture of property including map
-    """
-
-    property_type = models.ForeignKey(
-        PropertyInfo, related_name="floor_plan", on_delete=models.CASCADE
-    )
-    name = models.CharField(max_length=40, blank=True, null=True)
-    file = models.FileField(upload_to="floorplan/images", null=True)
-
-    def __str__(self):
-        return str(self.id)
-
-    class Meta:
-        ordering = ["-id"]
-        verbose_name_plural = "Floorplan"
-        db_table = "Floor plan"
-
-
 class ContactAgent(models.Model):
     """
     This model refers the contact of agent after someone wants a property
@@ -596,11 +659,11 @@ class ContactAgent(models.Model):
     name = models.CharField(max_length=25, null=True)
     email = models.EmailField()
     phone = models.CharField(max_length=15)
-    property_info = models.ForeignKey(
-        PropertyInfo, on_delete=models.CASCADE, related_name="property_info"
+    basic_details = models.ForeignKey(
+        BasicDetails, on_delete=models.CASCADE, related_name="contact_agent", null=True
     )
     agent = models.ForeignKey(
-        AgentDetail, on_delete=models.CASCADE, related_name="agent"
+        AgentDetail, on_delete=models.CASCADE, related_name="contact_agent"
     )
 
     def __str__(self):
