@@ -25,7 +25,6 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import AnonymousUser
-from property.models import PropertyInfo
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
