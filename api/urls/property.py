@@ -1,78 +1,10 @@
 from django.urls import include, path
 from rest_framework import routers
-from property.models import Schedule
-from api.viewsets.property_viewset import ScheduleList, PropertyCategoryViewset, PropertyTypesViewSet, \
-    PropertyCategoriesFilterViewSet, PropertyTypesFilterViewSet
-
-from api.viewsets.property_viewset import (
-    PropertyViewSet,
-    FieldVisitViewSet,
-    PropertyDiscussionViewSet,
-    RentalViewSet,
-    GalleryViewSet,
-    AmentitesViewSet,
-    ScheduleViewSet,
-    LocationViewSet,
-    PropertyDetailsView,
-    PropertyList,
-    PropertyTop,
-    PropertyPremium,
-    PropertyFeatured,
-    PropertySearchView,
-    PropertyRequestViewSet,
-    PropertyFilterView,
-    DetailPropertyView,
-    AdminDashboardView,
-    ContactAgentViewSet,
-    CityViewset,
-    FloorPlanViewSet,
-    CommentViewSet,
-    ReplyViewSet,
-)
 
 
 router = routers.DefaultRouter()
-router.register(r"property", PropertyViewSet)
-router.register(r"location", LocationViewSet)
-router.register(r"field_visits", FieldVisitViewSet)
-router.register(r"property_discussion", PropertyDiscussionViewSet)
-router.register(r"rental", RentalViewSet)
-router.register(r"gallery", GalleryViewSet)
-router.register(r"amenities", AmentitesViewSet)
-router.register(r"schedule", ScheduleViewSet)
-router.register(r"property_request", PropertyRequestViewSet)
-router.register(r"property-filter", PropertyFilterView)
-router.register(r"contact_agent", ContactAgentViewSet)
-router.register(r"property-list", PropertyList)  # for client sides
-router.register(r"city", CityViewset)
-router.register(r"property-categories", PropertyCategoryViewset)
-router.register(r"property-types", PropertyTypesViewSet)
-router.register(r"category-filter", PropertyCategoriesFilterViewSet)
-router.register(r"types-filter", PropertyTypesFilterViewSet)
-router.register(r"floorplan", FloorPlanViewSet)
-router.register(r"comment", CommentViewSet)
-router.register(r"reply", ReplyViewSet)
-
 
 urlpatterns = [
     path("", include(router.urls)),
-    path(
-        "property-detail/<int:pk>/",
-        PropertyDetailsView.as_view(),
-        name="property_detail",
-    ),
-    path("property-category/top/", PropertyTop.as_view(), name="property_top"),
-    path(
-        "property-category/premium/", PropertyPremium.as_view(), name="property_premium"
-    ),
-    path(
-        "property-category/featured/",
-        PropertyFeatured.as_view(),
-        name="property_featured",
-    ),
-    path("detail-property/", DetailPropertyView.as_view(), name="detail-property"),
-    # search
-    path("locations/", PropertySearchView.as_view(), name="search_property"),
-    # admin dashboard
-    path("admin_dashboard/", AdminDashboardView.as_view(), name="admin_dashboard"),
+    # path("admin_dashboard/", AdminDashboardView.as_view(), name="admin_dashboard"),
 ]
