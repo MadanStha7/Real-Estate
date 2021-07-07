@@ -41,6 +41,7 @@ from property.models import (
     RentalDetails,
 )
 from api.serializers.property_serializer import (
+    AmenitiesSerializer,
     BasicDetailsSerializer,
     CitySerializer,
     LocationSerializer,
@@ -51,6 +52,8 @@ from api.serializers.property_serializer import (
     GallerySerializer,
     PendingPropertySerializer,
     AssignPropertySerializer,
+    ResaleDetailsSerializer,
+    SellPropertyDetailsSerializer,
 )
 
 """===================================
@@ -142,6 +145,11 @@ class RentalDetailsViewset(viewsets.ModelViewSet):
     serializer_class = RentalDetailsSerializer
     pagination_class = None
 
+
+class SellPropertyDetailsViewSet(viewsets.ModelViewSet):
+    queryset = SellPropertyDetails.objects.all()
+    serializer_class = SellPropertyDetailsSerializer
+
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
             return [IsAuthenticated()]
@@ -156,6 +164,11 @@ class GalleryViewset(viewsets.ModelViewSet):
     queryset = Gallery.objects.all()
     serializer_class = GallerySerializer
     pagination_class = None
+
+
+class ResaleDetailsViewSet(viewsets.ModelViewSet):
+    queryset = ResaleDetails.objects.all()
+    serializer_class = ResaleDetailsSerializer
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
@@ -187,6 +200,11 @@ class PendingPropertyViewset(viewsets.ModelViewSet):
         else:
             queryset = BasicDetails.objects.filter(publish=False)
             return queryset
+
+
+class AmenitiesViewSet(viewsets.ModelViewSet):
+    queryset = Amenities.objects.all()
+    serializer_class = AmenitiesSerializer
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
