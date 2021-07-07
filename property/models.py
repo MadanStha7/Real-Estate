@@ -135,6 +135,8 @@ class BasicDetails(CommonInfo):
     condition_type = models.CharField(
         max_length=1, choices=CONDITION_CHOICES, null=True, blank=True
     )  # sell type
+    due_date = models.DateField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return str(self.id)
@@ -163,37 +165,6 @@ class RentPropertyDetails(CommonInfo):
         ("4 BHK", "4 BHK"),
         ("4+ BHK", "4+ BHK"),
     )
-    NUMBER_OF_FLOOR_CHOICES = (
-        ("G", "Ground"),
-        ("1", "1"),
-        ("2", "2"),
-        ("3", "3"),
-        ("4", "4"),
-        ("5", "5"),
-        ("6", "6"),
-        ("7", "7"),
-        ("8", "8"),
-        ("9", "9"),
-        ("10", "10"),
-        ("11", "11"),
-        ("12", "12"),
-        ("13", "13"),
-        ("14", "14"),
-        ("15", "15"),
-        ("16", "16"),
-        ("17", "17"),
-        ("18", "18"),
-        ("19", "19"),
-        ("20", "20"),
-    )
-    AGE_CHOICES = (
-        ("U", "Under Construction"),
-        ("L", "Less than a year"),
-        ("1", "1 to 3 year"),
-        ("3", "3 to 5 year"),
-        ("5", "5 to 10 year"),
-        ("M", "More than 10 year"),
-    )
     FACING_CHOICES = (
         ("E", "EAST"),
         ("W", "WEST"),
@@ -211,16 +182,12 @@ class RentPropertyDetails(CommonInfo):
     bhk_type = models.CharField(
         max_length=20, choices=BHK_CHOICES, default="F"
     )  # bedroom hall kitchen
-    floor_number = models.CharField(
-        max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G"
+    floor_number = models.CharField(max_length=40)
+    total_floors = models.CharField(max_length=40)
+    property_age = models.CharField(max_length=40)  # property age
+    facing_direction = models.CharField(
+        max_length=2, choices=FACING_CHOICES, default="E"
     )
-    total_floors = models.CharField(
-        max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G"
-    )
-    property_age = models.CharField(
-        max_length=1, choices=AGE_CHOICES, default="U"
-    )  # property age
-    facing_direction = models.CharField(max_length=2, choices=FACING_CHOICES)
     property_size = models.FloatField(default=0.00)  # size in sq.m
 
     def __str__(self):
@@ -241,11 +208,11 @@ class Location(CommonInfo):
         BasicDetails, on_delete=models.CASCADE, related_name="location", null=True
     )
     city = models.ForeignKey(
-        City, on_delete=models.CASCADE, related_name="city_locations", null=True
+        City, on_delete=models.CASCADE, related_name="city_locations"
     )
     street = models.TextField()
     # displaying the exact location using map
-    location = models.PointField(null=True, blank=True)
+    location = models.PointField(blank=True, null=True)  # pin point location
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
 
@@ -259,7 +226,7 @@ class Location(CommonInfo):
 
         elif self.latitude and self.longitude:
             self.location = Point(x=self.longitude, y=self.latitude, srid=4326)
-        super(BasicDetails, self).save(*args, **kwargs)
+        super(Location, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = "Property Location"
@@ -279,7 +246,9 @@ class RentalDetails(CommonInfo):
         ("U", "Unfurnishing"),
     )
     PARKING_CHOICES = (("N", "None"), ("M", "Motorbike"), ("C", "Car"), ("B", "Both"))
-
+    basic_details = models.OneToOneField(
+        BasicDetails, on_delete=models.CASCADE, related_name="rental_details", null=True
+    )
     expected_rent = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
     expected_deposit = models.DecimalField(
         default=0.00, decimal_places=2, max_digits=10, null=True, blank=True
@@ -290,9 +259,6 @@ class RentalDetails(CommonInfo):
     furnishing = models.CharField(max_length=1, choices=FURNISHING_CHOICES, default="F")
     no_of_parking = models.CharField(max_length=1, choices=PARKING_CHOICES)
     description = models.TextField()
-    basic_details = models.OneToOneField(
-        BasicDetails, on_delete=models.CASCADE, related_name="rental_details", null=True
-    )
 
     def __str__(self):
         return str(self.id)
