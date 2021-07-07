@@ -51,6 +51,19 @@ class PropertyTypes(CommonInfo):
         ordering = ["-created_on"]
 
 
+class Locality(CommonInfo):
+    """model to locality details of property"""
+
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f"property types of {self.name}, {self.id}"
+
+    class Meta:
+        verbose_name_plural = "Locality"
+        ordering = ["-created_on"]
+
+
 class BasicDetails(CommonInfo):
     """
     model to store  basic details of the property
@@ -198,16 +211,16 @@ class RentPropertyDetails(CommonInfo):
         ordering = ["-created_on"]
 
 
-class Location(CommonInfo):
+class LocalityDetails(CommonInfo):
     """
-    Location of rent property
+    Locality details
     """
 
     basic_details = models.OneToOneField(
         BasicDetails, on_delete=models.CASCADE, related_name="location", null=True
     )
-    city = models.ForeignKey(
-        City, on_delete=models.CASCADE, related_name="city_locations"
+    locality = models.ForeignKey(
+        Locality, on_delete=models.CASCADE, related_name="location", null=True
     )
     street = models.TextField()
     # displaying the exact location using map
@@ -225,7 +238,7 @@ class Location(CommonInfo):
 
         elif self.latitude and self.longitude:
             self.location = Point(x=self.longitude, y=self.latitude, srid=4326)
-        super(Location, self).save(*args, **kwargs)
+        super(LocalityDetails, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = "Property Location"
@@ -596,6 +609,27 @@ class PropertyRequest(CommonInfo):
         ("W", "Within a few days"),
         ("M", "Within a month"),
         ("I", "In few months time"),
+    )
+    owner = models.ForeignKey(
+        User,
+        related_name="property_request_owner",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    agent = models.ForeignKey(
+        User,
+        related_name="property_request_agent",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    staff = models.ForeignKey(
+        User,
+        related_name="property_request_staff",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
     name = models.CharField(max_length=32, blank=True, null=True)
     phone = models.CharField(max_length=15)
