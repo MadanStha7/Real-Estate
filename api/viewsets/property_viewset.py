@@ -27,7 +27,7 @@ from property.models import (
     PropertyTypes,
     BasicDetails,
     Location,
-    RentalDetails,
+    RentPropertyDetails,
     Gallery,
     SellPropertyDetails,
     ResaleDetails,
@@ -38,12 +38,19 @@ from property.models import (
     ContactAgent,
     Comment,
     Reply,
+    RentalDetails,
 )
 from api.serializers.property_serializer import (
     BasicDetailsSerializer,
     CitySerializer,
+    LocationSerializer,
     PropertyCategoriesSerializer,
     PropertyTypeSerializer,
+    RentPropertyDetailsSerializer,
+    RentalDetailsSerializer,
+    GallerySerializer,
+    PendingPropertySerializer,
+    AssignPropertySerializer,
 )
 
 """===================================
@@ -82,6 +89,128 @@ class PropertyCategoryViewset(viewsets.ModelViewSet):
 
 
 class BasicDetailsViewset(viewsets.ModelViewSet):
+    """
+    Viewsets to store the basic details of both rent and sale
+    """
+
     queryset = BasicDetails.objects.all()
     serializer_class = BasicDetailsSerializer
     pagination_class = None
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
+
+class RentPropertyDetailsViewset(viewsets.ModelViewSet):
+    """
+    Viewsets to store the basic details of both rent and sale
+    """
+
+    queryset = RentPropertyDetails.objects.all()
+    serializer_class = RentPropertyDetailsSerializer
+    pagination_class = None
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
+
+class LocalityDetailsViewset(viewsets.ModelViewSet):
+    """
+    Viewsets to store the basic details of both rent and sale
+    """
+
+    queryset = Location.objects.all()
+    serializer_class = LocationSerializer
+    pagination_class = None
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
+
+class RentalDetailsViewset(viewsets.ModelViewSet):
+    """
+    Viewsets to store the basic rental details
+    """
+
+    queryset = RentalDetails.objects.all()
+    serializer_class = RentalDetailsSerializer
+    pagination_class = None
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
+
+class GalleryViewset(viewsets.ModelViewSet):
+    """
+    Viewsets to store the gallery
+    """
+
+    queryset = Gallery.objects.all()
+    serializer_class = GallerySerializer
+    pagination_class = None
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
+
+class PendingPropertyViewset(viewsets.ModelViewSet):
+    """
+    Viewsets to display the pending property
+    """
+
+    queryset = BasicDetails.objects.none()
+    serializer_class = PendingPropertySerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        advertisement_type = self.request.query_params.get("advertisement_type", False)
+        if advertisement_type == "rent":
+            queryset = BasicDetails.objects.filter(
+                advertisement_type="R", publish=False
+            )
+            return queryset
+        if advertisement_type == "sale":
+            queryset = BasicDetails.objects.filter(
+                advertisement_type="S", publish=False
+            )
+            return queryset
+        else:
+            queryset = BasicDetails.objects.filter(publish=False)
+            return queryset
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
+    @action(detail=False, methods=["GET"])
+    def approve_property(self, request):
+        property = self.request.query_params.get("property_id", None)
+        if property:
+            get_property = BasicDetails.objects.get(id=property)
+            get_property.publish = True
+            get_property.save()
+            return Response(
+                {"message": "property successfully approved"}, status=status.HTTP_200_OK
+            )
+
+        else:
+            raise ValidationError({"error": "property is required"})
+
+
+class AssignPropertyViewset(generics.UpdateAPIView):
+    """Api to assign the property to employee"""
+
+    queryset = BasicDetails.objects.filter(publish=False)
+    serializer_class = AssignPropertySerializer
+    permission_classes = [IsAuthenticated]
