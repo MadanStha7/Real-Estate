@@ -14,8 +14,10 @@ from api.viewsets.property_viewset import (
     AssignPropertyViewset,
     SellPropertyDetailsViewSet,
     ResaleDetailsViewSet,
-    AmenitiesViewSet,
     LocalityViewset,
+    AmenitiesViewSet,
+    FieldVisitViewSet,
+    DashBoardView,
 )
 
 router = routers.DefaultRouter()
@@ -26,8 +28,7 @@ router.register(r"basic-details", BasicDetailsViewset)
 router.register(r"rent-property-details", RentPropertyDetailsViewset)
 router.register(r"locality-details", LocalityDetailsViewset)
 router.register(r"locality", LocalityViewset)
-
-
+router.register(r"field-visit", FieldVisitViewSet)
 # router.register(r"locality-details", LocalityDetailsViewset)
 router.register(r"rental-details", RentalDetailsViewset)
 router.register(r"gallery", GalleryViewset)
@@ -41,5 +42,5 @@ router.register(r"sell-amenities", AmenitiesViewSet)
 urlpatterns = [
     path("", include(router.urls)),
     path("assign-property/<int:pk>/", AssignPropertyViewset.as_view()),
-    # path("admin_dashboard/", AdminDashboardView.as_view(), name="admin_dashboard"),
+    path("admin_dashboard/", DashBoardView.as_view(), name="admin_dashboard"),
 ]
