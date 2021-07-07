@@ -24,6 +24,8 @@ router.register(r"property-category", PropertyCategoryViewset)
 router.register(r"basic-details", BasicDetailsViewset)
 router.register(r"rent-property-details", RentPropertyDetailsViewset)
 router.register(r"locality-details", LocalityDetailsViewset)
+
+# router.register(r"locality-details", LocalityDetailsViewset)
 router.register(r"rental-details", RentalDetailsViewset)
 router.register(r"gallery", GalleryViewset)
 router.register(r"pending-property", PendingPropertyViewset)  # pending property
