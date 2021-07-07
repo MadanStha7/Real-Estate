@@ -376,3 +376,35 @@ class AmenitiesSerializer(serializers.ModelSerializer):
             "title",
             "image",
         )
+
+
+class FieldVisitSerializer(serializers.ModelSerializer):
+    basic_details = BasicDetailsSerializer(read_only=True)
+    basic_details_id = serializers.PrimaryKeyRelatedField(
+        queryset=BasicDetails.objects.all(),
+        source="basic_details",
+        write_only=True,
+    )
+
+    class Meta:
+        model = FieldVisit
+        fields = ("id", "name", "email", "phone", "basic_details", "basic_details_id")
+
+    @transaction.atomic
+    def create(self, validated_data):
+        print("validated data", validated_data)
+        basic_details_data = validated_data.pop("basic_details")
+        fieldvisit = FieldVisit.objects.create(
+            basic_details=basic_details_data,
+            **validated_data,
+        )
+        return fieldvisit
+
+
+class DashBoardSerialzer(serializers.Serializer):
+    listed_property = serializers.IntegerField()
+    sellers = serializers.IntegerField()
+    buyers = serializers.IntegerField()
+    agents = serializers.IntegerField()
+    property_type_commercial = serializers.IntegerField()
+    property_type_residential = serializers.IntegerField()
