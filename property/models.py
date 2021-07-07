@@ -143,7 +143,6 @@ class BasicDetails(CommonInfo):
 
     class Meta:
         verbose_name_plural = "Basic Details"
-        db_table = "property_basics"
         ordering = ["-created_on"]
 
 
