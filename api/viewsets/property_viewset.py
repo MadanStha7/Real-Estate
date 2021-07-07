@@ -26,7 +26,6 @@ from property.models import (
     PropertyCategories,
     PropertyTypes,
     BasicDetails,
-    Location,
     RentPropertyDetails,
     Gallery,
     SellPropertyDetails,
@@ -39,12 +38,14 @@ from property.models import (
     Comment,
     Reply,
     RentalDetails,
+    LocalityDetails,
 )
 from api.serializers.property_serializer import (
     AmenitiesSerializer,
     BasicDetailsSerializer,
     CitySerializer,
-    LocationSerializer,
+    LocalityDetailsSerializer,
+    # LocationSerializer,
     PropertyCategoriesSerializer,
     PropertyTypeSerializer,
     RentPropertyDetailsSerializer,
@@ -126,8 +127,8 @@ class LocalityDetailsViewset(viewsets.ModelViewSet):
     Viewsets to store the basic details of both rent and sale
     """
 
-    queryset = Location.objects.all()
-    serializer_class = LocationSerializer
+    queryset = LocalityDetails.objects.all()
+    serializer_class = LocalityDetailsSerializer
     pagination_class = None
 
     def get_permissions(self):

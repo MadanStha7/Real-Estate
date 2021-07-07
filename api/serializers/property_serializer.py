@@ -5,7 +5,7 @@ from property.models import (
     PropertyCategories,
     PropertyTypes,
     BasicDetails,
-    Location,
+    LocalityDetails,
     RentalDetails,
     RentPropertyDetails,
     Gallery,
@@ -139,15 +139,15 @@ class RentPropertyDetailsSerializer(serializers.ModelSerializer):
         )
 
 
-class LocationSerializer(serializers.ModelSerializer):
+class LocalityDetailsSerializer(serializers.ModelSerializer):
     """serialzer to get all location data in rent an sale"""
 
     class Meta:
-        model = Location
+        model = LocalityDetails
         fields = (
             "id",
             "basic_details",
-            "city",
+            "locality",
             "street",
             "location",
         )
@@ -210,7 +210,6 @@ class PendingPropertySerializer(serializers.ModelSerializer):
     """
 
     city_value = CitySerializer(read_only=True, source="city")
-    location = LocationSerializer(read_only=True)
     property_categories_value = PropertyCategoriesSerializer(
         read_only=True, source="property_categories"
     )
@@ -231,7 +230,7 @@ class PendingPropertySerializer(serializers.ModelSerializer):
     )
     owner = UserSerializer(read_only=True)
     rent_property = RentPropertyDetailsSerializer(many=True, read_only=True)
-    location = LocationSerializer(read_only=True)
+    location = LocalityDetailsSerializer(read_only=True)
     # customer = serializers.SerializerMethodField()
 
     # def get_customer(self,obj):
