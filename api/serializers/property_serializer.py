@@ -6,6 +6,7 @@ from property.models import (
     PropertyTypes,
     BasicDetails,
     LocalityDetails,
+    Locality,
     RentalDetails,
     RentPropertyDetails,
     Gallery,
@@ -59,6 +60,12 @@ class PropertyCategoriesSerializer(serializers.ModelSerializer):
 class PropertyTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyTypes
+        fields = ("id", "name")
+
+
+class LocalitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Locality
         fields = ("id", "name")
 
 
@@ -142,6 +149,9 @@ class RentPropertyDetailsSerializer(serializers.ModelSerializer):
 class LocalityDetailsSerializer(serializers.ModelSerializer):
     """serialzer to get all location data in rent an sale"""
 
+    locality = LocalitySerializer(many=False, required=False)
+    locality_ = serializers.IntegerField(write_only=True, required=False)
+
     class Meta:
         model = LocalityDetails
         fields = (
@@ -149,8 +159,27 @@ class LocalityDetailsSerializer(serializers.ModelSerializer):
             "basic_details",
             "locality",
             "street",
-            "location",
+            "locality_",
         )
+
+    @transaction.atomic
+    def create(self, validated_data):
+        locality = validated_data.get("locality", None)
+        # locality_ = validated_data.get("locality_", None)
+        if locality is not None:
+            locality_data = validated_data.pop("locality")
+            locality = Locality.objects.create(name=locality_data["name"])
+            locality_details = LocalityDetails.objects.create(
+                locality=locality, **validated_data
+            )
+        else:
+            locality_id = validated_data.pop("locality_")
+            locality = Locality.objects.get(id=locality_id)
+            locality_details = LocalityDetails.objects.create(
+                locality=locality, **validated_data
+            )
+
+        return locality_details
 
 
 class RentalDetailsSerializer(serializers.ModelSerializer):
@@ -195,13 +224,19 @@ class GallerySerializer(serializers.ModelSerializer):
         )
 
 
-# class FilteredListSerializer(serializers.ListSerializer):
-#     """Serialzers to display a ph number of user"""
+class OwnerSerializer(serializers.Serializer):
+    """Serialzers to display a owner details"""
 
-#     def to_representation(self, data):
-#         print("data################",data)
-#         data = data.filter(user=self.context['request'].user, edition__hide=False)
-#         return super(FilteredListSerializer, self).to_representation(data)
+    class Meta:
+        model = UserProfile
+        fields = (
+            "id",
+            "full_name",
+            "user",
+            "phone_number",
+            "address",
+            "profile_picture",
+        )
 
 
 class PendingPropertySerializer(serializers.ModelSerializer):
@@ -231,17 +266,24 @@ class PendingPropertySerializer(serializers.ModelSerializer):
     owner = UserSerializer(read_only=True)
     rent_property = RentPropertyDetailsSerializer(many=True, read_only=True)
     location = LocalityDetailsSerializer(read_only=True)
-    # customer = serializers.SerializerMethodField()
+    full_name = serializers.SerializerMethodField(read_only=True)
+    phone_number = serializers.SerializerMethodField(read_only=True)
 
-    # def get_customer(self,obj):
-    #     print("obj",obj.owner.id)
-    #     try:
-    #         user_data = UserProfile.objects.get(user__id=obj.owner.id)
-    #         user = UserProfileSerializer(user_data, many=True)
-    #         print('user',user)
-    #     except UserProfile.DoesNotExist:
-    #         user = None
-    #     return user
+    def get_full_name(self, obj):
+        try:
+            full_name = UserProfile.objects.get(user=obj.owner).full_name
+            return full_name
+        except UserProfile.DoesNotExist:
+            full_name = None
+        return full_name
+
+    def get_phone_number(self, obj):
+        try:
+            phone_number = UserProfile.objects.get(user=obj.owner).phone_number
+            return phone_number
+        except UserProfile.DoesNotExist:
+            phone_number = None
+        return phone_number
 
     class Meta:
         # list_serializer_class = FilteredListSerializer
@@ -271,7 +313,8 @@ class PendingPropertySerializer(serializers.ModelSerializer):
             "membership_plan_value",
             "condition_type_value",
             "rent_property",
-            # "customer"
+            "full_name",
+            "phone_number",
         )
 
 
