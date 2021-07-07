@@ -640,6 +640,8 @@ class PropertyRequest(CommonInfo):
     place = models.TextField()
     price_range = models.TextField()
     size = models.DecimalField(default=0.00, decimal_places=4, max_digits=10)
+    due_date = models.DateField(null=True, blank=True)
+    description_assigned_to_employee = models.TextField(null=True, blank=True)
     description = models.TextField()
 
     def __str__(self):
