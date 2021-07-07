@@ -86,17 +86,26 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
     condition_type_value = serializers.CharField(
         source="get_condition_type_display", read_only=True
     )
+    advertisement_type_value = serializers.CharField(
+        source='get_advertisement_type_display', read_only=True)
+    listing_type_value = serializers.CharField(
+        source="get_listing_type_display", read_only=True)
+    membership_plan_value = serializers.CharField(
+        source="get_membership_plan_display", read_only=True)
+    condition_type_value = serializers.CharField(
+        source="get_condition_type_display", read_only=True)
+    city = CitySerializer(read_only=True)
+    property_categories = PropertyCategoriesSerializer(read_only=True)
+    property_types = PropertyTypeSerializer(read_only=True)
 
     class Meta:
         model = BasicDetails
         fields = (
             "id",
             "advertisement_type",
+            "advertisement_type_value",
             "city",
-            "city_value",
             "property_categories",
-            "property_categories_value",
-            "property_types_value",
             "property_types",
             "advertisement_type",
             "advertisement_type_value",
@@ -107,7 +116,9 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
             "publish",
             "views",
             "listing_type",
+            "listing_type_value",
             "membership_plan",
+            "membership_plan_value",
             "condition_type",
             "listing_type_value",
             "membership_plan_value",
@@ -283,6 +294,7 @@ class AssignPropertySerializer(serializers.ModelSerializer):
             "staff",
             "due_date",
             "description",
+            "condition_type_value",
         )
 
 

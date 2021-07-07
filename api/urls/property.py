@@ -15,6 +15,7 @@ from api.viewsets.property_viewset import (
     SellPropertyDetailsViewSet,
     ResaleDetailsViewSet,
     AmenitiesViewSet,
+    PropertyFilter
 )
 
 router = routers.DefaultRouter()
@@ -33,6 +34,8 @@ router.register(r"pending-property", PendingPropertyViewset)  # pending property
 router.register(r"sell-property-details", SellPropertyDetailsViewSet)
 router.register(r"resale-details", ResaleDetailsViewSet)
 router.register(r"sell-amenities", AmenitiesViewSet)
+router.register(r"property-filter", PropertyFilter)
+
 
 
 urlpatterns = [
