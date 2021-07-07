@@ -12,12 +12,15 @@ from api.viewsets.property_viewset import (
     GalleryViewset,
     PendingPropertyViewset,
     AssignPropertyViewset,
+    SellPropertyDetailsViewSet,
+    ResaleDetailsViewSet,
+    AmenitiesViewSet,
 )
 
 router = routers.DefaultRouter()
 router.register(r"city", CityViewset)
 router.register(r"property-types", PropertyTypesViewSet)
-router.register(r"category-filter", PropertyCategoryViewset)
+router.register(r"property-category", PropertyCategoryViewset)
 router.register(r"basic-details", BasicDetailsViewset)
 router.register(r"rent-property-details", RentPropertyDetailsViewset)
 router.register(r"locality-details", LocalityDetailsViewset)
@@ -25,6 +28,9 @@ router.register(r"rental-details", RentalDetailsViewset)
 router.register(r"gallery", GalleryViewset)
 router.register(r"pending-property", PendingPropertyViewset)  # pending property
 # router.register(r"assign-property", AssignPropertyViewset)  # pending property
+router.register(r"sell-property-details", SellPropertyDetailsViewSet)
+router.register(r"resale-details", ResaleDetailsViewSet)
+router.register(r"sell-amenities", AmenitiesViewSet)
 
 
 urlpatterns = [
