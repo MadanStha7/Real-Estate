@@ -88,3 +88,14 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
             "membership_plan",
             "condition_type",
         )
+
+
+class DashBoardSerialzer(serializers.Serializer):
+    listed_property = serializers.IntegerField()
+    sellers = serializers.IntegerField()
+    buyers = serializers.IntegerField()
+    agents = serializers.IntegerField()
+    property_type_commercial = serializers.IntegerField()
+    property_type_residential = serializers.IntegerField()
+
+

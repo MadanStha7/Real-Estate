@@ -43,7 +43,7 @@ from api.serializers.property_serializer import (
     BasicDetailsSerializer,
     CitySerializer,
     PropertyCategoriesSerializer,
-    PropertyTypeSerializer,
+    PropertyTypeSerializer, DashBoardSerialzer,
 )
 
 """===================================
@@ -85,3 +85,28 @@ class BasicDetailsViewset(viewsets.ModelViewSet):
     queryset = BasicDetails.objects.all()
     serializer_class = BasicDetailsSerializer
     pagination_class = None
+
+
+class DashBoardView(APIView):
+    def get(self, request):
+        listed_property = len(BasicDetails.objects.filter(publish=True))
+        sellers = len(BasicDetails.objects.all())
+        buyers = len(PropertyRequest.objects.all())
+        agents = len(AgentDetail.objects.all())
+        property_type_commercial = len(PropertyTypes.objects.filter(name="Commercial"))
+        property_type_residential = len(PropertyTypes.objects.filter(name="Residential"))
+        pending_property = BasicDetails.objects.filter(publish=False)
+
+        data = [
+            {
+                "listed_property": listed_property,
+                "sellers": sellers,
+                "buyers": buyers,
+                "agents": agents,
+                "property_type_commercial": property_type_commercial,
+                "property_type_residential": property_type_residential,
+                "pending_property": pending_property,
+            }
+        ]
+        results = DashBoardSerialzer(data, many=True).data
+        return Response(results)

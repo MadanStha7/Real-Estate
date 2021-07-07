@@ -5,7 +5,7 @@ from api.viewsets.property_viewset import (
     BasicDetailsViewset,
     CityViewset,
     PropertyTypesViewSet,
-    PropertyCategoryViewset,
+    PropertyCategoryViewset, DashBoardView,
 )
 
 router = routers.DefaultRouter()
@@ -17,5 +17,5 @@ router.register(r"basic-details", BasicDetailsViewset)
 
 urlpatterns = [
     path("", include(router.urls)),
-    # path("admin_dashboard/", AdminDashboardView.as_view(), name="admin_dashboard"),
+    path("admin_dashboard/", DashBoardView.as_view(), name="admin_dashboard"),
 ]
