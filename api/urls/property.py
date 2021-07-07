@@ -14,7 +14,10 @@ from api.viewsets.property_viewset import (
     AssignPropertyViewset,
     SellPropertyDetailsViewSet,
     ResaleDetailsViewSet,
-    AmenitiesViewSet, FieldVisitViewSet, DashBoardView,
+    LocalityViewset,
+    AmenitiesViewSet,
+    FieldVisitViewSet,
+    DashBoardView,
 )
 
 router = routers.DefaultRouter()
@@ -24,6 +27,7 @@ router.register(r"property-category", PropertyCategoryViewset)
 router.register(r"basic-details", BasicDetailsViewset)
 router.register(r"rent-property-details", RentPropertyDetailsViewset)
 router.register(r"locality-details", LocalityDetailsViewset)
+router.register(r"locality", LocalityViewset)
 router.register(r"field-visit", FieldVisitViewSet)
 # router.register(r"locality-details", LocalityDetailsViewset)
 router.register(r"rental-details", RentalDetailsViewset)

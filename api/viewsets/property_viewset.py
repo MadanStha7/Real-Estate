@@ -24,6 +24,7 @@ from api.permissions.user_permission import (
 from property.models import (
     City,
     PropertyCategories,
+    Locality,
     PropertyTypes,
     BasicDetails,
     RentPropertyDetails,
@@ -45,6 +46,7 @@ from api.serializers.property_serializer import (
     BasicDetailsSerializer,
     CitySerializer,
     LocalityDetailsSerializer,
+    LocalitySerializer,
     # LocationSerializer,
     PropertyCategoriesSerializer,
     PropertyTypeSerializer,
@@ -54,7 +56,9 @@ from api.serializers.property_serializer import (
     PendingPropertySerializer,
     AssignPropertySerializer,
     ResaleDetailsSerializer,
-    SellPropertyDetailsSerializer, FieldVisitSerializer, DashBoardSerialzer,
+    SellPropertyDetailsSerializer,
+    FieldVisitSerializer,
+    DashBoardSerialzer,
 )
 
 """===================================
@@ -85,6 +89,16 @@ class PropertyTypesViewSet(viewsets.ModelViewSet):
 class PropertyCategoryViewset(viewsets.ModelViewSet):
     queryset = PropertyCategories.objects.all()
     serializer_class = PropertyCategoriesSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
+
+class LocalityViewset(viewsets.ModelViewSet):
+    queryset = Locality.objects.all()
+    serializer_class = LocalitySerializer
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
@@ -248,7 +262,9 @@ class DashBoardView(APIView):
         buyers = len(PropertyRequest.objects.all())
         agents = len(AgentDetail.objects.all())
         property_type_commercial = len(PropertyTypes.objects.filter(name="Commercial"))
-        property_type_residential = len(PropertyTypes.objects.filter(name="Residential"))
+        property_type_residential = len(
+            PropertyTypes.objects.filter(name="Residential")
+        )
         pending_property = BasicDetails.objects.filter(publish=False)
 
         data = [
@@ -264,4 +280,3 @@ class DashBoardView(APIView):
         ]
         results = DashBoardSerialzer(data, many=True).data
         return Response(results)
-

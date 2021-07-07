@@ -39,6 +39,7 @@ class AgentDetail(CommonInfo):
     accept_terms_and_condition = models.BooleanField(default=False)
     added_at = models.DateTimeField(auto_now_add=True)
     is_verified = models.BooleanField(default=False)
+    terms_and_conditions = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         group, created = Group.objects.get_or_create(name="Agent")
@@ -72,6 +73,7 @@ class UserProfile(CommonInfo):
     count = models.PositiveBigIntegerField(default=0)
     is_email = models.BooleanField(default=False)
     is_phone = models.BooleanField(default=False)
+    terms_and_conditions = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         group, created = Group.objects.get_or_create(name="BuyerOrSeller")

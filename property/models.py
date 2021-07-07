@@ -60,7 +60,6 @@ class Locality(CommonInfo):
         return f"property types of {self.name}, {self.id}"
 
     class Meta:
-        verbose_name_plural = "Locality"
         ordering = ["-created_on"]
 
 
@@ -229,7 +228,7 @@ class LocalityDetails(CommonInfo):
     longitude = models.FloatField(blank=True, null=True)
 
     def __str__(self):
-        return f"property located at {self.city.name}"
+        return f"property located at {self.id}"
 
     def save(self, *args, **kwargs):
         if self.location:

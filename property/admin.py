@@ -18,6 +18,7 @@ from .models import (
     ContactAgent,
     Comment,
     Reply,
+    Locality,
 )
 
 # Register your models here.
@@ -40,5 +41,6 @@ admin.site.register(
         ContactAgent,
         Comment,
         Reply,
+        Locality,
     ]
 )
