@@ -9,7 +9,7 @@ from property.models import (
     Locality,
     RentalDetails,
     RentPropertyDetails,
-    Gallery,
+    RentGallery,
     SellPropertyDetails,
     ResaleDetails,
     Amenities,
@@ -211,17 +211,28 @@ class RentalDetailsSerializer(serializers.ModelSerializer):
         )
 
 
-class GallerySerializer(serializers.ModelSerializer):
+class RentGallerySerializer(serializers.ModelSerializer):
     """serialzer to get all gallery serialzers"""
 
     class Meta:
-        model = Gallery
+        model = RentGallery
         fields = (
             "id",
             "title",
             "image",
             "basic_details",
         )
+
+    @transaction.atomic
+    def create(self, validated_data):
+        user_data = validated_data.pop("user")
+        user = User.objects.create_user(
+            username=user_data["email"],
+            email=user_data["email"],
+            password=user_data["password"],
+        )
+        admin_profile = AdminProfile.objects.create(user_id=user.id, **validated_data)
+        return admin_profile
 
 
 class OwnerSerializer(serializers.Serializer):
