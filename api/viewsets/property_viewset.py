@@ -28,7 +28,7 @@ from property.models import (
     PropertyTypes,
     BasicDetails,
     RentPropertyDetails,
-    Gallery,
+    RentGallery,
     SellPropertyDetails,
     ResaleDetails,
     Amenities,
@@ -52,7 +52,7 @@ from api.serializers.property_serializer import (
     PropertyTypeSerializer,
     RentPropertyDetailsSerializer,
     RentalDetailsSerializer,
-    GallerySerializer,
+    RentGallerySerializer,
     PendingPropertySerializer,
     AssignPropertySerializer,
     ResaleDetailsSerializer,
@@ -171,13 +171,13 @@ class SellPropertyDetailsViewSet(viewsets.ModelViewSet):
         return [permission() for permission in self.permission_classes]
 
 
-class GalleryViewset(viewsets.ModelViewSet):
+class RentGalleryViewset(viewsets.ModelViewSet):
     """
-    Viewsets to store the gallery
+    Viewsets to store the rent gallery
     """
 
-    queryset = Gallery.objects.all()
-    serializer_class = GallerySerializer
+    queryset = RentGallery.objects.all()
+    serializer_class = RentGallerySerializer
     pagination_class = None
 
 
