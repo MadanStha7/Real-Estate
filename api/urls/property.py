@@ -9,7 +9,7 @@ from api.viewsets.property_viewset import (
     RentPropertyDetailsViewset,
     LocalityDetailsViewset,
     RentalDetailsViewset,
-    GalleryViewset,
+    RentGalleryViewset,
     PendingPropertyViewset,
     AssignPropertyViewset,
     SellPropertyDetailsViewSet,
@@ -31,7 +31,7 @@ router.register(r"locality", LocalityViewset)
 router.register(r"field-visit", FieldVisitViewSet)
 # router.register(r"locality-details", LocalityDetailsViewset)
 router.register(r"rental-details", RentalDetailsViewset)
-router.register(r"gallery", GalleryViewset)
+router.register(r"rent-gallery", RentGalleryViewset)
 router.register(r"pending-property", PendingPropertyViewset)  # pending property
 # router.register(r"assign-property", AssignPropertyViewset)  # pending property
 router.register(r"sell-property-details", SellPropertyDetailsViewSet)
