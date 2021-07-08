@@ -60,7 +60,6 @@ class Locality(CommonInfo):
         return f"property types of {self.name}, {self.id}"
 
     class Meta:
-        verbose_name_plural = "Locality"
         ordering = ["-created_on"]
 
 
@@ -152,7 +151,7 @@ class BasicDetails(CommonInfo):
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return str(self.id)
+        return f"property information for {self.advertisement_type} with id {self.id}"
 
     class Meta:
         verbose_name_plural = "Basic Details"
@@ -229,7 +228,7 @@ class LocalityDetails(CommonInfo):
     longitude = models.FloatField(blank=True, null=True)
 
     def __str__(self):
-        return f"property located at {self.city.name}"
+        return f"property located at {self.id}"
 
     def save(self, *args, **kwargs):
         if self.location:
@@ -281,20 +280,20 @@ class RentalDetails(CommonInfo):
         ordering = ["-created_on"]
 
 
-class Gallery(CommonInfo):
+class RentGallery(CommonInfo):
     """
     model to store the gallery
     """
 
     title = models.CharField(max_length=100, null=True, blank=True)
     image = models.ImageField(upload_to="property/gallery")
-    basic_details = models.OneToOneField(
+    basic_details = models.ForeignKey(
         BasicDetails, on_delete=models.CASCADE, related_name="gallery", null=True
     )
 
     class Meta:
-        verbose_name_plural = "Gallery"
-        db_table = "Gallery"
+        verbose_name_plural = "RentGallery"
+        db_table = "RentGallery"
 
     def __str__(self):
         # return str(self.id)
@@ -371,12 +370,8 @@ class SellPropertyDetails(CommonInfo):
     bhk_type = models.CharField(
         max_length=20, choices=BHK_CHOICES, default="F"
     )  # bedroom hall kitchen
-    total_floors = models.CharField(
-        max_length=2, choices=NUMBER_OF_FLOOR_CHOICES, default="G"
-    )
-    property_age = models.CharField(
-        max_length=1, choices=AGE_CHOICES, default="U"
-    )  # property age
+    total_floors = models.CharField(max_length=50)
+    property_age = models.CharField(max_length=40)  # property age
     built_up_area = models.DecimalField(
         default=0.00,
         decimal_places=2,

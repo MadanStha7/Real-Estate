@@ -6,9 +6,10 @@ from property.models import (
     PropertyTypes,
     BasicDetails,
     LocalityDetails,
+    Locality,
     RentalDetails,
     RentPropertyDetails,
-    Gallery,
+    RentGallery,
     SellPropertyDetails,
     ResaleDetails,
     Amenities,
@@ -23,6 +24,7 @@ from .user_serializer import (
     UserProfileSerializer,
     AdminProfileSerializer,
     UserSerializer,
+    StaffDetailSerializer
 )
 from user.models import (
     UserProfile,
@@ -59,6 +61,12 @@ class PropertyCategoriesSerializer(serializers.ModelSerializer):
 class PropertyTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyTypes
+        fields = ("id", "name")
+
+
+class LocalitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Locality
         fields = ("id", "name")
 
 
@@ -105,8 +113,11 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
             "advertisement_type",
             "advertisement_type_value",
             "city",
+            "city_value",
             "property_categories",
+            "property_categories_value",
             "property_types",
+            "property_types_value",
             "advertisement_type",
             "advertisement_type_value",
             "owner",
@@ -153,6 +164,9 @@ class RentPropertyDetailsSerializer(serializers.ModelSerializer):
 class LocalityDetailsSerializer(serializers.ModelSerializer):
     """serialzer to get all location data in rent an sale"""
 
+    locality = LocalitySerializer(many=False, required=False)
+    locality_ = serializers.IntegerField(write_only=True, required=False)
+
     class Meta:
         model = LocalityDetails
         fields = (
@@ -160,8 +174,27 @@ class LocalityDetailsSerializer(serializers.ModelSerializer):
             "basic_details",
             "locality",
             "street",
-            "location",
+            "locality_",
         )
+
+    @transaction.atomic
+    def create(self, validated_data):
+        locality = validated_data.get("locality", None)
+        # locality_ = validated_data.get("locality_", None)
+        if locality is not None:
+            locality_data = validated_data.pop("locality")
+            locality = Locality.objects.create(name=locality_data["name"])
+            locality_details = LocalityDetails.objects.create(
+                locality=locality, **validated_data
+            )
+        else:
+            locality_id = validated_data.pop("locality_")
+            locality = Locality.objects.get(id=locality_id)
+            locality_details = LocalityDetails.objects.create(
+                locality=locality, **validated_data
+            )
+
+        return locality_details
 
 
 class RentalDetailsSerializer(serializers.ModelSerializer):
@@ -193,11 +226,11 @@ class RentalDetailsSerializer(serializers.ModelSerializer):
         )
 
 
-class GallerySerializer(serializers.ModelSerializer):
+class RentGallerySerializer(serializers.ModelSerializer):
     """serialzer to get all gallery serialzers"""
 
     class Meta:
-        model = Gallery
+        model = RentGallery
         fields = (
             "id",
             "title",
@@ -205,14 +238,31 @@ class GallerySerializer(serializers.ModelSerializer):
             "basic_details",
         )
 
+    @transaction.atomic
+    def create(self, validated_data):
+        user_data = validated_data.pop("user")
+        user = User.objects.create_user(
+            username=user_data["email"],
+            email=user_data["email"],
+            password=user_data["password"],
+        )
+        admin_profile = AdminProfile.objects.create(user_id=user.id, **validated_data)
+        return admin_profile
 
-# class FilteredListSerializer(serializers.ListSerializer):
-#     """Serialzers to display a ph number of user"""
 
-#     def to_representation(self, data):
-#         print("data################",data)
-#         data = data.filter(user=self.context['request'].user, edition__hide=False)
-#         return super(FilteredListSerializer, self).to_representation(data)
+class OwnerSerializer(serializers.Serializer):
+    """Serialzers to display a owner details"""
+
+    class Meta:
+        model = UserProfile
+        fields = (
+            "id",
+            "full_name",
+            "user",
+            "phone_number",
+            "address",
+            "profile_picture",
+        )
 
 
 class PendingPropertySerializer(serializers.ModelSerializer):
@@ -242,17 +292,24 @@ class PendingPropertySerializer(serializers.ModelSerializer):
     owner = UserSerializer(read_only=True)
     rent_property = RentPropertyDetailsSerializer(many=True, read_only=True)
     location = LocalityDetailsSerializer(read_only=True)
-    # customer = serializers.SerializerMethodField()
+    full_name = serializers.SerializerMethodField(read_only=True)
+    phone_number = serializers.SerializerMethodField(read_only=True)
 
-    # def get_customer(self,obj):
-    #     print("obj",obj.owner.id)
-    #     try:
-    #         user_data = UserProfile.objects.get(user__id=obj.owner.id)
-    #         user = UserProfileSerializer(user_data, many=True)
-    #         print('user',user)
-    #     except UserProfile.DoesNotExist:
-    #         user = None
-    #     return user
+    def get_full_name(self, obj):
+        try:
+            full_name = UserProfile.objects.get(user=obj.owner).full_name
+            return full_name
+        except UserProfile.DoesNotExist:
+            full_name = None
+        return full_name
+
+    def get_phone_number(self, obj):
+        try:
+            phone_number = UserProfile.objects.get(user=obj.owner).phone_number
+            return phone_number
+        except UserProfile.DoesNotExist:
+            phone_number = None
+        return phone_number
 
     class Meta:
         # list_serializer_class = FilteredListSerializer
@@ -282,7 +339,8 @@ class PendingPropertySerializer(serializers.ModelSerializer):
             "membership_plan_value",
             "condition_type_value",
             "rent_property",
-            # "customer"
+            "full_name",
+            "phone_number",
         )
 
 
@@ -294,7 +352,6 @@ class AssignPropertySerializer(serializers.ModelSerializer):
             "staff",
             "due_date",
             "description",
-            "condition_type_value",
         )
 
 
@@ -388,3 +445,57 @@ class AmenitiesSerializer(serializers.ModelSerializer):
             "title",
             "image",
         )
+
+
+class FieldVisitSerializer(serializers.ModelSerializer):
+    basic_details = BasicDetailsSerializer(read_only=True)
+    basic_details_id = serializers.PrimaryKeyRelatedField(
+        queryset=BasicDetails.objects.all(),
+        source="basic_details",
+        write_only=True,
+    )
+
+    class Meta:
+        model = FieldVisit
+        fields = ("id", "name", "email", "phone", "basic_details", "basic_details_id")
+
+    @transaction.atomic
+    def create(self, validated_data):
+        print("validated data", validated_data)
+        basic_details_data = validated_data.pop("basic_details")
+        fieldvisit = FieldVisit.objects.create(
+            basic_details=basic_details_data,
+            **validated_data,
+        )
+        return fieldvisit
+
+
+class DashBoardSerialzer(serializers.Serializer):
+    listed_property = serializers.IntegerField()
+    sellers = serializers.IntegerField()
+    buyers = serializers.IntegerField()
+    agents = serializers.IntegerField()
+    property_type_commercial = serializers.IntegerField()
+    property_type_residential = serializers.IntegerField()
+class PropertyRequestSerializer(serializers.ModelSerializer):
+    request_type_value = serializers.CharField(source="get_request_type_display", read_only=True)
+    property_type_value = serializers.CharField(source="get_property_type_display", read_only=True)
+    urgent_value = serializers.CharField(source="get_urgent_display", read_only=True)
+    # staff = StaffDetailSerializer()
+    class Meta:
+        model = PropertyRequest
+        fields = (
+            "id", 
+            "name",
+            "email",
+            "phone",
+            "request_type",
+            "request_type_value",
+            "property_type",
+            "property_type_value",
+            "urgent",
+            "urgent_value",
+            "staff",
+            "due_date",
+            "description_assigned_to_employee"
+            )

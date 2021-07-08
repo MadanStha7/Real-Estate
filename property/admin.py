@@ -8,7 +8,7 @@ from .models import (
     BasicDetails,
     LocalityDetails,
     RentalDetails,
-    Gallery,
+    RentGallery,
     SellPropertyDetails,
     ResaleDetails,
     Amenities,
@@ -18,6 +18,7 @@ from .models import (
     ContactAgent,
     Comment,
     Reply,
+    Locality
 )
 
 # Register your models here.
@@ -30,7 +31,7 @@ admin.site.register(
         BasicDetails,
         LocalityDetails,
         RentalDetails,
-        Gallery,
+        RentGallery,
         SellPropertyDetails,
         ResaleDetails,
         Amenities,
@@ -40,5 +41,6 @@ admin.site.register(
         ContactAgent,
         Comment,
         Reply,
+        Locality,
     ]
 )
