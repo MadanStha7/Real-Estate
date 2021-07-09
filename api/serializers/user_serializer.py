@@ -147,11 +147,18 @@ class AgentDetailSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "location",
+            "full_name",
             "phone_number",
             "identification_type",
             "identification_number",
             "identification_file",
-            "terms_and_condition",
+            "added_at",
+            "is_verified",
+            "terms_and_conditions",
+<<<<<<< HEAD
+=======
+
+>>>>>>> dev
         ]
 
     @transaction.atomic
@@ -299,11 +306,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = (
             "id",
-            "full_name",
             "user",
+            "full_name",
             "phone_number",
             "address",
             "profile_picture",
+            "added_at",
+            "otp_code",
+            "count",
+            "is_email",
+            "is_phone",
+            "terms_and_conditions"
         )
 
     @transaction.atomic
