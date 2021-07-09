@@ -147,11 +147,14 @@ class AgentDetailSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "location",
+            "full_name",
             "phone_number",
             "identification_type",
             "identification_number",
             "identification_file",
-            "terms_and_condition",
+            "added_at",
+            "is_verified",
+            "terms_and_conditions",
         ]
 
     @transaction.atomic
