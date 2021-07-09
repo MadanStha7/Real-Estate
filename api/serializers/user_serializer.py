@@ -155,10 +155,6 @@ class AgentDetailSerializer(serializers.ModelSerializer):
             "added_at",
             "is_verified",
             "terms_and_conditions",
-<<<<<<< HEAD
-=======
-
->>>>>>> dev
         ]
 
     @transaction.atomic
@@ -316,7 +312,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "count",
             "is_email",
             "is_phone",
-            "terms_and_conditions"
+            "terms_and_conditions",
         )
 
     @transaction.atomic
