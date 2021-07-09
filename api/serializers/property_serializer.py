@@ -1,5 +1,6 @@
 from django.db.models.query import QuerySet
 from rest_framework import serializers
+from rest_framework.permissions import IsAuthenticated
 from property.models import (
     City,
     PropertyCategories,
@@ -41,6 +42,23 @@ from datetime import datetime, timezone
 User = get_user_model()
 
 
+class PropertyUserSerializer(serializers.ModelSerializer):
+    """
+    created to display name of user in property
+    """
+
+    username = serializers.CharField(required=False)
+    email = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+        ]
+
+
 class CitySerializer(serializers.ModelSerializer):
     class Meta:
         model = City
@@ -68,6 +86,42 @@ class LocalitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Locality
         fields = ("id", "name")
+
+
+class LocalityDetailsSerializer(serializers.ModelSerializer):
+    """serialzer to get all location data in rent an sale"""
+
+    locality = LocalitySerializer(many=False, required=False)
+    locality_ = serializers.IntegerField(write_only=True, required=False)
+
+    class Meta:
+        model = LocalityDetails
+        fields = (
+            "id",
+            "basic_details",
+            "locality",
+            "street",
+            "locality_",
+        )
+
+    @transaction.atomic
+    def create(self, validated_data):
+        locality = validated_data.get("locality", None)
+        # locality_ = validated_data.get("locality_", None)
+        if locality is not None:
+            locality_data = validated_data.pop("locality")
+            locality = Locality.objects.create(name=locality_data["name"])
+            locality_details = LocalityDetails.objects.create(
+                locality=locality, **validated_data
+            )
+        else:
+            locality_id = validated_data.pop("locality_")
+            locality = Locality.objects.get(id=locality_id)
+            locality_details = LocalityDetails.objects.create(
+                locality=locality, **validated_data
+            )
+
+        return locality_details
 
 
 class BasicDetailsSerializer(serializers.ModelSerializer):
@@ -165,42 +219,6 @@ class RentPropertyDetailsSerializer(serializers.ModelSerializer):
         )
 
 
-class LocalityDetailsSerializer(serializers.ModelSerializer):
-    """serialzer to get all location data in rent an sale"""
-
-    locality = LocalitySerializer(many=False, required=False)
-    locality_ = serializers.IntegerField(write_only=True, required=False)
-
-    class Meta:
-        model = LocalityDetails
-        fields = (
-            "id",
-            "basic_details",
-            "locality",
-            "street",
-            "locality_",
-        )
-
-    @transaction.atomic
-    def create(self, validated_data):
-        locality = validated_data.get("locality", None)
-        # locality_ = validated_data.get("locality_", None)
-        if locality is not None:
-            locality_data = validated_data.pop("locality")
-            locality = Locality.objects.create(name=locality_data["name"])
-            locality_details = LocalityDetails.objects.create(
-                locality=locality, **validated_data
-            )
-        else:
-            locality_id = validated_data.pop("locality_")
-            locality = Locality.objects.get(id=locality_id)
-            locality_details = LocalityDetails.objects.create(
-                locality=locality, **validated_data
-            )
-
-        return locality_details
-
-
 class RentalDetailsSerializer(serializers.ModelSerializer):
     """serialzer to get all rental details serialzers"""
 
@@ -231,12 +249,25 @@ class RentalDetailsSerializer(serializers.ModelSerializer):
 
 
 class GallerySerializer(serializers.ModelSerializer):
-    id_ = serializers.IntegerField(allow_null=True, write_only=True)
+    # id_ = serializers.IntegerField(allow_null=True, write_only=True)
+    image = serializers.ListField(
+        child=serializers.FileField(max_length=100000), write_only=True
+    )
+    image_value = serializers.FileField(read_only=True, source="image")
 
     class Meta:
-        read_only_fields = ["basic_details"]
+        # read_only_fields = ["basic_details"]
         model = Gallery
-        fields = ["id", "id_", "title", "basic_details", "image"]
+        fields = ["id", "title", "basic_details", "image", "image_value"]
+
+    @transaction.atomic
+    def create(self, validated_data):
+        print("validated daya")
+        image = validated_data.pop("image")
+        for img in image:
+            print("imagegeg", img)
+            gallery = Gallery.objects.create(image=img, **validated_data)
+        return gallery
 
 
 class OwnerSerializer(serializers.Serializer):
@@ -418,8 +449,6 @@ class ResaleDetailsSerializer(serializers.ModelSerializer):
 
 
 class AmenitiesSerializer(serializers.ModelSerializer):
-    basic_details = BasicDetailsSerializer(read_only=True)
-
     class Meta:
         model = Amenities
         fields = (
@@ -431,8 +460,6 @@ class AmenitiesSerializer(serializers.ModelSerializer):
             "security",
             "gym",
             "lift",
-            "title",
-            "image",
         )
 
 
@@ -468,58 +495,6 @@ class DashBoardSerialzer(serializers.Serializer):
     property_type_residential = serializers.IntegerField()
 
 
-class GalleryImageUploadSerializer(serializers.ModelSerializer):
-    basicdetails_id_ = serializers.IntegerField(write_only=True)
-    gallery = GallerySerializer(many=True)
-
-    class Meta:
-        model = BasicDetails
-        fields = ("id", "gallery", "basicdetails_id_")
-
-    @transaction.atomic
-    def create(self, validated_data):
-        print("validated data", validated_data)
-        gallery_data = validated_data.pop("gallery")
-        basicdetails__data = validated_data.get("basicdetails_id_")
-        print("basicdetails__data", basicdetails__data)
-        basic_details = BasicDetails.objects.get(id=basicdetails__data)
-        if gallery_data:
-            bulk_gallery_data = []
-            for image in gallery_data:
-                gallery_image = Gallery(
-                    basic_details=basic_details,
-                    image=image.get("image"),
-                    title=image.get("title"),
-                )
-                bulk_gallery_data.append(gallery_image)
-            Gallery.objects.bulk_create(bulk_gallery_data)
-        return basic_details
-
-    @transaction.atomic
-    def update(self, instance, validated_data):
-        gallery_data = validated_data.pop("gallery")
-        print("gallery_data", gallery_data)
-        bulk_gallery_update = []
-        bulk_gallery_create = []
-        if gallery_data:
-            for image in gallery_data:
-                print("data", image.get("id_"))
-                if image.get("id_"):
-                    gallery_image = Gallery(id=image.get("id_"))
-                    gallery_image.image = image.get("title")
-                    bulk_gallery_update.append(gallery_image)
-                else:
-                    gallery_image = Gallery(
-                        basic_details=instance, image=image.get("title")
-                    )
-                    bulk_gallery_create.append(gallery_image)
-            # Gallery.objects.bulk_create(bulk_gallery_create)
-            Gallery.objects.bulk_update(bulk_gallery_update, fields=["title"])
-        return super(GalleryImageUploadSerializer, self).update(
-            instance, validated_data
-        )
-
-
 class PropertyRequestSerializer(serializers.ModelSerializer):
 
     request_type_value = serializers.CharField(
@@ -547,4 +522,25 @@ class PropertyRequestSerializer(serializers.ModelSerializer):
             "staff",
             "due_date",
             "description_assigned_to_employee",
+        )
+
+
+class PropertyDiscussionSerializer(serializers.ModelSerializer):
+    tags = serializers.ListField(child=serializers.CharField(), required=False)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source="user", write_only=True
+    )
+    user = PropertyUserSerializer(read_only=True)
+
+    class Meta:
+        model = PropertyDiscussionBoard
+        fields = (
+            "id",
+            "discussion",
+            "title",
+            "tags",
+            "comments",
+            "basic_details",
+            "user",
+            "user_id",
         )
