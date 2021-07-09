@@ -77,6 +77,11 @@ class CityViewset(viewsets.ModelViewSet):
         if self.action in ["create", "partial_update", "destroy"]:
             return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
+    
+    
+class ListedPropertyViewSet(viewsets.ModelViewSet):
+    queryset = BasicDetails.objects.filter(publish=True)
+    serializer_class = BasicDetailsSerializer
 
 
 class PropertyFilter(viewsets.ModelViewSet):

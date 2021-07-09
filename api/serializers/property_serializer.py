@@ -87,6 +87,40 @@ class LocalitySerializer(serializers.ModelSerializer):
         model = Locality
         fields = ("id", "name")
 
+class LocalityDetailsSerializer(serializers.ModelSerializer):
+    """serialzer to get all location data in rent an sale"""
+
+    locality = LocalitySerializer(many=False, required=False)
+    locality_ = serializers.IntegerField(write_only=True, required=False)
+
+    class Meta:
+        model = LocalityDetails
+        fields = (
+            "id",
+            "basic_details",
+            "locality",
+            "street",
+            "locality_",
+        )
+
+    @transaction.atomic
+    def create(self, validated_data):
+        locality = validated_data.get("locality", None)
+        # locality_ = validated_data.get("locality_", None)
+        if locality is not None:
+            locality_data = validated_data.pop("locality")
+            locality = Locality.objects.create(name=locality_data["name"])
+            locality_details = LocalityDetails.objects.create(
+                locality=locality, **validated_data
+            )
+        else:
+            locality_id = validated_data.pop("locality_")
+            locality = Locality.objects.get(id=locality_id)
+            locality_details = LocalityDetails.objects.create(
+                locality=locality, **validated_data
+            )
+
+        return locality_details
 
 class BasicDetailsSerializer(serializers.ModelSerializer):
     """
@@ -183,40 +217,7 @@ class RentPropertyDetailsSerializer(serializers.ModelSerializer):
         )
 
 
-class LocalityDetailsSerializer(serializers.ModelSerializer):
-    """serialzer to get all location data in rent an sale"""
 
-    locality = LocalitySerializer(many=False, required=False)
-    locality_ = serializers.IntegerField(write_only=True, required=False)
-
-    class Meta:
-        model = LocalityDetails
-        fields = (
-            "id",
-            "basic_details",
-            "locality",
-            "street",
-            "locality_",
-        )
-
-    @transaction.atomic
-    def create(self, validated_data):
-        locality = validated_data.get("locality", None)
-        # locality_ = validated_data.get("locality_", None)
-        if locality is not None:
-            locality_data = validated_data.pop("locality")
-            locality = Locality.objects.create(name=locality_data["name"])
-            locality_details = LocalityDetails.objects.create(
-                locality=locality, **validated_data
-            )
-        else:
-            locality_id = validated_data.pop("locality_")
-            locality = Locality.objects.get(id=locality_id)
-            locality_details = LocalityDetails.objects.create(
-                locality=locality, **validated_data
-            )
-
-        return locality_details
 
 
 class RentalDetailsSerializer(serializers.ModelSerializer):
@@ -436,7 +437,7 @@ class ResaleDetailsSerializer(serializers.ModelSerializer):
 
 
 class AmenitiesSerializer(serializers.ModelSerializer):
-    basic_details = BasicDetailsSerializer(read_only=True)
+    basic_details = BasicDetailsSerializer()
 
     class Meta:
         model = Amenities
@@ -449,8 +450,6 @@ class AmenitiesSerializer(serializers.ModelSerializer):
             "security",
             "gym",
             "lift",
-            "title",
-            "image",
         )
 
 
