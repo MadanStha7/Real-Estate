@@ -1,5 +1,6 @@
 from django.db.models.query import QuerySet
 from rest_framework import serializers
+from rest_framework.permissions import IsAuthenticated
 from property.models import (
     City,
     PropertyCategories,
@@ -39,6 +40,23 @@ from django.contrib.auth.models import Group
 from datetime import datetime, timezone
 
 User = get_user_model()
+
+
+class PropertyUserSerializer(serializers.ModelSerializer):
+    """
+    created to display name of user in property
+    """
+
+    username = serializers.CharField(required=False)
+    email = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+        ]
 
 
 class CitySerializer(serializers.ModelSerializer):
@@ -547,4 +565,25 @@ class PropertyRequestSerializer(serializers.ModelSerializer):
             "staff",
             "due_date",
             "description_assigned_to_employee",
+        )
+
+
+class PropertyDiscussionSerializer(serializers.ModelSerializer):
+    tags = serializers.ListField(child=serializers.CharField(), required=False)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source="user", write_only=True
+    )
+    user = PropertyUserSerializer(read_only=True)
+
+    class Meta:
+        model = PropertyDiscussionBoard
+        fields = (
+            "id",
+            "discussion",
+            "title",
+            "tags",
+            "comments",
+            "basic_details",
+            "user",
+            "user_id",
         )
