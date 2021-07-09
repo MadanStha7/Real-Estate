@@ -288,7 +288,7 @@ class Gallery(CommonInfo):
     """
 
     title = models.CharField(max_length=100, null=True, blank=True)
-    image = models.ImageField(upload_to="property/gallery", null=True, blank=True)
+    image = models.ImageField(upload_to="property/gallery")
     basic_details = models.ForeignKey(
         BasicDetails, on_delete=models.CASCADE, related_name="gallery"
     )
@@ -309,7 +309,7 @@ class Gallery(CommonInfo):
 
 class SellPropertyDetails(CommonInfo):
     """
-    model to store the sell property details
+    model to store the sell property details of advertisement type sale
     """
 
     BHK_CHOICES = (
@@ -395,7 +395,7 @@ class SellPropertyDetails(CommonInfo):
 
 class ResaleDetails(CommonInfo):
     """
-    This model defines the resale details of property.
+    This model defines the resale details of advertisement type sale.
     """
 
     PRICE_CHOICES = (("N", "Negotiable"), ("F", "Fixed"))
@@ -442,7 +442,7 @@ class ResaleDetails(CommonInfo):
 
 class Amenities(CommonInfo):
     """
-    Amenities details of property.
+    Amenities details of advertisement type sale .
     """
 
     basic_details = models.ForeignKey(
