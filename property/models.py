@@ -188,7 +188,9 @@ class RentPropertyDetails(CommonInfo):
         ("D", "Don't Know"),
     )
     basic_details = models.ForeignKey(
-        BasicDetails, on_delete=models.CASCADE, related_name="rent_property", null=True
+        BasicDetails,
+        on_delete=models.CASCADE,
+        related_name="rent_property",
     )
     bhk_type = models.CharField(
         max_length=20, choices=BHK_CHOICES, default="F"
@@ -216,7 +218,7 @@ class LocalityDetails(CommonInfo):
     """
 
     basic_details = models.OneToOneField(
-        BasicDetails, on_delete=models.CASCADE, related_name="location", null=True
+        BasicDetails, on_delete=models.CASCADE, related_name="location"
     )
     locality = models.ForeignKey(
         Locality, on_delete=models.CASCADE, related_name="location", null=True
@@ -258,7 +260,7 @@ class RentalDetails(CommonInfo):
     )
     PARKING_CHOICES = (("N", "None"), ("M", "Motorbike"), ("C", "Car"), ("B", "Both"))
     basic_details = models.OneToOneField(
-        BasicDetails, on_delete=models.CASCADE, related_name="rental_details", null=True
+        BasicDetails, on_delete=models.CASCADE, related_name="rental_details"
     )
     expected_rent = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
     expected_deposit = models.DecimalField(
@@ -280,20 +282,20 @@ class RentalDetails(CommonInfo):
         ordering = ["-created_on"]
 
 
-class RentGallery(CommonInfo):
+class Gallery(CommonInfo):
     """
-    model to store the gallery
+    model to store the gallery of both sale and rent
     """
 
     title = models.CharField(max_length=100, null=True, blank=True)
-    image = models.ImageField(upload_to="property/gallery")
+    image = models.ImageField(upload_to="property/gallery", null=True, blank=True)
     basic_details = models.ForeignKey(
-        BasicDetails, on_delete=models.CASCADE, related_name="gallery", null=True
+        BasicDetails, on_delete=models.CASCADE, related_name="gallery"
     )
 
     class Meta:
-        verbose_name_plural = "RentGallery"
-        db_table = "RentGallery"
+        verbose_name_plural = "Gallery"
+        db_table = "Gallery"
 
     def __str__(self):
         # return str(self.id)
@@ -365,7 +367,6 @@ class SellPropertyDetails(CommonInfo):
         BasicDetails,
         on_delete=models.CASCADE,
         related_name="sell_property_details",
-        null=True,
     )
     bhk_type = models.CharField(
         max_length=20, choices=BHK_CHOICES, default="F"
@@ -428,7 +429,7 @@ class ResaleDetails(CommonInfo):
     )
     description = models.TextField()
     basic_details = models.ForeignKey(
-        BasicDetails, on_delete=models.CASCADE, related_name="resale_details", null=True
+        BasicDetails, on_delete=models.CASCADE, related_name="resale_details"
     )
 
     def __str__(self):
@@ -445,7 +446,7 @@ class Amenities(CommonInfo):
     """
 
     basic_details = models.ForeignKey(
-        BasicDetails, on_delete=models.CASCADE, related_name="amenities", null=True
+        BasicDetails, on_delete=models.CASCADE, related_name="amenities"
     )
     total_no_bathrooms = models.IntegerField(default=0)
     water_supply = models.BooleanField(default=False)  # 24 hours hot water
@@ -453,8 +454,6 @@ class Amenities(CommonInfo):
     security = models.BooleanField(default=False)
     gym = models.BooleanField(default=False)
     lift = models.BooleanField(default=False)
-    title = models.CharField(max_length=100, null=True, blank=True)
-    image = models.ImageField(upload_to="sale/amenities")
 
     class Meta:
         verbose_name_plural = "Amenities"
@@ -473,7 +472,7 @@ class FieldVisit(CommonInfo):
     email = models.CharField(max_length=16, blank=False)
     phone = models.CharField(max_length=16)
     basic_details = models.ForeignKey(
-        BasicDetails, on_delete=models.CASCADE, related_name="field_visit", null=True
+        BasicDetails, on_delete=models.CASCADE, related_name="field_visit"
     )
 
     def __str__(self):
