@@ -21,6 +21,7 @@ from api.viewsets.property_viewset import (
     GalleryImageUploadViewset,
     PropertyFilter,
     PropertyRequestViewSet,
+    PropertyDiscussionViewSet,
 )
 
 router = routers.DefaultRouter()
@@ -32,6 +33,7 @@ router.register(r"rent-property-details", RentPropertyDetailsViewset)
 router.register(r"locality-details", LocalityDetailsViewset)
 router.register(r"locality", LocalityViewset)
 router.register(r"field-visit", FieldVisitViewSet)
+router.register(r"property-discussion", PropertyDiscussionViewSet)
 # router.register(r"locality-details", LocalityDetailsViewset)
 # rent
 router.register(r"rental-details", RentalDetailsViewset)
