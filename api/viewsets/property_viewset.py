@@ -77,8 +77,8 @@ class CityViewset(viewsets.ModelViewSet):
         if self.action in ["create", "partial_update", "destroy"]:
             return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
-    
-    
+
+
 class ListedPropertyViewSet(viewsets.ModelViewSet):
     queryset = BasicDetails.objects.filter(publish=True)
     serializer_class = BasicDetailsSerializer
@@ -156,7 +156,7 @@ class BasicDetailsViewset(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated()]
+            return [IsAuthenticated]
         return [permission() for permission in self.permission_classes]
 
 
@@ -319,21 +319,6 @@ class DashBoardView(APIView):
         ]
         results = DashBoardSerialzer(data, many=True).data
         return Response(results)
-
-
-class GalleryImageUploadViewset(viewsets.ModelViewSet):
-    """
-    Viewsets to store upload multiple image
-    """
-
-    queryset = BasicDetails.objects.all()
-    serializer_class = GalleryImageUploadSerializer
-    pagination_class = None
-
-    def get_permissions(self):
-        if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated()]
-        return [permission() for permission in self.permission_classes]
 
 
 class PropertyRequestViewSet(viewsets.ModelViewSet):

@@ -495,61 +495,6 @@ class DashBoardSerialzer(serializers.Serializer):
     property_type_residential = serializers.IntegerField()
 
 
-class GalleryImageUploadSerializer(serializers.ModelSerializer):
-    basicdetails_id_ = serializers.IntegerField(write_only=True)
-    gallery = GallerySerializer(many=True)
-
-    class Meta:
-        model = BasicDetails
-        fields = ("id", "gallery", "basicdetails_id_")
-
-    @transaction.atomic
-    def create(self, validated_data):
-        print("validated data", validated_data)
-        gallery_data = validated_data.pop("gallery")
-        basicdetails__data = validated_data.get("basicdetails_id_")
-        print("basicdetails__data", basicdetails__data)
-        basic_details = BasicDetails.objects.get(id=basicdetails__data)
-        if gallery_data:
-            bulk_gallery_data = []
-            for image in gallery_data:
-                gallery_image = Gallery(
-                    basic_details=basic_details,
-                    image=image.get("image"),
-                    title=image.get("title"),
-                )
-                bulk_gallery_data.append(gallery_image)
-            Gallery.objects.bulk_create(bulk_gallery_data)
-        return basic_details
-
-    @transaction.atomic
-    def update(self, instance, validated_data):
-        gallery_data = validated_data.pop("gallery")
-        print("gallery_data", gallery_data)
-        bulk_gallery_update = []
-        bulk_gallery_create = []
-        if gallery_data:
-            for image in gallery_data:
-                print("data", image.get("id_"))
-                if image.get("id_"):
-                    gallery_image = Gallery(id=image.get("id_"))
-                    gallery_image.title = image.get("title")
-                    gallery_image.image = image.get("image")
-                    bulk_gallery_update.append(gallery_image)
-                else:
-                    gallery_image = Gallery(
-                        basic_details=instance,
-                        title=image.get("title"),
-                        image=image.get("image"),
-                    )
-                    bulk_gallery_create.append(gallery_image)
-            # Gallery.objects.bulk_create(bulk_gallery_create)
-            Gallery.objects.bulk_update(bulk_gallery_update, fields=["title", "image"])
-        return super(GalleryImageUploadSerializer, self).update(
-            instance, validated_data
-        )
-
-
 class PropertyRequestSerializer(serializers.ModelSerializer):
 
     request_type_value = serializers.CharField(
