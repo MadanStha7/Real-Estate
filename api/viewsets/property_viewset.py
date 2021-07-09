@@ -58,7 +58,6 @@ from api.serializers.property_serializer import (
     SellPropertyDetailsSerializer,
     FieldVisitSerializer,
     DashBoardSerialzer,
-    GalleryImageUploadSerializer,
     PropertyRequestSerializer,
     GallerySerializer,
     PropertyDiscussionSerializer,
