@@ -16,9 +16,9 @@ from api.viewsets.property_viewset import (
     ResaleDetailsViewSet,
     LocalityViewset,
     AmenitiesViewSet,
-    PropertyFilter,
     FieldVisitViewSet,
     DashBoardView,
+    PropertyFilter,
     PropertyRequestViewSet
 )
 

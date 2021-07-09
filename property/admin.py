@@ -18,7 +18,7 @@ from .models import (
     ContactAgent,
     Comment,
     Reply,
-    Locality
+    Locality,
 )
 
 # Register your models here.

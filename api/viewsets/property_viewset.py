@@ -310,6 +310,8 @@ class DashBoardView(APIView):
         ]
         results = DashBoardSerialzer(data, many=True).data
         return Response(results)
+
+
 class PropertyRequestViewSet(viewsets.ModelViewSet):
     queryset = PropertyRequest.objects.all()
     serializer_class = PropertyRequestSerializer

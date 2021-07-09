@@ -477,15 +477,20 @@ class DashBoardSerialzer(serializers.Serializer):
     agents = serializers.IntegerField()
     property_type_commercial = serializers.IntegerField()
     property_type_residential = serializers.IntegerField()
+
+
 class PropertyRequestSerializer(serializers.ModelSerializer):
-    request_type_value = serializers.CharField(source="get_request_type_display", read_only=True)
-    property_type_value = serializers.CharField(source="get_property_type_display", read_only=True)
+    request_type_value = serializers.CharField(
+        source="get_request_type_display", read_only=True)
+    property_type_value = serializers.CharField(
+        source="get_property_type_display", read_only=True)
     urgent_value = serializers.CharField(source="get_urgent_display", read_only=True)
-    # staff = StaffDetailSerializer()
+    staff = StaffDetailSerializer(read_only=True)
+
     class Meta:
         model = PropertyRequest
         fields = (
-            "id", 
+            "id",
             "name",
             "email",
             "phone",
@@ -498,4 +503,4 @@ class PropertyRequestSerializer(serializers.ModelSerializer):
             "staff",
             "due_date",
             "description_assigned_to_employee"
-            )
+        )
