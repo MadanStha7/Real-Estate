@@ -151,7 +151,7 @@ class AgentDetailSerializer(serializers.ModelSerializer):
             "identification_type",
             "identification_number",
             "identification_file",
-            "accept_terms_and_condition",
+            "terms_and_condition",
         ]
 
     @transaction.atomic
