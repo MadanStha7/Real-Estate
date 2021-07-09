@@ -52,7 +52,6 @@ from api.serializers.property_serializer import (
     PropertyTypeSerializer,
     RentPropertyDetailsSerializer,
     RentalDetailsSerializer,
-    GallerySerializer,
     PendingPropertySerializer,
     AssignPropertySerializer,
     ResaleDetailsSerializer,
@@ -60,6 +59,8 @@ from api.serializers.property_serializer import (
     FieldVisitSerializer,
     DashBoardSerialzer,
     GalleryImageUploadSerializer,
+    PropertyRequestSerializer,
+    GallerySerializer,
 )
 
 """===================================
@@ -75,6 +76,37 @@ class CityViewset(viewsets.ModelViewSet):
         if self.action in ["create", "partial_update", "destroy"]:
             return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
+
+
+class PropertyFilter(viewsets.ModelViewSet):
+    """
+    This views returns property on the basis of filterations.
+    """
+
+    queryset = BasicDetails.objects.none()
+    serializer_class = BasicDetailsSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["property_categories", "property_type", "city"]
+
+    def get_queryset(self):
+        verified_property = BasicDetails.objects.filter(publish=True)
+        print("verified_property", verified_property)
+        property_categories = self.request.query_params.get("property_categories", None)
+        property_type = self.request.query_params.get("property_type", None)
+        city = self.request.query_params.get("city", None)
+        if property_categories:
+            queryset = verified_property.filter(
+                property_categories__name=property_categories
+            )
+            return queryset
+        if property_type:
+            queryset = verified_property.filter(property_type__name=property_type)
+            return queryset
+        if city:
+            queryset = verified_property.filter(city__name=city)
+            return queryset
+        else:
+            return BasicDetails.objects.filter(publish=True)
 
 
 class PropertyTypesViewSet(viewsets.ModelViewSet):
@@ -296,3 +328,9 @@ class GalleryImageUploadViewset(viewsets.ModelViewSet):
         if self.action in ["create", "partial_update", "destroy"]:
             return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
+
+
+class PropertyRequestViewSet(viewsets.ModelViewSet):
+    queryset = PropertyRequest.objects.all()
+    serializer_class = PropertyRequestSerializer
+    permission_classes = [IsAuthenticated]

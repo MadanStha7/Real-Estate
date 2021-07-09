@@ -19,6 +19,8 @@ from api.viewsets.property_viewset import (
     FieldVisitViewSet,
     DashBoardView,
     GalleryImageUploadViewset,
+    PropertyFilter,
+    PropertyRequestViewSet,
 )
 
 router = routers.DefaultRouter()
@@ -44,6 +46,8 @@ router.register(
 router.register(r"sell-property-details", SellPropertyDetailsViewSet)
 router.register(r"resale-details", ResaleDetailsViewSet)
 router.register(r"sell-amenities", AmenitiesViewSet)
+router.register(r"property-filter", PropertyFilter)
+router.register(r"property-request", PropertyRequestViewSet)
 
 
 urlpatterns = [

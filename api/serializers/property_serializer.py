@@ -24,6 +24,7 @@ from .user_serializer import (
     UserProfileSerializer,
     AdminProfileSerializer,
     UserSerializer,
+    StaffDetailSerializer,
 )
 from user.models import (
     UserProfile,
@@ -93,18 +94,34 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
     condition_type_value = serializers.CharField(
         source="get_condition_type_display", read_only=True
     )
+    advertisement_type_value = serializers.CharField(
+        source="get_advertisement_type_display", read_only=True
+    )
+    listing_type_value = serializers.CharField(
+        source="get_listing_type_display", read_only=True
+    )
+    membership_plan_value = serializers.CharField(
+        source="get_membership_plan_display", read_only=True
+    )
+    condition_type_value = serializers.CharField(
+        source="get_condition_type_display", read_only=True
+    )
+    city = CitySerializer(read_only=True)
+    property_categories = PropertyCategoriesSerializer(read_only=True)
+    property_types = PropertyTypeSerializer(read_only=True)
 
     class Meta:
         model = BasicDetails
         fields = (
             "id",
             "advertisement_type",
+            "advertisement_type_value",
             "city",
             "city_value",
             "property_categories",
             "property_categories_value",
-            "property_types_value",
             "property_types",
+            "property_types_value",
             "advertisement_type",
             "advertisement_type_value",
             "owner",
@@ -114,7 +131,9 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
             "publish",
             "views",
             "listing_type",
+            "listing_type_value",
             "membership_plan",
+            "membership_plan_value",
             "condition_type",
             "listing_type_value",
             "membership_plan_value",
@@ -209,19 +228,6 @@ class RentalDetailsSerializer(serializers.ModelSerializer):
             "description",
             "no_of_parking_value",
         )
-
-
-# class RentGallerySerializer(serializers.ModelSerializer):
-#     """serialzer to get all gallery serialzers"""
-
-#     class Meta:
-#         model = RentGallery
-#         fields = (
-#             "id",
-#             "title",
-#             "image",
-#             "basic_details",
-#         )
 
 
 class GallerySerializer(serializers.ModelSerializer):
@@ -511,4 +517,34 @@ class GalleryImageUploadSerializer(serializers.ModelSerializer):
             Gallery.objects.bulk_update(bulk_gallery_update, fields=["title"])
         return super(GalleryImageUploadSerializer, self).update(
             instance, validated_data
+        )
+
+
+class PropertyRequestSerializer(serializers.ModelSerializer):
+
+    request_type_value = serializers.CharField(
+        source="get_request_type_display", read_only=True
+    )
+    property_type_value = serializers.CharField(
+        source="get_property_type_display", read_only=True
+    )
+    urgent_value = serializers.CharField(source="get_urgent_display", read_only=True)
+    staff = StaffDetailSerializer(read_only=True)
+
+    class Meta:
+        model = PropertyRequest
+        fields = (
+            "id",
+            "name",
+            "email",
+            "phone",
+            "request_type",
+            "request_type_value",
+            "property_type",
+            "property_type_value",
+            "urgent",
+            "urgent_value",
+            "staff",
+            "due_date",
+            "description_assigned_to_employee",
         )

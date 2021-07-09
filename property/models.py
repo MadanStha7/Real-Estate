@@ -151,7 +151,7 @@ class BasicDetails(CommonInfo):
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return str(self.id)
+        return f"property information for {self.advertisement_type} with id {self.id}"
 
     class Meta:
         verbose_name_plural = "Basic Details"
