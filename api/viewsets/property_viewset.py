@@ -28,7 +28,7 @@ from property.models import (
     PropertyTypes,
     BasicDetails,
     RentPropertyDetails,
-    RentGallery,
+    Gallery,
     SellPropertyDetails,
     ResaleDetails,
     Amenities,
@@ -52,13 +52,14 @@ from api.serializers.property_serializer import (
     PropertyTypeSerializer,
     RentPropertyDetailsSerializer,
     RentalDetailsSerializer,
-    RentGallerySerializer,
+    GallerySerializer,
     PendingPropertySerializer,
     AssignPropertySerializer,
     ResaleDetailsSerializer,
     SellPropertyDetailsSerializer,
     FieldVisitSerializer,
     DashBoardSerialzer,
+    GalleryImageUploadSerializer,
 )
 
 """===================================
@@ -171,13 +172,13 @@ class SellPropertyDetailsViewSet(viewsets.ModelViewSet):
         return [permission() for permission in self.permission_classes]
 
 
-class RentGalleryViewset(viewsets.ModelViewSet):
+class GalleryViewset(viewsets.ModelViewSet):
     """
     Viewsets to store the rent gallery
     """
 
-    queryset = RentGallery.objects.all()
-    serializer_class = RentGallerySerializer
+    queryset = Gallery.objects.all()
+    serializer_class = GallerySerializer
     pagination_class = None
 
 
@@ -280,3 +281,18 @@ class DashBoardView(APIView):
         ]
         results = DashBoardSerialzer(data, many=True).data
         return Response(results)
+
+
+class GalleryImageUploadViewset(viewsets.ModelViewSet):
+    """
+    Viewsets to store upload multiple image
+    """
+
+    queryset = BasicDetails.objects.all()
+    serializer_class = GalleryImageUploadSerializer
+    pagination_class = None
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
