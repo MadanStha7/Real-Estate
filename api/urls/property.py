@@ -18,11 +18,10 @@ from api.viewsets.property_viewset import (
     AmenitiesViewSet,
     FieldVisitViewSet,
     DashBoardView,
-    GalleryImageUploadViewset,
     PropertyFilter,
     PropertyRequestViewSet,
     PropertyDiscussionViewSet,
-    ListedPropertyViewSet
+    ListedPropertyViewSet,
 )
 
 router = routers.DefaultRouter()
@@ -41,11 +40,6 @@ router.register(r"rental-details", RentalDetailsViewset)
 router.register(r"gallery", GalleryViewset)
 router.register(r"pending-property", PendingPropertyViewset)  # pending property
 router.register(r"listed-property", ListedPropertyViewSet)  # listed property
-router.register(
-    r"rent-gallery-image-upload", GalleryImageUploadViewset
-)  # pending property
-
-# router.register(r"assign-property", AssignPropertyViewset)  # pending property
 # sale
 router.register(r"sell-property-details", SellPropertyDetailsViewSet)
 router.register(r"resale-details", ResaleDetailsViewSet)
