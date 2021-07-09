@@ -36,7 +36,6 @@ class AgentDetail(CommonInfo):
     identification_file = models.FileField(
         upload_to="agent/identification", blank=True, null=True
     )
-    accept_terms_and_condition = models.BooleanField(default=False)
     added_at = models.DateTimeField(auto_now_add=True)
     is_verified = models.BooleanField(default=False)
     terms_and_conditions = models.BooleanField(default=False)
