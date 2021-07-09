@@ -61,6 +61,7 @@ from api.serializers.property_serializer import (
     GalleryImageUploadSerializer,
     PropertyRequestSerializer,
     GallerySerializer,
+    PropertyDiscussionSerializer,
 )
 
 """===================================
@@ -334,3 +335,13 @@ class PropertyRequestViewSet(viewsets.ModelViewSet):
     queryset = PropertyRequest.objects.all()
     serializer_class = PropertyRequestSerializer
     permission_classes = [IsAuthenticated]
+
+
+class PropertyDiscussionViewSet(viewsets.ModelViewSet):
+    queryset = PropertyDiscussionBoard.objects.all()
+    serializer_class = PropertyDiscussionSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "partial_update", "finish"]:
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
