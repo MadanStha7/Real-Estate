@@ -160,9 +160,6 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
     condition_type_value = serializers.CharField(
         source="get_condition_type_display", read_only=True
     )
-    city = CitySerializer(read_only=True)
-    property_categories = PropertyCategoriesSerializer(read_only=True)
-    property_types = PropertyTypeSerializer(read_only=True)
 
     class Meta:
         model = BasicDetails
@@ -389,13 +386,14 @@ class SellPropertyDetailsSerializer(serializers.ModelSerializer):
         source="get_facing_direction_display", read_only=True
     )
 
-    basic_details = BasicDetailsSerializer(read_only=True)
+    basic_details_value = BasicDetailsSerializer(read_only=True)
 
     class Meta:
         model = SellPropertyDetails
         fields = (
             "id",
             "basic_details",
+            "basic_details_value",
             "bhk_type",
             "bhk_type_value",
             "total_floors",
@@ -423,13 +421,14 @@ class ResaleDetailsSerializer(serializers.ModelSerializer):
     construction_type_value = serializers.CharField(
         source="get_construction_type_display", read_only=True
     )
-    basic_details = BasicDetailsSerializer(read_only=True)
+    basic_details_value = BasicDetailsSerializer(read_only=True)
 
     class Meta:
         model = ResaleDetails
         fields = (
             "id",
             "basic_details",
+            "basic_details_value",
             "expected_price",
             "price",
             "price_value",
