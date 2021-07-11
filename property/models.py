@@ -139,7 +139,7 @@ class BasicDetails(CommonInfo):
     publish = models.BooleanField(default=False)
     views = models.PositiveIntegerField(default=0)
     listing_type = models.CharField(
-        max_length=2, choices=LISTING_TYPE_CHOICES, null=True, blank=True
+        max_length=2, choices=LISTING_TYPE_CHOICES, default="Fr"
     )
     membership_plan = models.CharField(
         max_length=1, choices=MEMBERSHIP_PLAN_CHOICES, null=True, blank=True
@@ -151,7 +151,7 @@ class BasicDetails(CommonInfo):
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f"property information for {self.advertisement_type} with id {self.id}"
+        return f"property information with id {self.id}"
 
     class Meta:
         verbose_name_plural = "Basic Details"
