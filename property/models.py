@@ -88,21 +88,22 @@ class BasicDetails(CommonInfo):
         ("U", "Used"),
     )
     city = models.ForeignKey(
-        City, on_delete=models.CASCADE, related_name="city_property", null=True
+        City,
+        on_delete=models.CASCADE,
+        related_name="basic_details",
+        null=True,
     )
     property_categories = models.ForeignKey(
         PropertyCategories,
         on_delete=models.CASCADE,
-        related_name="property_info",
+        related_name="basic_details",
         null=True,
-        blank=True,
     )
     property_types = models.ForeignKey(
         PropertyTypes,
         on_delete=models.CASCADE,
-        related_name="property_info",
+        related_name="basic_details",
         null=True,
-        blank=True,
     )
     advertisement_type = models.CharField(
         max_length=2, choices=ADVERTISEMENT_TYPE_CHOICES, default=""
