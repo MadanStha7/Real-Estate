@@ -221,7 +221,7 @@ class RentPropertyDetailsSerializer(serializers.ModelSerializer):
 
 class RentalDetailsSerializer(serializers.ModelSerializer):
     """serialzer to get all rental details serialzers"""
-
+    basic_details = BasicDetailsSerializer(read_only=True)
     price_value = serializers.CharField(source="get_price_display", read_only=True)
     furnishing_value = serializers.CharField(
         source="get_furnishing_display", read_only=True
@@ -493,6 +493,7 @@ class DashBoardSerialzer(serializers.Serializer):
     agents = serializers.IntegerField()
     property_type_commercial = serializers.IntegerField()
     property_type_residential = serializers.IntegerField()
+    pending_property = BasicDetailsSerializer(read_only=True)
 
 
 class PropertyRequestSerializer(serializers.ModelSerializer):
