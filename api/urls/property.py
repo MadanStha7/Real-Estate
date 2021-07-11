@@ -22,6 +22,7 @@ from api.viewsets.property_viewset import (
     PropertyRequestViewSet,
     PropertyDiscussionViewSet,
     ListedPropertyViewSet,
+    AssignPropertyRequestViewset,
 )
 
 router = routers.DefaultRouter()
@@ -51,5 +52,6 @@ router.register(r"property-request", PropertyRequestViewSet)
 urlpatterns = [
     path("", include(router.urls)),
     path("assign-property/<int:pk>/", AssignPropertyViewset.as_view()),
+    path("assign-property-request/<int:pk>/", AssignPropertyRequestViewset.as_view()),
     path("admin_dashboard/", DashBoardView.as_view(), name="admin_dashboard"),
 ]
