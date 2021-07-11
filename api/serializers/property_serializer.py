@@ -75,17 +75,32 @@ class PropertyCategoriesSerializer(serializers.ModelSerializer):
         model = PropertyCategories
         fields = ("id", "name")
 
+    def validate_name(self, name):
+        if PropertyCategories.objects.filter(name=name.lower()).exists():
+            raise serializers.ValidationError("Name already exists!")
+        return name
+
 
 class PropertyTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyTypes
         fields = ("id", "name")
+        
+    def validate_name(self, name):
+        if PropertyTypes.objects.filter(name=name.lower()).exists():
+            raise serializers.ValidationError("Name already exists!")
+        return name
 
 
 class LocalitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Locality
         fields = ("id", "name")
+        
+    def validate_name(self, name):
+        if Locality.objects.filter(name=name.lower()).exists():
+            raise serializers.ValidationError("Name already exists!")
+        return name
 
 
 class LocalityDetailsSerializer(serializers.ModelSerializer):
