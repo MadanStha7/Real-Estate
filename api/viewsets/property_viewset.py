@@ -155,7 +155,7 @@ class BasicDetailsViewset(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy"]:
-            return [IsAuthenticated]
+            return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
 
