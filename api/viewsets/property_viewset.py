@@ -155,8 +155,11 @@ class BasicDetailsViewset(viewsets.ModelViewSet):
     pagination_class = None
 
     def get_permissions(self):
-        if self.action in ["create", "partial_update", "destroy"]:
+        if self.action in ["create", "partial_update", "destroy", "approve_property"]:
             return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+        if self.action in ["approve_property"]:
+            return [IsAuthenticated(), UserIsAdmin()]
         return [permission() for permission in self.permission_classes]
 
     @action(detail=False, methods=["GET"])
@@ -304,7 +307,8 @@ class DashBoardView(APIView):
         property_type_residential = len(
             BasicDetails.objects.filter(property_types__name="Residential")
         )
-        pending_property = BasicDetails.objects.filter(publish=False)
+        rental = RentalDetails.objects.filter(basic_details__publish=False)
+        resale = ResaleDetails.objects.filter(basic_details__publish=False)
 
         data = [
             {
@@ -314,7 +318,8 @@ class DashBoardView(APIView):
                 "agents": agents,
                 "property_type_commercial": property_type_commercial,
                 "property_type_residential": property_type_residential,
-                "pending_property": pending_property,
+                "rental": rental,
+                "resale": resale,
             }
         ]
         results = DashBoardSerialzer(data, many=True).data

@@ -408,6 +408,7 @@ class SellPropertyDetailsSerializer(serializers.ModelSerializer):
 
 
 class ResaleDetailsSerializer(serializers.ModelSerializer):
+    basic_details = BasicDetailsSerializer(read_only=True)
     price_value = serializers.CharField(source="get_price_display", read_only=True)
     kitchen_type_value = serializers.CharField(
         source="get_kitchen_type_display", read_only=True
@@ -492,7 +493,8 @@ class DashBoardSerialzer(serializers.Serializer):
     agents = serializers.IntegerField()
     property_type_commercial = serializers.IntegerField()
     property_type_residential = serializers.IntegerField()
-    pending_property = BasicDetailsSerializer(read_only=True)
+    rental = RentalDetailsSerializer(many=True, read_only=True)
+    resale = ResaleDetailsSerializer(many=True, read_only=True)
 
 
 class PropertyRequestSerializer(serializers.ModelSerializer):
