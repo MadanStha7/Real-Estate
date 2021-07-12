@@ -62,7 +62,12 @@ from api.serializers.property_serializer import (
     PropertyRequestSerializer,
     GallerySerializer,
     PropertyDiscussionSerializer,
+    AssignPropertyRequestSerializer,
 )
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 
 """===================================
 -- Property model on client side starts ---
@@ -105,6 +110,7 @@ class PropertyFilter(viewsets.ModelViewSet):
                 property_categories__name=property_categories
             )
             return queryset
+
         if property_type:
             queryset = verified_property.filter(property_types__name=property_type)
             return queryset
@@ -283,12 +289,26 @@ class AmenitiesViewSet(viewsets.ModelViewSet):
         return [permission() for permission in self.permission_classes]
 
 
-class AssignPropertyViewset(generics.UpdateAPIView):
+class AssignPropertyViewset(generics.CreateAPIView):
     """Api to assign the property to employee"""
 
     queryset = BasicDetails.objects.filter(publish=False)
     serializer_class = AssignPropertySerializer
     permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        pending_property = self.request.query_params.get("pending_property_id", False)
+        try:
+            basic_details = BasicDetails.objects.get(id=pending_property)
+        except BasicDetails.DoesNotExist:
+            raise ValidationError({"error": "basic details doesn't exist"})
+        staff = self.request.data.get("staff")
+        due_date = self.request.data.get("due_date")
+        description = self.request.data.get("description")
+        basic_details.staff = User.objects.get(id=staff)
+        basic_details.due_date = due_date
+        basic_details.description = description
+        basic_details.save()
 
 
 class FieldVisitViewSet(viewsets.ModelViewSet):
@@ -303,7 +323,9 @@ class DashBoardView(APIView):
         sellers = len(BasicDetails.objects.all())
         buyers = len(PropertyRequest.objects.all())
         agents = len(AgentDetail.objects.all())
-        property_type_commercial = len(BasicDetails.objects.filter(property_types__name="Commercial"))
+        property_type_commercial = len(
+            BasicDetails.objects.filter(property_types__name="Commercial")
+        )
         property_type_residential = len(
             BasicDetails.objects.filter(property_types__name="Residential")
         )
@@ -346,9 +368,28 @@ class PropertyDiscussionViewSet(viewsets.ModelViewSet):
         return [permission() for permission in self.permission_classes]
 
 
-class AssignPropertyRequestViewset(generics.UpdateAPIView):
+class AssignPropertyRequestViewset(generics.CreateAPIView):
     """Api to assign the propertyrequest to employee"""
 
     queryset = PropertyRequest.objects.all()
-    serializer_class = PropertyRequestSerializer
+    serializer_class = AssignPropertyRequestSerializer
     permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        property_request = self.request.query_params.get("property_request_id", False)
+        print("property_request")
+        try:
+            property_request_obj = PropertyRequest.objects.get(id=property_request)
+        except BasicDetails.DoesNotExist:
+            raise ValidationError({"error": "Property Request doesn't exist"})
+        staff = self.request.data.get("staff")
+        due_date = self.request.data.get("due_date")
+        description_assigned_to_employee = self.request.data.get(
+            "description_assigned_to_employee"
+        )
+        property_request_obj.staff = User.objects.get(id=staff)
+        property_request_obj.due_date = due_date
+        property_request_obj.description_assigned_to_employee = (
+            description_assigned_to_employee
+        )
+        property_request_obj.save()
