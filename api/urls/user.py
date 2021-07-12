@@ -14,6 +14,7 @@ from api.viewsets.user_viewset import (
     AdminViewSet,
     LogoutView,
     MyProfileView,
+    ListOfAssignedStaffView,
 )
 
 router = routers.DefaultRouter()
@@ -37,6 +38,7 @@ urlpatterns = [
         ChangePasswordView.as_view(),
         name="auth_change_password",
     ),
+    path("assinged-staff/", ListOfAssignedStaffView.as_view()),
     # contact page for sending email
     path("send-mail/", SendMailView.as_view(), name="send-mail"),
     path("logout/", LogoutView.as_view(), name="logout"),

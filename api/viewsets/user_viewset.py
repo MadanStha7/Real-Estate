@@ -25,6 +25,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import AnonymousUser
+from rest_framework.generics import ListAPIView
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -293,6 +294,7 @@ class MyProfileView(viewsets.ModelViewSet):
 
 
 class LogoutView(APIView):
+
     """expires the logg in session of user"""
 
     def get(self, request, format=None):
@@ -301,3 +303,19 @@ class LogoutView(APIView):
         return Response(
             {"success": ("Successfully logged out.")}, status=status.HTTP_200_OK
         )
+
+
+class ListOfAssignedStaffView(APIView):
+    """API to list all the employee/staff details to assign in property"""
+
+    def get(self, request):
+        try:
+            staff = User.objects.filter(groups__name="Staff")
+            staff_data = []
+            for element in staff:
+                id_of_staff = element.id
+                full_name = element.staff_detail.full_name
+                staff_data.append({"id_of_staff": id_of_staff, "full_name": full_name})
+            return Response(staff_data)
+        except User.DoesNotExist:
+            return Response({"error": ("No data available")})
