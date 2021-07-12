@@ -637,7 +637,7 @@ class PropertyRequest(CommonInfo):
     size = models.DecimalField(default=0.00, decimal_places=4, max_digits=10)
     due_date = models.DateField(null=True, blank=True)
     description_assigned_to_employee = models.TextField(null=True, blank=True)
-    description = models.TextField()
+    description = models.TextField(null=True)
 
     def __str__(self):
         return self.name
