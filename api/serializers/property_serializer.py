@@ -218,6 +218,7 @@ class RentPropertyDetailsSerializer(serializers.ModelSerializer):
 
 class RentalDetailsSerializer(serializers.ModelSerializer):
     """serialzer to get all rental details serialzers"""
+
     basic_details = BasicDetailsSerializer(read_only=True)
     price_value = serializers.CharField(source="get_price_display", read_only=True)
     furnishing_value = serializers.CharField(
@@ -362,6 +363,10 @@ class PendingPropertySerializer(serializers.ModelSerializer):
 
 
 class AssignPropertySerializer(serializers.ModelSerializer):
+    staff = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+    )
+
     class Meta:
         model = BasicDetails
         fields = (
@@ -547,4 +552,20 @@ class PropertyDiscussionSerializer(serializers.ModelSerializer):
             "basic_details",
             "user",
             "user_id",
+        )
+
+
+class AssignPropertyRequestSerializer(serializers.ModelSerializer):
+    staff = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+    )
+    description_assigned_to_employee = serializers.CharField()
+
+    class Meta:
+        model = PropertyRequest
+        fields = (
+            "id",
+            "staff",
+            "description_assigned_to_employee",
+            "due_date",
         )
