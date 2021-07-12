@@ -5,6 +5,7 @@ from rest_framework import generics
 from itertools import chain
 from datetime import datetime, timezone
 from rest_framework import filters
+from rest_framework.generics import ListAPIView, GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
@@ -91,13 +92,13 @@ class PropertyFilter(viewsets.ModelViewSet):
     queryset = BasicDetails.objects.none()
     serializer_class = BasicDetailsSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ["property_categories", "property_type", "city"]
+    search_fields = ["property_categories", "property_types", "city"]
 
     def get_queryset(self):
         verified_property = BasicDetails.objects.filter(publish=True)
         print("verified_property", verified_property)
         property_categories = self.request.query_params.get("property_categories", None)
-        property_type = self.request.query_params.get("property_type", None)
+        property_type = self.request.query_params.get("property_types", None)
         city = self.request.query_params.get("city", None)
         if property_categories:
             queryset = verified_property.filter(
@@ -105,7 +106,7 @@ class PropertyFilter(viewsets.ModelViewSet):
             )
             return queryset
         if property_type:
-            queryset = verified_property.filter(property_type__name=property_type)
+            queryset = verified_property.filter(property_types__name=property_type)
             return queryset
         if city:
             queryset = verified_property.filter(city__name=city)
@@ -157,6 +158,20 @@ class BasicDetailsViewset(viewsets.ModelViewSet):
         if self.action in ["create", "partial_update", "destroy"]:
             return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
+
+    @action(detail=False, methods=["GET"])
+    def approve_property(self, request):
+        property = self.request.query_params.get("property_id", None)
+        if property:
+            get_property = BasicDetails.objects.get(id=property)
+            get_property.publish = True
+            get_property.save()
+            return Response(
+                {"message": "property successfully approved"}, status=status.HTTP_200_OK
+            )
+
+        else:
+            raise ValidationError({"error": "property is required"})
 
 
 class RentPropertyDetailsViewset(viewsets.ModelViewSet):
@@ -264,20 +279,6 @@ class AmenitiesViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
 
-    @action(detail=False, methods=["GET"])
-    def approve_property(self, request):
-        property = self.request.query_params.get("property_id", None)
-        if property:
-            get_property = BasicDetails.objects.get(id=property)
-            get_property.publish = True
-            get_property.save()
-            return Response(
-                {"message": "property successfully approved"}, status=status.HTTP_200_OK
-            )
-
-        else:
-            raise ValidationError({"error": "property is required"})
-
 
 class AssignPropertyViewset(generics.UpdateAPIView):
     """Api to assign the property to employee"""
@@ -294,14 +295,14 @@ class FieldVisitViewSet(viewsets.ModelViewSet):
 
 
 class DashBoardView(APIView):
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         listed_property = len(BasicDetails.objects.filter(publish=True))
         sellers = len(BasicDetails.objects.all())
         buyers = len(PropertyRequest.objects.all())
         agents = len(AgentDetail.objects.all())
-        property_type_commercial = len(PropertyTypes.objects.filter(name="Commercial"))
+        property_type_commercial = len(BasicDetails.objects.filter(property_types__name="Commercial"))
         property_type_residential = len(
-            PropertyTypes.objects.filter(name="Residential")
+            BasicDetails.objects.filter(property_types__name="Residential")
         )
         pending_property = BasicDetails.objects.filter(publish=False)
 
