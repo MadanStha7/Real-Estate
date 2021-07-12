@@ -345,5 +345,5 @@ class AssignPropertyRequestViewset(generics.UpdateAPIView):
     """Api to assign the propertyrequest to employee"""
 
     queryset = PropertyRequest.objects.all()
-    serializer_class = AssignPropertySerializer
+    serializer_class = PropertyRequestSerializer
     permission_classes = [IsAuthenticated]
