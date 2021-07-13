@@ -89,6 +89,36 @@ class ListedPropertyViewSet(viewsets.ModelViewSet):
     serializer_class = BasicDetailsSerializer
 
 
+class PremiumPropetyViewSet(generics.ListAPIView):
+    serializer_class = BasicDetailsSerializer
+
+    def get_queryset(self):
+        premium_category = BasicDetails.objects.filter(listing_type="P").filter(
+            publish=True
+        )
+        return premium_category
+
+
+class FeaturedPropetyViewSet(generics.ListAPIView):
+    serializer_class = BasicDetailsSerializer
+
+    def get_queryset(self):
+        featured_category = BasicDetails.objects.filter(listing_type="Fe").filter(
+            publish=True
+        )
+        return featured_category
+
+
+class FreePropetyViewSet(generics.ListAPIView):
+    serializer_class = BasicDetailsSerializer
+
+    def get_queryset(self):
+        free_category = BasicDetails.objects.filter(listing_type="Fr").filter(
+            publish=True
+        )
+        return free_category
+
+
 class PropertyFilter(viewsets.ModelViewSet):
     """
     This views returns property on the basis of filterations.
@@ -119,6 +149,26 @@ class PropertyFilter(viewsets.ModelViewSet):
             return queryset
         else:
             return BasicDetails.objects.filter(publish=True)
+
+
+class PropertySearchViewSet(generics.ListAPIView):
+    serializer_class = BasicDetailsSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["city", 'locality']
+    
+    def get_queryset(self):
+        verified_property = BasicDetails.objects.filter(publish=True)
+        city = self.request.query_params.get("city", None)
+        locality = self.request.query_params.get("locality", None)
+        if city:
+            queryset = verified_property.filter(city__name=city)
+            return queryset
+        if locality:
+            queryset = verified_property.filter(location__locality__name=locality)
+            return queryset
+        else:
+            return BasicDetails.objects.filter(publish=True)
+        
 
 
 class PropertyTypesViewSet(viewsets.ModelViewSet):
