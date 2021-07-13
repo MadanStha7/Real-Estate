@@ -24,6 +24,8 @@ from api.viewsets.property_viewset import (
     ListedPropertyViewSet,
     AssignPropertyRequestViewset,
     DashBoardPendingPropertyView,
+    FloorPlanViewset,
+ 
 )
 
 router = routers.DefaultRouter()
@@ -48,6 +50,7 @@ router.register(r"resale-details", ResaleDetailsViewSet)
 router.register(r"sell-amenities", AmenitiesViewSet)
 router.register(r"property-filter", PropertyFilter)
 router.register(r"property-request", PropertyRequestViewSet)
+router.register(r"floor-plan", FloorPlanViewset)
 
 
 urlpatterns = [

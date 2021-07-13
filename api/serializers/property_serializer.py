@@ -20,6 +20,7 @@ from property.models import (
     ContactAgent,
     Comment,
     Reply,
+    FloorPlan,
 )
 from .user_serializer import (
     UserProfileSerializer,
@@ -233,6 +234,7 @@ class RentPropertyDetailsSerializer(serializers.ModelSerializer):
             "property_size",
             "bhk_type_value",
             "facing_direction_value",
+            
         )
 
 
@@ -589,3 +591,27 @@ class AssignPropertyRequestSerializer(serializers.ModelSerializer):
             "description_assigned_to_employee",
             "due_date",
         )
+
+
+class FloorPlanSerializer(serializers.ModelSerializer):
+
+    image = serializers.ListField(
+        child=serializers.FileField(max_length=100000), write_only=True
+    )
+    image_value = serializers.FileField(read_only=True, source="image")
+
+    class Meta:
+ 
+        model = FloorPlan
+        fields = ["id", "basic_details", "name", "image", "image_value"]
+
+    @transaction.atomic
+    def create(self, validated_data):
+        print("validated data")
+        image = validated_data.pop("image")
+        for img in image:
+            print("imageges", img)
+            gallery = Gallery.objects.create(image=img, **validated_data)
+        return gallery
+
+

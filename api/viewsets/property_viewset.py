@@ -41,6 +41,7 @@ from property.models import (
     Reply,
     RentalDetails,
     LocalityDetails,
+    FloorPlan,
 )
 from api.serializers.property_serializer import (
     AmenitiesSerializer,
@@ -63,6 +64,7 @@ from api.serializers.property_serializer import (
     GallerySerializer,
     PropertyDiscussionSerializer,
     AssignPropertyRequestSerializer,
+    FloorPlanSerializer,
 )
 from django.contrib.auth import get_user_model
 
@@ -437,3 +439,9 @@ class AssignPropertyRequestViewset(generics.CreateAPIView):
             description_assigned_to_employee
         )
         property_request_obj.save()
+
+
+class FloorPlanViewset(viewsets.ModelViewSet):
+
+    queryset = FloorPlan.objects.all()
+    serializer_class = FloorPlanSerializer
