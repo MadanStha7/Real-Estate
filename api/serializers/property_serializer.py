@@ -180,6 +180,8 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
     condition_type_value = serializers.CharField(
         source="get_condition_type_display", read_only=True
     )
+    location = LocalityDetailsSerializer(read_only=True)
+    
 
     class Meta:
         model = BasicDetails
@@ -189,6 +191,7 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
             "advertisement_type_value",
             "city",
             "city_value",
+            "location",
             "property_categories",
             "property_categories_value",
             "property_types",
