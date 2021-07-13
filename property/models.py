@@ -37,6 +37,10 @@ class PropertyCategories(CommonInfo):
         verbose_name_plural = "PropertyCategories"
         ordering = ["-created_on"]
 
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower()
+        return super().save(*args, **kwargs)
+
 
 class PropertyTypes(CommonInfo):
     """model to store type of property"""
@@ -50,6 +54,10 @@ class PropertyTypes(CommonInfo):
         verbose_name_plural = "PropertyTypes"
         ordering = ["-created_on"]
 
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower()
+        return super().save(*args, **kwargs)
+
 
 class Locality(CommonInfo):
     """model to locality details of property"""
@@ -61,6 +69,10 @@ class Locality(CommonInfo):
 
     class Meta:
         ordering = ["-created_on"]
+    
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower()
+        return super().save(*args, **kwargs)
 
 
 class BasicDetails(CommonInfo):
