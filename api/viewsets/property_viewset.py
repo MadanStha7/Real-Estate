@@ -367,28 +367,17 @@ class DashBoardPendingPropertyView(APIView):
             else:
                 advertisement_type = None
 
-            try:
-                location = LocalityDetails.objects.get(
-                    basic_details__id=element.id
-                ).locality.name
-            except LocalityDetails.DoesNotExist:
-                location = None
+            location = LocalityDetails.objects.filter(
+                basic_details__id=element.id
+            ).values("locality__name")
+            rental_details_price = RentalDetails.objects.filter(
+                basic_details__id=element.id
+            ).values("expected_rent")
 
-            try:
-                rental_details_price = RentalDetails.objects.get(
-                    basic_details__id=element.id
-                ).expected_rent
-
-            except RentalDetails.DoesNotExist:
-                rental_details_price = None
-
-            try:
-                resale_details_price = ResaleDetails.objects.get(
-                    basic_details__id=element.id
-                ).expected_price
-
-            except ResaleDetails.DoesNotExist:
-                resale_details_price = None
+            resale_details_price = ResaleDetails.objects.filter(
+                basic_details__id=element.id
+            ).values("expected_price")
+            print("resale_details_price", resale_details_price)
 
             pending_property.append(
                 {
