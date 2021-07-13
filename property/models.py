@@ -209,7 +209,6 @@ class RentPropertyDetails(CommonInfo):
 
     class Meta:
         verbose_name_plural = "Rent Property Details"
-        db_table = "rent_property_details"
         ordering = ["-created_on"]
 
 
@@ -243,8 +242,7 @@ class LocalityDetails(CommonInfo):
         super(LocalityDetails, self).save(*args, **kwargs)
 
     class Meta:
-        verbose_name_plural = "Property Location"
-        db_table = "property_location"
+        verbose_name_plural = "LocalityDetails"
         ordering = ["-created_on"]
 
 
@@ -278,7 +276,7 @@ class RentalDetails(CommonInfo):
         return str(self.id)
 
     class Meta:
-        verbose_name_plural = "Rental Info"
+        verbose_name_plural = "Rental Details"
         db_table = "property_rental"
         ordering = ["-created_on"]
 
