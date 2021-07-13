@@ -69,7 +69,7 @@ class Locality(CommonInfo):
 
     class Meta:
         ordering = ["-created_on"]
-    
+
     def save(self, *args, **kwargs):
         self.name = self.name.lower()
         return super().save(*args, **kwargs)
@@ -472,6 +472,25 @@ class Amenities(CommonInfo):
 
     def __str__(self):
         return str(self.id)
+
+
+class FloorPlan(CommonInfo):
+    """
+    model to store the the architecture of property
+    """
+
+    basic_details = models.ForeignKey(
+        BasicDetails, on_delete=models.CASCADE, related_name="floorplan"
+    )
+    name = models.CharField(max_length=40, blank=True, null=True)
+    image = models.FileField(upload_to="floorplan/images")
+
+    def __str__(self):
+        return f"Floor plan with basic details {self.basic_details.id}"
+
+    class Meta:
+        ordering = ["-id"]
+        verbose_name_plural = "Floorplan"
 
 
 class FieldVisit(CommonInfo):
