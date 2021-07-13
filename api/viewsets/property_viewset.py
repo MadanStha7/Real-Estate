@@ -324,14 +324,11 @@ class DashBoardView(APIView):
         buyers = len(PropertyRequest.objects.all())
         agents = len(AgentDetail.objects.all())
         property_type_commercial = len(
-            BasicDetails.objects.filter(property_types__name="Commercial")
+            BasicDetails.objects.filter(property_types__name="commercial")
         )
         property_type_residential = len(
-            BasicDetails.objects.filter(property_types__name="Residential")
+            BasicDetails.objects.filter(property_types__name="residential")
         )
-        rental = RentalDetails.objects.filter(basic_details__publish=False)
-        resale = ResaleDetails.objects.filter(basic_details__publish=False)
-
         data = [
             {
                 "listed_property": listed_property,
@@ -340,12 +337,53 @@ class DashBoardView(APIView):
                 "agents": agents,
                 "property_type_commercial": property_type_commercial,
                 "property_type_residential": property_type_residential,
-                "rental": rental,
-                "resale": resale,
+                # "rental": rental,
+                # "resale": resale,
             }
         ]
         results = DashBoardSerialzer(data, many=True).data
         return Response(results)
+
+
+class DashBoardPendingPropertyView(APIView):
+    """API to list all pending property in dashboard"""
+
+    def get(self, request):
+        basic_details = BasicDetails.objects.filter(publish=False)
+        print("basic_details", basic_details)
+        pending_property = []
+        for element in basic_details:
+            print("element", element)
+            if element.property_types:
+                property_type = element.property_types.name
+            else:
+                property_type = None
+
+            if element.property_categories:
+                property_categories = element.property_categories.name
+            else:
+                property_categories = None
+
+            if element.advertisement_type:
+                advertisement_type = element.advertisement_type
+            else:
+                advertisement_type = None
+            if element.location:
+                location = element.location.street
+            else:
+                location = None
+            # rental_price = element.rental_details.price
+            # resale_price = element.resale_details.price
+            pending_property.append(
+                {
+                    "property_type": property_type,
+                    "property_categories": property_categories,
+                    "advertisement_type": advertisement_type,
+                    "location": location,
+                }
+            )
+            print("pending property", pending_property)
+        return Response(pending_property)
 
 
 class PropertyRequestViewSet(viewsets.ModelViewSet):

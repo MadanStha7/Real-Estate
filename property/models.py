@@ -260,7 +260,7 @@ class RentalDetails(CommonInfo):
         ("U", "Unfurnishing"),
     )
     PARKING_CHOICES = (("N", "None"), ("M", "Motorbike"), ("C", "Car"), ("B", "Both"))
-    basic_details = models.OneToOneField(
+    basic_details = models.ForeignKey(
         BasicDetails, on_delete=models.CASCADE, related_name="rental_details"
     )
     expected_rent = models.DecimalField(default=0.00, decimal_places=2, max_digits=10)
