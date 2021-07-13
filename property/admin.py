@@ -19,6 +19,7 @@ from .models import (
     Comment,
     Reply,
     Locality,
+    FloorPlan,
 )
 
 # Register your models here.
@@ -42,5 +43,6 @@ admin.site.register(
         Comment,
         Reply,
         Locality,
+        FloorPlan,
     ]
 )
