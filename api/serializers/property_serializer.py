@@ -234,7 +234,7 @@ class RentPropertyDetailsSerializer(serializers.ModelSerializer):
 class RentalDetailsSerializer(serializers.ModelSerializer):
     """serialzer to get all rental details serialzers"""
 
-    basic_details = BasicDetailsSerializer(read_only=True)
+    # basic_details = BasicDetailsSerializer(read_only=True)
     price_value = serializers.CharField(source="get_price_display", read_only=True)
     furnishing_value = serializers.CharField(
         source="get_furnishing_display", read_only=True
@@ -428,7 +428,6 @@ class SellPropertyDetailsSerializer(serializers.ModelSerializer):
 
 
 class ResaleDetailsSerializer(serializers.ModelSerializer):
-    basic_details = BasicDetailsSerializer(read_only=True)
     price_value = serializers.CharField(source="get_price_display", read_only=True)
     kitchen_type_value = serializers.CharField(
         source="get_kitchen_type_display", read_only=True
@@ -515,6 +514,7 @@ class DashBoardSerialzer(serializers.Serializer):
     property_type_residential = serializers.IntegerField()
     rental = RentalDetailsSerializer(many=True, read_only=True)
     resale = ResaleDetailsSerializer(many=True, read_only=True)
+    basic_details = BasicDetailsSerializer(many=True, read_only=True)
 
 
 class PropertyRequestSerializer(serializers.ModelSerializer):
