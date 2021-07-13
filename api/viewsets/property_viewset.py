@@ -350,10 +350,8 @@ class DashBoardPendingPropertyView(APIView):
 
     def get(self, request):
         basic_details = BasicDetails.objects.filter(publish=False)
-        print("basic_details", basic_details)
         pending_property = []
         for element in basic_details:
-            print("element", element)
             if element.property_types:
                 property_type = element.property_types.name
             else:
@@ -365,24 +363,43 @@ class DashBoardPendingPropertyView(APIView):
                 property_categories = None
 
             if element.advertisement_type:
-                advertisement_type = element.advertisement_type
+                advertisement_type = element.get_advertisement_type_display()
             else:
                 advertisement_type = None
-            if element.location:
-                location = element.location.street
-            else:
+
+            try:
+                location = LocalityDetails.objects.get(
+                    basic_details__id=element.id
+                ).locality.name
+            except LocalityDetails.DoesNotExist:
                 location = None
-            # rental_price = element.rental_details.price
-            # resale_price = element.resale_details.price
+
+            try:
+                rental_details_price = RentalDetails.objects.get(
+                    basic_details__id=element.id
+                ).expected_rent
+
+            except RentalDetails.DoesNotExist:
+                rental_details_price = None
+
+            try:
+                resale_details_price = ResaleDetails.objects.get(
+                    basic_details__id=element.id
+                ).expected_price
+
+            except ResaleDetails.DoesNotExist:
+                resale_details_price = None
+
             pending_property.append(
                 {
                     "property_type": property_type,
                     "property_categories": property_categories,
                     "advertisement_type": advertisement_type,
                     "location": location,
+                    "rental_details_price": rental_details_price,
+                    "resale_details_price": resale_details_price,
                 }
             )
-            print("pending property", pending_property)
         return Response(pending_property)
 
 
