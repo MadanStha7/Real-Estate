@@ -64,6 +64,7 @@ from api.serializers.property_serializer import (
     PropertyDiscussionSerializer,
     AssignPropertyRequestSerializer,
 )
+from property.utils.paginations import CustomPagination
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -154,8 +155,8 @@ class PropertyFilter(viewsets.ModelViewSet):
 class PropertySearchViewSet(generics.ListAPIView):
     serializer_class = BasicDetailsSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ["city", 'locality']
-    
+    search_fields = ["city", "locality"]
+
     def get_queryset(self):
         verified_property = BasicDetails.objects.filter(publish=True)
         city = self.request.query_params.get("city", None)
@@ -168,7 +169,6 @@ class PropertySearchViewSet(generics.ListAPIView):
             return queryset
         else:
             return BasicDetails.objects.filter(publish=True)
-        
 
 
 class PropertyTypesViewSet(viewsets.ModelViewSet):
@@ -310,7 +310,7 @@ class PendingPropertyViewset(viewsets.ModelViewSet):
 
     queryset = BasicDetails.objects.none()
     serializer_class = PendingPropertySerializer
-    pagination_class = None
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         advertisement_type = self.request.query_params.get("advertisement_type", False)
