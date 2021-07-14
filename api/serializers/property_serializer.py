@@ -20,6 +20,7 @@ from property.models import (
     ContactAgent,
     Comment,
     Reply,
+    FloorPlan,
 )
 from .user_serializer import (
     UserProfileSerializer,
@@ -593,6 +594,28 @@ class AssignPropertyRequestSerializer(serializers.ModelSerializer):
         )
 
 
+class FloorPlanSerializer(serializers.ModelSerializer):
+
+    image = serializers.ListField(
+        child=serializers.FileField(max_length=100000), write_only=True
+    )
+    image_value = serializers.FileField(read_only=True, source="image")
+
+    class Meta:
+
+        model = FloorPlan
+        fields = ["id", "basic_details", "image", "image_value"]
+
+    @transaction.atomic
+    def create(self, validated_data):
+        print("validated data")
+        image = validated_data.pop("image")
+        for img in image:
+            print("imageges", img)
+            floor_plan = FloorPlan.objects.create(image=img, **validated_data)
+        return floor_plan
+
+
 class BasicDetailRetrieveSerializer(serializers.ModelSerializer):
     """serialzers for detail view of basic details in detailpage"""
 
@@ -611,6 +634,7 @@ class BasicDetailRetrieveSerializer(serializers.ModelSerializer):
     sell_property_details = SellPropertyDetailsSerializer(many=True, read_only=True)
     resale_details = ResaleDetailsSerializer(many=True, read_only=True)
     amenities = AmenitiesSerializer(many=True, read_only=True)
+    floorplan = FloorPlanSerializer(many=True, read_only=True)
     no_of_days = serializers.SerializerMethodField(read_only=True)
 
     def get_no_of_days(self, obj):
@@ -642,4 +666,5 @@ class BasicDetailRetrieveSerializer(serializers.ModelSerializer):
             "sell_property_details",
             "resale_details",
             "amenities",
+            "floorplan",
         )
