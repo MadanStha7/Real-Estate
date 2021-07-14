@@ -55,5 +55,7 @@ urlpatterns = [
     path("assign-property/", AssignPropertyViewset.as_view()),
     path("assign-property-request/", AssignPropertyRequestViewset.as_view()),
     path("admin_dashboard/", DashBoardView.as_view(), name="admin_dashboard"),
-    path("admin-dashboard/pending-property/", DashBoardPendingPropertyView.as_view()),
+    path(
+        "admin-dashboard/pending-property/", DashBoardPendingPropertyView.as_view()
+    ),  # admin pending property
 ]
