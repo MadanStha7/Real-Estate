@@ -20,6 +20,7 @@ from .models import (
     Reply,
     Locality,
     FloorPlan,
+    RentPropertyDetails,
 )
 
 # Register your models here.
@@ -44,5 +45,6 @@ admin.site.register(
         Reply,
         Locality,
         FloorPlan,
+        RentPropertyDetails,
     ]
 )

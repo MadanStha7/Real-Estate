@@ -645,6 +645,7 @@ class BasicDetailRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = BasicDetails
         fields = (
+            "id",
             "created_on",
             "views",
             "listing_type",

@@ -234,6 +234,24 @@ class BasicDetailsViewset(viewsets.ModelViewSet):
         else:
             raise ValidationError({"error": "property is required"})
 
+    @action(detail=False, methods=["get"], url_path="similar-property")
+    def similar_property(self, request, *args, **kwargs):
+        property = self.request.query_params.get("property_id", None)
+        if property:
+            try:
+                basic_details = BasicDetails.objects.get(id=property, publish=True)
+                similar_property = BasicDetails.objects.filter(
+                    advertisement_type=basic_details.advertisement_type, publish=True
+                ).order_by("-id")[:4]
+                serializer = BasicDetailRetrieveSerializer(similar_property, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except BasicDetails.DoesNotExist:
+                raise ValidationError(
+                    {"error": "Object with this property id doesn't exist!"}
+                )
+        else:
+            raise ValidationError({"error": "property is required"})
+
 
 class RentPropertyDetailsViewset(viewsets.ModelViewSet):
     """
@@ -398,7 +416,7 @@ class DashBoardView(APIView):
 
 
 class DashBoardPendingPropertyView(APIView):
-    """API to list all pending property in dashboard"""
+    """API to list all pending property in home section dashboard """
 
     def get(self, request):
         basic_details = BasicDetails.objects.filter(publish=False).order_by("-id")[:5]
@@ -503,3 +521,11 @@ class BasicDetailRetrieveView(generics.RetrieveAPIView):
 
     queryset = BasicDetails.objects.filter(publish=True)
     serializer_class = BasicDetailRetrieveSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        """API to count the number of views in property"""
+        obj = self.get_object()
+        print("Obj", obj)
+        obj.views = obj.views + 1
+        obj.save(update_fields=("views",))
+        return super().retrieve(request, *args, **kwargs)
