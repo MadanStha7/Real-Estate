@@ -65,7 +65,6 @@ from api.serializers.property_serializer import (
     AssignPropertyRequestSerializer,
     BasicDetailRetrieveSerializer,
 )
-from property.utils.paginations import CustomPagination
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -311,7 +310,7 @@ class PendingPropertyViewset(viewsets.ModelViewSet):
 
     queryset = BasicDetails.objects.none()
     serializer_class = PendingPropertySerializer
-    pagination_class = CustomPagination
+    pagination_class = None
 
     def get_queryset(self):
         advertisement_type = self.request.query_params.get("advertisement_type", False)
@@ -400,7 +399,7 @@ class DashBoardPendingPropertyView(APIView):
     """API to list all pending property in dashboard"""
 
     def get(self, request):
-        basic_details = BasicDetails.objects.filter(publish=False)
+        basic_details = BasicDetails.objects.filter(publish=False).order_by("-id")[:5]
         pending_property = []
         for element in basic_details:
             if element.property_types:
