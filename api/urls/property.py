@@ -28,6 +28,7 @@ from api.viewsets.property_viewset import (
     FreePropetyViewSet,
     PropertySearchViewSet,
     DashBoardPendingPropertyView,
+    BasicDetailRetrieveView,
 )
 
 router = routers.DefaultRouter()
@@ -68,4 +69,5 @@ urlpatterns = [
     path(
         "admin-dashboard/pending-property/", DashBoardPendingPropertyView.as_view()
     ),  # admin pending property
+    path("basic-details/property/<int:pk>/", BasicDetailRetrieveView.as_view()),
 ]

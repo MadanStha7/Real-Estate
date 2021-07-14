@@ -63,6 +63,7 @@ from api.serializers.property_serializer import (
     GallerySerializer,
     PropertyDiscussionSerializer,
     AssignPropertyRequestSerializer,
+    BasicDetailRetrieveSerializer,
 )
 from property.utils.paginations import CustomPagination
 from django.contrib.auth import get_user_model
@@ -487,3 +488,10 @@ class AssignPropertyRequestViewset(generics.CreateAPIView):
             description_assigned_to_employee
         )
         property_request_obj.save()
+
+
+class BasicDetailRetrieveView(generics.RetrieveAPIView):
+    """API to retrieve the single basic detail in client detail page"""
+
+    queryset = BasicDetails.objects.filter(publish=True)
+    serializer_class = BasicDetailRetrieveSerializer
