@@ -93,7 +93,7 @@ class ListedPropertyViewSet(viewsets.ModelViewSet):
 
 
 class PremiumPropetyViewSet(generics.ListAPIView):
-    serializer_class = BasicDetailsSerializer
+    serializer_class = BasicDetailRetrieveSerializer
 
     def get_queryset(self):
         premium_category = BasicDetails.objects.filter(listing_type="P").filter(
@@ -103,7 +103,7 @@ class PremiumPropetyViewSet(generics.ListAPIView):
 
 
 class FeaturedPropetyViewSet(generics.ListAPIView):
-    serializer_class = BasicDetailsSerializer
+    serializer_class = BasicDetailRetrieveSerializer
 
     def get_queryset(self):
         featured_category = BasicDetails.objects.filter(listing_type="Fe").filter(
@@ -113,7 +113,7 @@ class FeaturedPropetyViewSet(generics.ListAPIView):
 
 
 class FreePropetyViewSet(generics.ListAPIView):
-    serializer_class = BasicDetailsSerializer
+    serializer_class = BasicDetailRetrieveSerializer
 
     def get_queryset(self):
         free_category = BasicDetails.objects.filter(listing_type="Fr").filter(
