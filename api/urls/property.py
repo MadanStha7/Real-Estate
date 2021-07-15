@@ -62,7 +62,6 @@ router.register(r"reply", ReplyViewSet)
 router.register(r"property-search", PropertySearchViewSet)
 
 
-
 urlpatterns = [
     path("", include(router.urls)),
     path("assign-property/", AssignPropertyViewset.as_view()),
