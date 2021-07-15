@@ -557,6 +557,8 @@ class PropertyRequestSerializer(serializers.ModelSerializer):
         )
 
 
+
+
 class PropertyDiscussionSerializer(serializers.ModelSerializer):
     tags = serializers.ListField(child=serializers.CharField(), required=False)
     user_id = serializers.PrimaryKeyRelatedField(
@@ -594,78 +596,102 @@ class AssignPropertyRequestSerializer(serializers.ModelSerializer):
         )
 
 
-class FloorPlanSerializer(serializers.ModelSerializer):
+class ReplySerializer(serializers.ModelSerializer):
+    created_on = serializers.DateTimeField(read_only=True)
+    full_name = serializers.SerializerMethodField(read_only=True)
+    # reply_ = serializers.SerializerMethodField(read_only=True)
 
-    image = serializers.ListField(
-        child=serializers.FileField(max_length=100000), write_only=True
-    )
-    image_value = serializers.FileField(read_only=True, source="image")
+    def get_full_name(self, obj):
+        if obj:
+            user_obj = obj.reply_madeby
+            try:
+                user_details = user_obj.agent_detail.full_name
+                return user_details
+            except AgentDetail.DoesNotExist:
+                pass
+            try:
+                user_details = user_obj.buyer_seller_profile.full_name
+                return user_details
+            except UserProfile.DoesNotExist:
+                pass
 
-    class Meta:
+            try:
+                user_details = user_obj.staff_detail.full_name
+                return user_details
+            except StaffDetail.DoesNotExist:
+                pass
+            try:
+                user_details = user_obj.admin.full_name
+                return user_details
 
-        model = FloorPlan
-        fields = ["id", "basic_details", "image", "image_value"]
-
-    @transaction.atomic
-    def create(self, validated_data):
-        print("validated data")
-        image = validated_data.pop("image")
-        for img in image:
-            print("imageges", img)
-            floor_plan = FloorPlan.objects.create(image=img, **validated_data)
-        return floor_plan
-
-
-class BasicDetailRetrieveSerializer(serializers.ModelSerializer):
-    """serialzers for detail view of basic details in detailpage"""
-
-    membership_plan = serializers.CharField(source="get_membership_plan_display")
-    condition_type = serializers.CharField(source="get_condition_type_display")
-    listing_type = serializers.CharField(source="get_listing_type_display")
-    advertisement_type = serializers.CharField(source="get_advertisement_type_display")
-    city = CitySerializer(read_only=True)
-    property_categories = PropertyCategoriesSerializer(read_only=True)
-    property_types = PropertyTypeSerializer(read_only=True)
-    owner = UserSerializer(read_only=True)
-    rent_property = RentPropertyDetailsSerializer(many=True, read_only=True)
-    location = LocalityDetailsSerializer(read_only=True)
-    rental_details = RentalDetailsSerializer(many=True, read_only=True)
-    gallery = GallerySerializer(many=True, read_only=True)
-    sell_property_details = SellPropertyDetailsSerializer(many=True, read_only=True)
-    resale_details = ResaleDetailsSerializer(many=True, read_only=True)
-    amenities = AmenitiesSerializer(many=True, read_only=True)
-    floorplan = FloorPlanSerializer(many=True, read_only=True)
-    no_of_days = serializers.SerializerMethodField(read_only=True)
-
-    def get_no_of_days(self, obj):
-        today_date = datetime.now(timezone.utc)
-        posted_date = (today_date - obj.created_on).days
-        return posted_date
+            except AdminProfile.DoesNotExist:
+                pass
 
     class Meta:
-        model = BasicDetails
+        model = Reply
         fields = (
             "id",
+            "reply_madeby",
+            "reply_madeto",
+            "comment",
+            "reply",
             "created_on",
-            "views",
-            "listing_type",
-            "membership_plan",
-            "condition_type",
-            "due_date",
-            "description",  # display in about section
-            "no_of_days",
-            "city",
-            "property_categories",
-            "property_types",
-            "advertisement_type",
-            "views",
-            "location",
-            "rent_property",
-            "owner",
-            "rental_details",
-            "gallery",
-            "sell_property_details",
-            "resale_details",
-            "amenities",
-            "floorplan",
+            "full_name",
+        )
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source="user", write_only=True
+    )
+    discussion_board_id = serializers.PrimaryKeyRelatedField(
+        queryset=PropertyDiscussionBoard.objects.all(),
+        source="discussion_board",
+        write_only=True,
+    )
+    discussion_board = PropertyDiscussionSerializer(read_only=True)
+    user_details = serializers.SerializerMethodField(read_only=True)
+    reply = ReplySerializer(many=True, read_only=True)
+
+    created_on = serializers.DateTimeField(read_only=True)
+
+    def get_user_details(self, obj):
+        if obj:
+            user_obj = obj.user
+            try:
+                user_details = user_obj.agent_detail.full_name
+                return user_details
+            except AgentDetail.DoesNotExist:
+                pass
+            try:
+                user_details = user_obj.buyer_seller_profile.full_name
+                return user_details
+            except UserProfile.DoesNotExist:
+                pass
+
+            try:
+                user_details = user_obj.staff_detail.full_name
+                return user_details
+            except StaffDetail.DoesNotExist:
+                pass
+            try:
+                user_details = user_obj.admin.full_name
+                return user_details
+
+            except AdminProfile.DoesNotExist:
+                pass
+            # return
+
+    class Meta:
+        model = Comment
+        fields = (
+            "id",
+            "user_id",
+            "discussion_board_id",
+            "text",
+            "user",
+            "discussion_board",
+            "created_on",
+            "user_details",
+            "reply",
         )
