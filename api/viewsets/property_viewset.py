@@ -241,7 +241,10 @@ class BasicDetailsViewset(viewsets.ModelViewSet):
             try:
                 basic_details = BasicDetails.objects.get(id=property, publish=True)
                 similar_property = BasicDetails.objects.filter(
-                    advertisement_type=basic_details.advertisement_type, publish=True
+                    advertisement_type=basic_details.advertisement_type, publish=True,
+                    property_categories=basic_details.property_categories,
+                    property_types=basic_details.property_types,
+                    city=basic_details.city
                 ).order_by("-id")[:4]
                 serializer = BasicDetailRetrieveSerializer(similar_property, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
