@@ -535,7 +535,7 @@ class PropertyRequestSerializer(serializers.ModelSerializer):
     )
     urgent_value = serializers.CharField(source="get_urgent_display", read_only=True)
     staff_value = StaffDetailSerializer(read_only=True)
-    description_assigned_to_employee = serializers.CharField()
+    description_assigned_to_employee = serializers.CharField(required=False)
 
     class Meta:
         model = PropertyRequest
