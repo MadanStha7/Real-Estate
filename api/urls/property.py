@@ -56,7 +56,6 @@ router.register(r"property-filter", PropertyFilter)
 router.register(r"property-request", PropertyRequestViewSet)
 router.register(r"floor-plan", FloorPlanViewset)  # for both sale and rent
 
-
 urlpatterns = [
     path("", include(router.urls)),
     path("assign-property/", AssignPropertyViewset.as_view()),
