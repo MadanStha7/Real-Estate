@@ -66,6 +66,8 @@ from api.serializers.property_serializer import (
     AssignPropertyRequestSerializer,
     FloorPlanSerializer,
     BasicDetailRetrieveSerializer,
+    CommentSerializer,
+    ReplySerializer
 )
 from django.contrib.auth import get_user_model
 
@@ -154,21 +156,27 @@ class PropertyFilter(viewsets.ModelViewSet):
             return BasicDetails.objects.filter(publish=True)
 
 
-class PropertySearchViewSet(generics.ListAPIView):
+class PropertySearchViewSet(viewsets.ModelViewSet):
+    queryset = BasicDetails.objects.all()
     serializer_class = BasicDetailsSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ["city", "locality"]
-
+    filter_backends = [filters.SearchFilter,DjangoFilterBackend]
+    filterset_fields=["advertisement_type"]
+    search_fields = ["city", 'locality']
+    
     def get_queryset(self):
         verified_property = BasicDetails.objects.filter(publish=True)
         city = self.request.query_params.get("city", None)
         locality = self.request.query_params.get("locality", None)
+        # advertisement_type = self.request.query_params.get("advertisement_type", None)
         if city:
             queryset = verified_property.filter(city__name=city)
             return queryset
         if locality:
             queryset = verified_property.filter(location__locality__name=locality)
             return queryset
+        # if advertisement_type:
+        #     queryset = verified_property.filter(advertisement_type=advertisement_type)
+        #     return queryset
         else:
             return BasicDetails.objects.filter(publish=True)
 
@@ -512,23 +520,35 @@ class AssignPropertyRequestViewset(generics.CreateAPIView):
         property_request_obj.save()
 
 
-class FloorPlanViewset(viewsets.ModelViewSet):
-    """API for floorplan"""
+class CommentViewSet(viewsets.ModelViewSet):
+    """This view shows the comment on discussion board"""
 
-    queryset = FloorPlan.objects.all()
-    serializer_class = FloorPlanSerializer
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    @action(detail=True, methods=["GET"])
+    def total_discussion(self, request, pk=None):
+        """Total number of comments in a single property"""
+        property_obj = get_object_or_404(BasicDetails.objects.filter(id=pk))
+        if property_obj is not None:
+            try:
+                comment = Comment.objects.filter(
+                    discussion_board__property_type__id=property_obj.id
+                )
+                print("comment", comment)
+                serializer = self.get_serializer(comment, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            except Comment.DoesNotExist:
+                raise ValidationError({"error": "No data to display"})
+        else:
+            return Response({"data": "No data to display"}, status=status.HTTP_200_OK)
+
+        # property_obj = self.get_object()
 
 
-class BasicDetailRetrieveView(generics.RetrieveAPIView):
-    """API to retrieve the single basic detail in client detail page"""
+class ReplyViewSet(viewsets.ModelViewSet):
+    """This view shows the reply on comment"""
 
-    queryset = BasicDetails.objects.filter(publish=True)
-    serializer_class = BasicDetailRetrieveSerializer
-
-    def retrieve(self, request, *args, **kwargs):
-        """API to count the number of views in property"""
-        obj = self.get_object()
-        print("Obj", obj)
-        obj.views = obj.views + 1
-        obj.save(update_fields=("views",))
-        return super().retrieve(request, *args, **kwargs)
+    queryset = Reply.objects.all()
+    serializer_class = ReplySerializer

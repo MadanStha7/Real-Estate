@@ -30,6 +30,8 @@ from api.viewsets.property_viewset import (
     DashBoardPendingPropertyView,
     BasicDetailRetrieveView,
     FloorPlanViewset,
+    CommentViewSet,
+    ReplyViewSet
 )
 
 router = routers.DefaultRouter()
@@ -55,6 +57,10 @@ router.register(r"sell-amenities", AmenitiesViewSet)
 router.register(r"property-filter", PropertyFilter)
 router.register(r"property-request", PropertyRequestViewSet)
 router.register(r"floor-plan", FloorPlanViewset)  # for both sale and rent
+router.register(r"comment", CommentViewSet)
+router.register(r"reply", ReplyViewSet)
+router.register(r"property-search", PropertySearchViewSet)
+
 
 
 urlpatterns = [
@@ -62,14 +68,8 @@ urlpatterns = [
     path("assign-property/", AssignPropertyViewset.as_view()),
     path("assign-property-request/", AssignPropertyRequestViewset.as_view()),
     path("admin_dashboard/", DashBoardView.as_view(), name="admin_dashboard"),
-    path("property-free/", FreePropetyViewSet.as_view(), name="free_propety"),
-    path(
-        "property-featured/", FeaturedPropetyViewSet.as_view(), name="featured_propety"
-    ),
-    path("property-premium/", PremiumPropetyViewSet.as_view(), name="premium_propety"),
-    path("property-search/", PropertySearchViewSet.as_view(), name="search_propety"),
-    path(
-        "admin-dashboard/pending-property/", DashBoardPendingPropertyView.as_view()
-    ),  # admin pending property
-    path("basic-details/property/<int:pk>/", BasicDetailRetrieveView.as_view()),
+    path('property-free/', FreePropetyViewSet.as_view(), name="free_propety"),
+    path('property-featured/', FeaturedPropetyViewSet.as_view(), name="featured_propety"),
+    path('property-premium/', PremiumPropetyViewSet.as_view(), name="premium_propety"),
+    # path('property-search/', PropertySearchViewSet.as_view(), name="search_propety"),
 ]
