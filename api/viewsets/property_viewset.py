@@ -519,6 +519,27 @@ class AssignPropertyRequestViewset(generics.CreateAPIView):
         )
         property_request_obj.save()
 
+class FloorPlanViewset(viewsets.ModelViewSet):
+    """API for floorplan"""
+
+    queryset = FloorPlan.objects.all()
+    serializer_class = FloorPlanSerializer
+
+
+class BasicDetailRetrieveView(generics.RetrieveAPIView):
+    """API to retrieve the single basic detail in client detail page"""
+
+    queryset = BasicDetails.objects.filter(publish=True)
+    serializer_class = BasicDetailRetrieveSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        """API to count the number of views in property"""
+        obj = self.get_object()
+        print("Obj", obj)
+        obj.views = obj.views + 1
+        obj.save(update_fields=("views",))
+        return super().retrieve(request, *args, **kwargs)
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     """This view shows the comment on discussion board"""

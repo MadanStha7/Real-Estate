@@ -595,6 +595,82 @@ class AssignPropertyRequestSerializer(serializers.ModelSerializer):
             "due_date",
         )
 
+class FloorPlanSerializer(serializers.ModelSerializer):
+
+    image = serializers.ListField(
+        child=serializers.FileField(max_length=100000), write_only=True
+    )
+    image_value = serializers.FileField(read_only=True, source="image")
+    class Meta:
+        model = FloorPlan
+        fields = ["id", "basic_details", "image", "image_value"]
+
+    @transaction.atomic
+    def create(self, validated_data):
+        print("validated data")
+        image = validated_data.pop("image")
+        for img in image:
+            print("imageges", img)
+            floor_plan = FloorPlan.objects.create(image=img, **validated_data)
+        return floor_plan
+    
+
+class BasicDetailRetrieveSerializer(serializers.ModelSerializer):
+    """serialzers for detail view of basic details in detailpage"""
+
+    membership_plan = serializers.CharField(source="get_membership_plan_display")
+    condition_type = serializers.CharField(source="get_condition_type_display")
+    listing_type = serializers.CharField(source="get_listing_type_display")
+    advertisement_type = serializers.CharField(source="get_advertisement_type_display")
+    city = CitySerializer(read_only=True)
+    property_categories = PropertyCategoriesSerializer(read_only=True)
+    property_types = PropertyTypeSerializer(read_only=True)
+    owner = UserSerializer(read_only=True)
+    rent_property = RentPropertyDetailsSerializer(many=True, read_only=True)
+    location = LocalityDetailsSerializer(read_only=True)
+    rental_details = RentalDetailsSerializer(many=True, read_only=True)
+    gallery = GallerySerializer(many=True, read_only=True)
+    sell_property_details = SellPropertyDetailsSerializer(many=True, read_only=True)
+    resale_details = ResaleDetailsSerializer(many=True, read_only=True)
+    amenities = AmenitiesSerializer(many=True, read_only=True)
+    floorplan = FloorPlanSerializer(many=True, read_only=True)
+    no_of_days = serializers.SerializerMethodField(read_only=True)
+
+    def get_no_of_days(self, obj):
+        today_date = datetime.now(timezone.utc)
+        posted_date = (today_date - obj.created_on).days
+        return posted_date
+
+    class Meta:
+        model = BasicDetails
+        fields = (
+            "id",
+            "created_on",
+            "views",
+            "listing_type",
+            "membership_plan",
+            "condition_type",
+            "due_date",
+            "description",  # display in about section
+            "no_of_days",
+            "city",
+            "property_categories",
+            "property_types",
+            "advertisement_type",
+            "views",
+            "location",
+            "rent_property",
+            "owner",
+            "rental_details",
+            "gallery",
+            "sell_property_details",
+            "resale_details",
+            "amenities",
+            "floorplan",
+        )
+
+
+
 
 class ReplySerializer(serializers.ModelSerializer):
     created_on = serializers.DateTimeField(read_only=True)

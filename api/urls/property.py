@@ -71,5 +71,9 @@ urlpatterns = [
     path('property-free/', FreePropetyViewSet.as_view(), name="free_propety"),
     path('property-featured/', FeaturedPropetyViewSet.as_view(), name="featured_propety"),
     path('property-premium/', PremiumPropetyViewSet.as_view(), name="premium_propety"),
-    # path('property-search/', PropertySearchViewSet.as_view(), name="search_propety"),
+    path(
+        "admin-dashboard/pending-property/", DashBoardPendingPropertyView.as_view()
+    ),  # admin pending property
+    path("basic-details/property/<int:pk>/", BasicDetailRetrieveView.as_view()),
+
 ]
