@@ -661,7 +661,7 @@ class PropertyRequest(CommonInfo):
     request_type = models.CharField(max_length=1, choices=REQUEST_TYPE_CHOICES)
     property_type = models.CharField(max_length=1, choices=PROPERTY_TYPE_CHOICES)
     urgent = models.CharField(max_length=1, choices=URGENT_CHOICES)
-    place = models.TextField()
+    place = models.TextField()  # not imp
     price_range = models.TextField()
     size = models.DecimalField(default=0.00, decimal_places=4, max_digits=10)
     due_date = models.DateField(null=True, blank=True)
