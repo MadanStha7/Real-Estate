@@ -67,7 +67,7 @@ from api.serializers.property_serializer import (
     FloorPlanSerializer,
     BasicDetailRetrieveSerializer,
     CommentSerializer,
-    ReplySerializer
+    ReplySerializer,
 )
 from django.contrib.auth import get_user_model
 
@@ -158,11 +158,11 @@ class PropertyFilter(viewsets.ModelViewSet):
 
 class PropertySearchViewSet(viewsets.ModelViewSet):
     queryset = BasicDetails.objects.all()
-    serializer_class = BasicDetailsSerializer
-    filter_backends = [filters.SearchFilter,DjangoFilterBackend]
-    filterset_fields=["advertisement_type"]
-    search_fields = ["city", 'locality']
-    
+    serializer_class = BasicDetailRetrieveSerializer
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    filterset_fields = ["advertisement_type"]
+    search_fields = ["city", "locality"]
+
     def get_queryset(self):
         verified_property = BasicDetails.objects.filter(publish=True)
         city = self.request.query_params.get("city", None)
@@ -249,10 +249,11 @@ class BasicDetailsViewset(viewsets.ModelViewSet):
             try:
                 basic_details = BasicDetails.objects.get(id=property, publish=True)
                 similar_property = BasicDetails.objects.filter(
-                    advertisement_type=basic_details.advertisement_type, publish=True,
+                    advertisement_type=basic_details.advertisement_type,
+                    publish=True,
                     property_categories=basic_details.property_categories,
                     property_types=basic_details.property_types,
-                    city=basic_details.city
+                    city=basic_details.city,
                 ).order_by("-id")[:4]
                 serializer = BasicDetailRetrieveSerializer(similar_property, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -518,6 +519,7 @@ class AssignPropertyRequestViewset(generics.CreateAPIView):
             description_assigned_to_employee
         )
         property_request_obj.save()
+
 
 class FloorPlanViewset(viewsets.ModelViewSet):
     """API for floorplan"""
