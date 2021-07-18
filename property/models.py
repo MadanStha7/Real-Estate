@@ -486,6 +486,7 @@ class Amenities(CommonInfo):
     water_supply = models.BooleanField(default=False)  # 24 hours hot water
     swimming_pool = models.BooleanField(default=False)
     security = models.BooleanField(default=False)
+    lift = models.BooleanField(default=False)
     gym = models.BooleanField(default=False)
     hot_water = models.BooleanField(default=False)
     cctv = models.BooleanField(default=False)
