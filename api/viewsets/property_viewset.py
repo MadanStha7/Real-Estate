@@ -130,13 +130,12 @@ class PropertyFilter(viewsets.ModelViewSet):
     """
 
     queryset = BasicDetails.objects.none()
-    serializer_class = BasicDetailsSerializer
+    serializer_class = BasicDetailRetrieveSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ["property_categories", "property_types", "city"]
 
     def get_queryset(self):
         verified_property = BasicDetails.objects.filter(publish=True)
-        print("verified_property", verified_property)
         property_categories = self.request.query_params.get("property_categories", None)
         property_type = self.request.query_params.get("property_types", None)
         city = self.request.query_params.get("city", None)

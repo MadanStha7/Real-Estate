@@ -299,20 +299,6 @@ class GallerySerializer(serializers.ModelSerializer):
         return gallery
 
 
-class OwnerSerializer(serializers.Serializer):
-    """Serialzers to display a owner details"""
-
-    class Meta:
-        model = UserProfile
-        fields = (
-            "id",
-            "full_name",
-            "user",
-            "phone_number",
-            "address",
-            "profile_picture",
-        )
-
 
 class AssignPropertySerializer(serializers.ModelSerializer):
     staff = serializers.PrimaryKeyRelatedField(
@@ -570,21 +556,21 @@ class BasicDetailRetrieveSerializer(serializers.ModelSerializer):
     city = CitySerializer(read_only=True)
     property_categories = PropertyCategoriesSerializer(read_only=True)
     property_types = PropertyTypeSerializer(read_only=True)
-    owner = UserSerializer(read_only=True)
+    posted_by = UserSerializer(read_only=True)
     rent_property = RentPropertyDetailsSerializer(many=True, read_only=True)
     location = LocalityDetailsSerializer(read_only=True)
     rental_details = RentalDetailsSerializer(many=True, read_only=True)
     gallery = GallerySerializer(many=True, read_only=True)
     sell_property_details = SellPropertyDetailsSerializer(many=True, read_only=True)
     resale_details = ResaleDetailsSerializer(many=True, read_only=True)
-    amenities = AmenitiesSerializer(many=True, read_only=True)
+    amenities = AmenitiesSerializer(read_only=True)
     floorplan = FloorPlanSerializer(many=True, read_only=True)
     no_of_days = serializers.SerializerMethodField(read_only=True)
     full_name = serializers.SerializerMethodField(read_only=True)
 
     def get_full_name(self, obj):
         try:
-            full_name = UserProfile.objects.get(user=obj.owner).full_name
+            full_name = UserProfile.objects.get(user=obj.posted_by).full_name
             return full_name
         except UserProfile.DoesNotExist:
             full_name = None
@@ -614,7 +600,7 @@ class BasicDetailRetrieveSerializer(serializers.ModelSerializer):
             "views",
             "location",
             "rent_property",
-            "owner",
+            "posted_by",
             "rental_details",
             "gallery",
             "sell_property_details",
