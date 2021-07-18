@@ -60,7 +60,7 @@ class PropertyTypes(CommonInfo):
 
 
 class Locality(CommonInfo):
-    """model to locality details of property"""
+    """model to store locality  of property"""
 
     name = models.CharField(max_length=200)
 
@@ -120,35 +120,27 @@ class BasicDetails(CommonInfo):
     advertisement_type = models.CharField(
         max_length=2, choices=ADVERTISEMENT_TYPE_CHOICES, default=""
     )
-    owner = models.ForeignKey(
+    posted_by = models.ForeignKey(
         User,
-        related_name="userprofile",
+        related_name="basic_detail_postedby",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
     )
     agent = models.ForeignKey(
         User,
-        related_name="agentdetail",
+        related_name="basic_detail_agent",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
     )
     staff = models.ForeignKey(
         User,
-        related_name="staffdetail",
+        related_name="basic_detail_staff",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
     )
-    admin = models.ForeignKey(
-        User,
-        related_name="admin_profile",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
-
     publish = models.BooleanField(default=False)
     views = models.PositiveIntegerField(default=0)
     listing_type = models.CharField(
@@ -200,6 +192,23 @@ class RentPropertyDetails(CommonInfo):
         ("SW", "South-West"),
         ("D", "Don't Know"),
     )
+    AGE_CHOICES = (
+        ("U", "Under Construction"),
+        ("L", "Less than a year"),
+        ("1", "1 to 3 year"),
+        ("3", "3 to 5 year"),
+        ("5", "5 to 10 year"),
+        ("M", "More than 10 year"),
+    )
+
+    PROPERTY_SIZE_CHOICES = (
+        ("Sf", "Sq Feet"),
+        ("sm", "Sq Meter"),
+        ("A", "Aana"),
+        ("R", "Ropani"),
+        ("K", "Kattha"),
+    )
+
     basic_details = models.ForeignKey(
         BasicDetails,
         on_delete=models.CASCADE,
@@ -210,11 +219,18 @@ class RentPropertyDetails(CommonInfo):
     )  # bedroom hall kitchen
     floor_number = models.CharField(max_length=40)
     total_floors = models.CharField(max_length=40)
-    property_age = models.CharField(max_length=40)  # property age
+    property_age = models.CharField(
+        max_length=1, choices=AGE_CHOICES, default="U"
+    )  # property age
     facing_direction = models.CharField(
         max_length=2, choices=FACING_CHOICES, default="E"
     )
-    property_size = models.FloatField(default=0.00)  # size in sq.m
+    property_size = models.DecimalField(
+        default=0.00,
+        decimal_places=2,
+        max_digits=10,
+    )
+    property_size_choice = models.CharField(max_length=2, choices=PROPERTY_SIZE_CHOICES)
 
     def __str__(self):
         return f"property information of rent property with id {self.id}"
@@ -373,7 +389,13 @@ class SellPropertyDetails(CommonInfo):
         ("SW", "South-West"),
         ("D", "Don't Know"),
     )
-    PROPERTY_SIZE_CHOICES = (("R", "Ropani"), ("A", "Aana"), ("S", "Square Feet"))
+    PROPERTY_SIZE_CHOICES = (
+        ("Sf", "Sq Feet"),
+        ("sm", "Sq Meter"),
+        ("A", "Aana"),
+        ("R", "Ropani"),
+        ("K", "Kattha"),
+    )
     basic_details = models.ForeignKey(
         BasicDetails,
         on_delete=models.CASCADE,
@@ -383,7 +405,7 @@ class SellPropertyDetails(CommonInfo):
         max_length=20, choices=BHK_CHOICES, default="F"
     )  # bedroom hall kitchen
     total_floors = models.CharField(max_length=50)
-    property_age = models.CharField(max_length=40)  # property age
+    property_age = models.CharField(max_length=2, choices=AGE_CHOICES)
     built_up_area = models.DecimalField(
         default=0.00,
         decimal_places=2,
@@ -394,6 +416,7 @@ class SellPropertyDetails(CommonInfo):
         decimal_places=2,
         max_digits=10,
     )
+    property_size_choice = models.CharField(max_length=2, choices=PROPERTY_SIZE_CHOICES)
     facing_direction = models.CharField(max_length=2, choices=FACING_CHOICES)
 
     def __str__(self):
@@ -456,7 +479,7 @@ class Amenities(CommonInfo):
     Amenities details of advertisement type sale .
     """
 
-    basic_details = models.ForeignKey(
+    basic_details = models.OneToOneField(
         BasicDetails, on_delete=models.CASCADE, related_name="amenities"
     )
     total_no_bathrooms = models.IntegerField(default=0)
@@ -464,7 +487,16 @@ class Amenities(CommonInfo):
     swimming_pool = models.BooleanField(default=False)
     security = models.BooleanField(default=False)
     gym = models.BooleanField(default=False)
-    lift = models.BooleanField(default=False)
+    hot_water = models.BooleanField(default=False)
+    cctv = models.BooleanField(default=False)
+    fire_safety = models.BooleanField(default=False)
+    car_parking = models.BooleanField(default=False)
+    play_area = models.BooleanField(default=False)
+    water_purifier = models.BooleanField(default=False)
+    backup_electricity = models.BooleanField(default=False)
+    gated_community = models.BooleanField(default=False)
+    earthquake_resistant = models.BooleanField(default=False)
+    maintenance_staff = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "Amenities"
