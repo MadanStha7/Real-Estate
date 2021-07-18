@@ -479,7 +479,7 @@ class Amenities(CommonInfo):
     Amenities details of advertisement type sale .
     """
 
-    basic_details = models.OneToOneField(
+    basic_details = models.ForeignKey(
         BasicDetails, on_delete=models.CASCADE, related_name="amenities"
     )
     total_no_bathrooms = models.IntegerField(default=0)
