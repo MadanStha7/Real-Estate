@@ -420,8 +420,18 @@ class AmenitiesSerializer(serializers.ModelSerializer):
             "water_supply",
             "swimming_pool",
             "security",
-            "gym",
             "lift",
+            "gym",
+            "hot_water",
+            "cctv",
+            "fire_safety",
+            "car_parking",
+            "play_area",
+            "water_purifier",
+            "backup_electricity",
+            "gated_community",
+            "earthquake_resistant",
+            "maintenance_staff",
         )
 
 
