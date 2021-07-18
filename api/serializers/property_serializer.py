@@ -299,7 +299,6 @@ class GallerySerializer(serializers.ModelSerializer):
         return gallery
 
 
-
 class AssignPropertySerializer(serializers.ModelSerializer):
     staff = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
@@ -563,7 +562,7 @@ class BasicDetailRetrieveSerializer(serializers.ModelSerializer):
     gallery = GallerySerializer(many=True, read_only=True)
     sell_property_details = SellPropertyDetailsSerializer(many=True, read_only=True)
     resale_details = ResaleDetailsSerializer(many=True, read_only=True)
-    amenities = AmenitiesSerializer(read_only=True)
+    amenities = AmenitiesSerializer(many=True, read_only=True)
     floorplan = FloorPlanSerializer(many=True, read_only=True)
     no_of_days = serializers.SerializerMethodField(read_only=True)
     full_name = serializers.SerializerMethodField(read_only=True)
