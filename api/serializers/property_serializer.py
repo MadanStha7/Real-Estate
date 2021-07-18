@@ -306,85 +306,6 @@ class OwnerSerializer(serializers.Serializer):
         )
 
 
-class PendingPropertySerializer(serializers.ModelSerializer):
-    """
-    serialzer for all pending property display
-    """
-
-    city_value = CitySerializer(read_only=True, source="city")
-    property_categories_value = PropertyCategoriesSerializer(
-        read_only=True, source="property_categories"
-    )
-    property_types_value = PropertyTypeSerializer(
-        read_only=True, source="property_types"
-    )
-    advertisement_type_value = serializers.CharField(
-        source="get_advertisement_type_display", read_only=True
-    )
-    listing_type_value = serializers.CharField(
-        source="get_listing_type_display", read_only=True
-    )
-    membership_plan_value = serializers.CharField(
-        source="get_membership_plan_display", read_only=True
-    )
-    condition_type_value = serializers.CharField(
-        source="get_condition_type_display", read_only=True
-    )
-    owner = UserSerializer(read_only=True)
-    rent_property = RentPropertyDetailsSerializer(many=True, read_only=True)
-    location = LocalityDetailsSerializer(read_only=True)
-    full_name = serializers.SerializerMethodField(read_only=True)
-    phone_number = serializers.SerializerMethodField(read_only=True)
-
-    def get_full_name(self, obj):
-        try:
-            full_name = UserProfile.objects.get(user=obj.owner).full_name
-            return full_name
-        except UserProfile.DoesNotExist:
-            full_name = None
-        return full_name
-
-    def get_phone_number(self, obj):
-        try:
-            phone_number = UserProfile.objects.get(user=obj.owner).phone_number
-            return phone_number
-        except UserProfile.DoesNotExist:
-            phone_number = None
-        return phone_number
-
-    class Meta:
-        # list_serializer_class = FilteredListSerializer
-        model = BasicDetails
-        fields = (
-            "id",
-            "advertisement_type",
-            "city",
-            "city_value",
-            "location",
-            "property_categories",
-            "property_categories_value",
-            "property_types_value",
-            "property_types",
-            "advertisement_type",
-            "advertisement_type_value",
-            "owner",
-            "agent",
-            "staff",
-            "admin",
-            "publish",
-            "views",
-            "listing_type",
-            "membership_plan",
-            "condition_type",
-            "listing_type_value",
-            "membership_plan_value",
-            "condition_type_value",
-            "rent_property",
-            "full_name",
-            "phone_number",
-        )
-
-
 class AssignPropertySerializer(serializers.ModelSerializer):
     staff = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
@@ -557,8 +478,6 @@ class PropertyRequestSerializer(serializers.ModelSerializer):
         )
 
 
-
-
 class PropertyDiscussionSerializer(serializers.ModelSerializer):
     tags = serializers.ListField(child=serializers.CharField(), required=False)
     user_id = serializers.PrimaryKeyRelatedField(
@@ -595,12 +514,14 @@ class AssignPropertyRequestSerializer(serializers.ModelSerializer):
             "due_date",
         )
 
+
 class FloorPlanSerializer(serializers.ModelSerializer):
 
     image = serializers.ListField(
         child=serializers.FileField(max_length=100000), write_only=True
     )
     image_value = serializers.FileField(read_only=True, source="image")
+
     class Meta:
         model = FloorPlan
         fields = ["id", "basic_details", "image", "image_value"]
@@ -613,7 +534,7 @@ class FloorPlanSerializer(serializers.ModelSerializer):
             print("imageges", img)
             floor_plan = FloorPlan.objects.create(image=img, **validated_data)
         return floor_plan
-    
+
 
 class BasicDetailRetrieveSerializer(serializers.ModelSerializer):
     """serialzers for detail view of basic details in detailpage"""
@@ -635,6 +556,15 @@ class BasicDetailRetrieveSerializer(serializers.ModelSerializer):
     amenities = AmenitiesSerializer(many=True, read_only=True)
     floorplan = FloorPlanSerializer(many=True, read_only=True)
     no_of_days = serializers.SerializerMethodField(read_only=True)
+    full_name = serializers.SerializerMethodField(read_only=True)
+
+    def get_full_name(self, obj):
+        try:
+            full_name = UserProfile.objects.get(user=obj.owner).full_name
+            return full_name
+        except UserProfile.DoesNotExist:
+            full_name = None
+        return full_name
 
     def get_no_of_days(self, obj):
         today_date = datetime.now(timezone.utc)
@@ -667,9 +597,8 @@ class BasicDetailRetrieveSerializer(serializers.ModelSerializer):
             "resale_details",
             "amenities",
             "floorplan",
+            "full_name",
         )
-
-
 
 
 class ReplySerializer(serializers.ModelSerializer):
@@ -770,4 +699,98 @@ class CommentSerializer(serializers.ModelSerializer):
             "created_on",
             "user_details",
             "reply",
+        )
+
+
+class PendingPropertySerializer(serializers.ModelSerializer):
+    """
+    serialzer for all pending property display
+    """
+
+    city_value = CitySerializer(read_only=True, source="city")
+    property_categories_value = PropertyCategoriesSerializer(
+        read_only=True, source="property_categories"
+    )
+    property_types_value = PropertyTypeSerializer(
+        read_only=True, source="property_types"
+    )
+    advertisement_type_value = serializers.CharField(
+        source="get_advertisement_type_display", read_only=True
+    )
+    listing_type_value = serializers.CharField(
+        source="get_listing_type_display", read_only=True
+    )
+    membership_plan_value = serializers.CharField(
+        source="get_membership_plan_display", read_only=True
+    )
+    condition_type_value = serializers.CharField(
+        source="get_condition_type_display", read_only=True
+    )
+    owner = UserSerializer(read_only=True)
+    rent_property = RentPropertyDetailsSerializer(many=True, read_only=True)
+    location = LocalityDetailsSerializer(read_only=True)
+    rent_property = RentPropertyDetailsSerializer(many=True, read_only=True)
+    location = LocalityDetailsSerializer(read_only=True)
+    rental_details = RentalDetailsSerializer(many=True, read_only=True)
+    gallery = GallerySerializer(many=True, read_only=True)
+    sell_property_details = SellPropertyDetailsSerializer(many=True, read_only=True)
+    resale_details = ResaleDetailsSerializer(many=True, read_only=True)
+    amenities = AmenitiesSerializer(many=True, read_only=True)
+    floorplan = FloorPlanSerializer(many=True, read_only=True)
+
+    full_name = serializers.SerializerMethodField(read_only=True)
+    phone_number = serializers.SerializerMethodField(read_only=True)
+
+    def get_full_name(self, obj):
+        try:
+            full_name = UserProfile.objects.get(user=obj.owner).full_name
+            return full_name
+        except UserProfile.DoesNotExist:
+            full_name = None
+        return full_name
+
+    def get_phone_number(self, obj):
+        try:
+            phone_number = UserProfile.objects.get(user=obj.owner).phone_number
+            return phone_number
+        except UserProfile.DoesNotExist:
+            phone_number = None
+        return phone_number
+
+    class Meta:
+        # list_serializer_class = FilteredListSerializer
+        model = BasicDetails
+        fields = (
+            "id",
+            "advertisement_type",
+            "city",
+            "city_value",
+            "location",
+            "property_categories",
+            "property_categories_value",
+            "property_types_value",
+            "property_types",
+            "advertisement_type",
+            "advertisement_type_value",
+            "owner",
+            "agent",
+            "staff",
+            "admin",
+            "publish",
+            "views",
+            "listing_type",
+            "membership_plan",
+            "condition_type",
+            "listing_type_value",
+            "membership_plan_value",
+            "condition_type_value",
+            "rent_property",
+            "full_name",
+            "phone_number",
+            "rental_details",
+            "gallery",
+            "sell_property_details",
+            "resale_details",
+            "amenities",
+            "floorplan",
         )
