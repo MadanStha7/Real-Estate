@@ -750,7 +750,7 @@ class PendingPropertySerializer(serializers.ModelSerializer):
     condition_type_value = serializers.CharField(
         source="get_condition_type_display", read_only=True
     )
-    owner = UserSerializer(read_only=True)
+    posted_by = UserSerializer(read_only=True)
     rent_property = RentPropertyDetailsSerializer(many=True, read_only=True)
     location = LocalityDetailsSerializer(read_only=True)
     location = LocalityDetailsSerializer(read_only=True)
@@ -766,7 +766,7 @@ class PendingPropertySerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj):
         try:
-            full_name = UserProfile.objects.get(user=obj.owner).full_name
+            full_name = UserProfile.objects.get(user=obj.posted_by).full_name
             return full_name
         except UserProfile.DoesNotExist:
             full_name = None
@@ -774,7 +774,7 @@ class PendingPropertySerializer(serializers.ModelSerializer):
 
     def get_phone_number(self, obj):
         try:
-            phone_number = UserProfile.objects.get(user=obj.owner).phone_number
+            phone_number = UserProfile.objects.get(user=obj.posted_by).phone_number
             return phone_number
         except UserProfile.DoesNotExist:
             phone_number = None
@@ -795,10 +795,9 @@ class PendingPropertySerializer(serializers.ModelSerializer):
             "property_types",
             "advertisement_type",
             "advertisement_type_value",
-            "owner",
+            "posted_by",
             "agent",
             "staff",
-            "admin",
             "publish",
             "views",
             "listing_type",
