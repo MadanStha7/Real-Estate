@@ -198,10 +198,9 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
             "property_types_value",
             "advertisement_type",
             "advertisement_type_value",
-            "owner",
+            "posted_by",
             "agent",
             "staff",
-            "admin",
             "publish",
             "views",
             "listing_type",
@@ -222,6 +221,12 @@ class RentPropertyDetailsSerializer(serializers.ModelSerializer):
     facing_direction_value = serializers.CharField(
         source="get_facing_direction_display", read_only=True
     )
+    property_size_choice_value = serializers.CharField(
+        source="get_property_size_choice_display", read_only=True
+    )
+    property_age_value = serializers.CharField(
+        source="get_property_property_age_display", read_only=True
+    )
 
     class Meta:
         model = RentPropertyDetails
@@ -234,8 +239,11 @@ class RentPropertyDetailsSerializer(serializers.ModelSerializer):
             "property_age",
             "facing_direction",
             "property_size",
+            "property_size_choice",
+            "property_size_choice_value",
             "bhk_type_value",
             "facing_direction_value",
+            "property_age_value",
         )
 
 
@@ -328,11 +336,15 @@ class SellPropertyDetailsSerializer(serializers.ModelSerializer):
     total_floors_value = serializers.CharField(
         source="get_total_floors_display", read_only=True
     )
+    facing_direction_value = serializers.CharField(
+        source="get_facing_direction_display", read_only=True
+    )
+
     property_age_value = serializers.CharField(
         source="get_property_age_display", read_only=True
     )
-    facing_direction_value = serializers.CharField(
-        source="get_facing_direction_display", read_only=True
+    property_size_choice_value = serializers.CharField(
+        source="get_property_size_choice_display", read_only=True
     )
 
     basic_details_value = BasicDetailsSerializer(read_only=True)
@@ -353,6 +365,8 @@ class SellPropertyDetailsSerializer(serializers.ModelSerializer):
             "property_size",
             "facing_direction",
             "facing_direction_value",
+            "property_size_choice",
+            "property_size_choice_value",
         )
 
 
@@ -729,7 +743,6 @@ class PendingPropertySerializer(serializers.ModelSerializer):
     owner = UserSerializer(read_only=True)
     rent_property = RentPropertyDetailsSerializer(many=True, read_only=True)
     location = LocalityDetailsSerializer(read_only=True)
-    rent_property = RentPropertyDetailsSerializer(many=True, read_only=True)
     location = LocalityDetailsSerializer(read_only=True)
     rental_details = RentalDetailsSerializer(many=True, read_only=True)
     gallery = GallerySerializer(many=True, read_only=True)
