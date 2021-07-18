@@ -219,9 +219,12 @@ class OtpVerify(APIView):
             data = serializer.validated_data
             otp = data.get("otp_code")
             u_id = data.get("user_id")
+            print("otp", otp)
+            print("u_id", u_id)
+
             try:
                 # get the user id
-                user_profile = UserProfile.objects.get(user_id=u_id)
+                user_profile = UserProfile.objects.get(id=u_id)
                 old_otp = user_profile.otp_code
                 if otp != old_otp:
                     return Response(
