@@ -36,13 +36,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
 
-    def perform_create(self, serializer):
-        serializer = UserProfileSerializer(data=self.request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"True"}, status=status.HTTP_201_CREATED)
-        return Response("serializer errors", status=status.HTTP_400_BAD_REQUEST)
-
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
