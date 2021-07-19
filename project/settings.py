@@ -69,8 +69,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "project.urls"
 
-if DEBUG is True:
-    print("debug", DEBUG)
+if INTERNAL_IPS:
     DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda _request: DEBUG}
 
 
