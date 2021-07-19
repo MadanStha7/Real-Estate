@@ -11,7 +11,7 @@ User = get_user_model()
 class City(CommonInfo):
     """model to store name of city"""
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
@@ -28,7 +28,7 @@ class City(CommonInfo):
 class PropertyCategories(CommonInfo):
     """model to store category of property"""
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return f"property category of {self.name}, {self.id}"
@@ -45,7 +45,7 @@ class PropertyCategories(CommonInfo):
 class PropertyTypes(CommonInfo):
     """model to store type of property"""
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return f"property types of {self.name}, {self.id}"
