@@ -493,6 +493,7 @@ class PropertyDiscussionSerializer(serializers.ModelSerializer):
         queryset=User.objects.all(), source="user", write_only=True
     )
     user = PropertyUserSerializer(read_only=True)
+    discussion_value = serializers.CharField(source="get_discussion_display")
 
     class Meta:
         model = PropertyDiscussionBoard
@@ -505,6 +506,7 @@ class PropertyDiscussionSerializer(serializers.ModelSerializer):
             "basic_details",
             "user",
             "user_id",
+            "discussion_value",
         )
 
 
