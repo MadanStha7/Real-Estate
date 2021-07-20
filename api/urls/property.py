@@ -31,7 +31,9 @@ from api.viewsets.property_viewset import (
     BasicDetailRetrieveView,
     FloorPlanViewset,
     CommentViewSet,
-    ReplyViewSet
+    ReplyViewSet,
+    NameSuggestions,
+    LocalityFilter,
 )
 
 router = routers.DefaultRouter()
@@ -67,12 +69,15 @@ urlpatterns = [
     path("assign-property/", AssignPropertyViewset.as_view()),
     path("assign-property-request/", AssignPropertyRequestViewset.as_view()),
     path("admin_dashboard/", DashBoardView.as_view(), name="admin_dashboard"),
-    path('property-free/', FreePropetyViewSet.as_view(), name="free_propety"),
-    path('property-featured/', FeaturedPropetyViewSet.as_view(), name="featured_propety"),
-    path('property-premium/', PremiumPropetyViewSet.as_view(), name="premium_propety"),
+    path("property-free/", FreePropetyViewSet.as_view(), name="free_propety"),
+    path(
+        "property-featured/", FeaturedPropetyViewSet.as_view(), name="featured_propety"
+    ),
+    path("property-premium/", PremiumPropetyViewSet.as_view(), name="premium_propety"),
     path(
         "admin-dashboard/pending-property/", DashBoardPendingPropertyView.as_view()
     ),  # admin pending property
     path("basic-details/property/<int:pk>/", BasicDetailRetrieveView.as_view()),
-
+    path("namesuggestion/", NameSuggestions.as_view()),
+    path("locality-filter/", LocalityFilter.as_view()),
 ]
