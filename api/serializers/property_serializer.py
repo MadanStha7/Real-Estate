@@ -101,11 +101,14 @@ class PropertyTypeSerializer(serializers.ModelSerializer):
 class LocalitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Locality
-        fields = ("id", "name")
+        fields = ("id", "city", "name")
 
     def validate_name(self, name):
-        if Locality.objects.filter(name=name.lower()).exists():
-            raise serializers.ValidationError("Locality with this name already exists!")
+        if not self.instance:
+            if Locality.objects.filter(name=name.lower()).exists():
+                raise serializers.ValidationError(
+                    "Locality with this name already exists!"
+                )
         return name
 
 
@@ -131,7 +134,10 @@ class LocalityDetailsSerializer(serializers.ModelSerializer):
         # locality_ = validated_data.get("locality_", None)
         if locality is not None:
             locality_data = validated_data.pop("locality")
-            locality = Locality.objects.create(name=locality_data["name"])
+            basic_details_obj = validated_data.get("basic_details")
+            locality = Locality.objects.create(
+                name=locality_data["name"], city=basic_details_obj.city
+            )
             locality_details = LocalityDetails.objects.create(
                 locality=locality, **validated_data
             )
@@ -493,7 +499,9 @@ class PropertyDiscussionSerializer(serializers.ModelSerializer):
         queryset=User.objects.all(), source="user", write_only=True
     )
     user = PropertyUserSerializer(read_only=True)
-    discussion_value = serializers.CharField(source="get_discussion_display")
+    discussion_value = serializers.CharField(
+        source="get_discussion_display", read_only=True
+    )
 
     class Meta:
         model = PropertyDiscussionBoard
