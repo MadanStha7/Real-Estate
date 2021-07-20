@@ -1,7 +1,6 @@
 from django.db.models.query import QuerySet
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth.models import Group
 from property.models import (
     City,
     PropertyCategories,
@@ -203,7 +202,6 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
             return full_name
         else:
             pass
-        
 
     def get_phone(self, obj):
         group_admin = Group.objects.get(name="Admin").user_set.all()
@@ -216,7 +214,6 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
             return phone
         else:
             pass
-      
 
     class Meta:
         model = BasicDetails
@@ -247,7 +244,7 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
             "membership_plan_value",
             "condition_type_value",
             "full_name",
-            "phone"
+            "phone",
         )
 
 
@@ -791,7 +788,7 @@ class PendingPropertySerializer(serializers.ModelSerializer):
     amenities = AmenitiesSerializer(many=True, read_only=True)
     floorplan = FloorPlanSerializer(many=True, read_only=True)
 
-    full_name = serializers.SerializerMethodField(read_only=True)   
+    full_name = serializers.SerializerMethodField(read_only=True)
     phone = serializers.SerializerMethodField(read_only=True)
 
     def get_full_name(self, obj):
@@ -805,7 +802,6 @@ class PendingPropertySerializer(serializers.ModelSerializer):
             return full_name
         else:
             pass
-        
 
     def get_phone(self, obj):
         group_admin = Group.objects.get(name="Admin").user_set.all()
@@ -818,7 +814,6 @@ class PendingPropertySerializer(serializers.ModelSerializer):
             return phone
         else:
             pass
-      
 
     class Meta:
         # list_serializer_class = FilteredListSerializer
@@ -856,3 +851,7 @@ class PendingPropertySerializer(serializers.ModelSerializer):
             "full_name",
             "phone",
         )
+
+
+class SuggestionSerializer(serializers.ModelSerializer):
+    category = serializers.StringRelatedField()
