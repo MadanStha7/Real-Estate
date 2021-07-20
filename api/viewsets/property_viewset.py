@@ -14,7 +14,6 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from user.models import AgentDetail, UserProfile, AdminProfile
-from django.contrib.auth.models import Group
 from api.permissions.user_permission import (
     UserIsAuthenticated,
     UserIsAdmin,
@@ -136,6 +135,7 @@ class PropertyFilter(viewsets.ModelViewSet):
 
     def get_queryset(self):
         verified_property = BasicDetails.objects.filter(publish=True)
+        print("verified_property", verified_property)
         property_categories = self.request.query_params.get("property_categories", None)
         property_type = self.request.query_params.get("property_types", None)
         city = self.request.query_params.get("city", None)
@@ -218,6 +218,23 @@ class BasicDetailsViewset(viewsets.ModelViewSet):
     queryset = BasicDetails.objects.all()
     serializer_class = BasicDetailsSerializer
     pagination_class = None
+
+    def perform_create(self, serializer):
+        serializer.save(posted_by=self.request.user)
+
+    # def perform_create(self, serializer):
+    #     get_group = self.request.user.groups.all()
+
+    #     for group in get_group:
+    #         if group.name == "BuyerOrSeller":
+    #             users = self.request.user
+    #             posted_by= users.buyer_seller_profile.full_name
+    #         elif group.name == "Admin":
+    #             admin = self.request.user
+    #             owner = None
+    #         else:
+    #             pass
+    #     serializer.save(posted_by= posted_by)
 
     def get_permissions(self):
         if self.action in ["create", "partial_update", "destroy", "approve_property"]:
