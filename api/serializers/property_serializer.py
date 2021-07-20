@@ -156,7 +156,7 @@ class LocalityDetailsSerializer(serializers.ModelSerializer):
         locality = instance.locality
         locality.name = locality_validated_data.get("name", locality.name)
         locality.save()
-        instance.street = validated_data.get('street', instance.street)
+        instance.street = validated_data.get("street", instance.street)
         instance.save()
         return instance
 
@@ -798,32 +798,32 @@ class PendingPropertySerializer(serializers.ModelSerializer):
     amenities = AmenitiesSerializer(many=True, read_only=True)
     floorplan = FloorPlanSerializer(many=True, read_only=True)
 
-    full_name = serializers.SerializerMethodField(read_only=True)
-    phone = serializers.SerializerMethodField(read_only=True)
+    # full_name = serializers.SerializerMethodField(read_only=True)
+    # phone = serializers.SerializerMethodField(read_only=True)
 
-    def get_full_name(self, obj):
-        group_admin = Group.objects.get(name="Admin").user_set.all()
-        group_user = Group.objects.get(name="BuyerOrSeller").user_set.all()
-        if obj.posted_by in group_admin:
-            full_name = AdminProfile.objects.get(user=obj.posted_by).full_name
-            return full_name
-        elif obj.posted_by in group_user:
-            full_name = UserProfile.objects.get(user=obj.posted_by).full_name
-            return full_name
-        else:
-            pass
+    # def get_full_name(self, obj):
+    #     group_admin = Group.objects.get(name="Admin").user_set.all()
+    #     group_user = Group.objects.get(name="BuyerOrSeller").user_set.all()
+    #     if obj.posted_by in group_admin:
+    #         full_name = AdminProfile.objects.get(user=obj.posted_by).full_name
+    #         return full_name
+    #     elif obj.posted_by in group_user:
+    #         full_name = UserProfile.objects.get(user=obj.posted_by).full_name
+    #         return full_name
+    #     else:
+    #         pass
 
-    def get_phone(self, obj):
-        group_admin = Group.objects.get(name="Admin").user_set.all()
-        group_user = Group.objects.get(name="BuyerOrSeller").user_set.all()
-        if obj.posted_by in group_admin:
-            phone = AdminProfile.objects.get(user=obj.posted_by).phone
-            return phone
-        elif obj.posted_by in group_user:
-            phone = UserProfile.objects.get(user=obj.posted_by).phone_number
-            return phone
-        else:
-            pass
+    # def get_phone(self, obj):
+    #     group_admin = Group.objects.get(name="Admin").user_set.all()
+    #     group_user = Group.objects.get(name="BuyerOrSeller").user_set.all()
+    #     if obj.posted_by in group_admin:
+    #         phone = AdminProfile.objects.get(user=obj.posted_by).phone
+    #         return phone
+    #     elif obj.posted_by in group_user:
+    #         phone = UserProfile.objects.get(user=obj.posted_by).phone_number
+    #         return phone
+    #     else:
+    #         pass
 
     class Meta:
         # list_serializer_class = FilteredListSerializer
@@ -858,8 +858,8 @@ class PendingPropertySerializer(serializers.ModelSerializer):
             "resale_details",
             "amenities",
             "floorplan",
-            "full_name",
-            "phone",
+            # "full_name",
+            # "phone",
         )
 
 
