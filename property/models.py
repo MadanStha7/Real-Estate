@@ -62,6 +62,9 @@ class PropertyTypes(CommonInfo):
 class Locality(CommonInfo):
     """model to store locality  of property"""
 
+    city = models.ForeignKey(
+        City, on_delete=models.CASCADE, related_name="locality", null=True, blank=True
+    )
     name = models.CharField(max_length=200)
 
     def __str__(self):
