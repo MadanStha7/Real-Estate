@@ -628,6 +628,4 @@ class LocalityFilter(APIView):
         city = self.request.query_params.get("city", "")
         if city:
             localitys = Locality.objects.filter(city__name=city).values("id", "name")
-            print("localitys", localitys)
-            res = {"data": localitys}
-            return Response(res)
+            return Response(localitys)
