@@ -67,6 +67,7 @@ from api.serializers.property_serializer import (
     BasicDetailRetrieveSerializer,
     CommentSerializer,
     ReplySerializer,
+    SuggestionSerializer,
 )
 from django.contrib.auth import get_user_model
 
@@ -591,3 +592,42 @@ class ReplyViewSet(viewsets.ModelViewSet):
 
     queryset = Reply.objects.all()
     serializer_class = ReplySerializer
+
+
+class NameSuggestions(APIView):
+    """
+    api for locality suggestions during search
+    """
+
+    queryset = None
+    serializer_class = SuggestionSerializer
+
+    def get(self, request, *args, **kwargs):
+        city = self.request.query_params.get("city", "")
+        name = self.request.query_params.get("name", "")
+        name_suggestions = []
+        if name:
+            localitys = Locality.objects.filter(city__name=city).values("name")
+            for locality in localitys:
+                if name.lower() in locality.get("name", "").lower():
+                    name_suggestions.append(locality.get("name"))
+        res = {"suggestions": list(set(name_suggestions))}
+
+        return Response(res)
+
+
+class LocalityFilter(APIView):
+    """
+    API to return the locality of specific city
+    """
+
+    queryset = None
+    serializer_class = None
+
+    def get(self, request, *args, **kwargs):
+        city = self.request.query_params.get("city", "")
+        if city:
+            localitys = Locality.objects.filter(city__name=city).values("id", "name")
+            print("localitys", localitys)
+            res = {"data": localitys}
+            return Response(res)
