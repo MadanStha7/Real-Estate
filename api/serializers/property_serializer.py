@@ -150,6 +150,16 @@ class LocalityDetailsSerializer(serializers.ModelSerializer):
 
         return locality_details
 
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        locality_validated_data = validated_data.pop("locality", None)
+        locality = instance.locality
+        locality.name = locality_validated_data.get("name", locality.name)
+        locality.save()
+        instance.street = validated_data.get('street', instance.street)
+        instance.save()
+        return instance
+
 
 class BasicDetailsSerializer(serializers.ModelSerializer):
     """
