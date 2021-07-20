@@ -1,6 +1,7 @@
 from django.db.models.query import QuerySet
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.models import Group
 from property.models import (
     City,
     PropertyCategories,
@@ -188,6 +189,34 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
         source="get_condition_type_display", read_only=True
     )
     location = LocalityDetailsSerializer(read_only=True)
+    full_name = serializers.SerializerMethodField(read_only=True)
+    phone = serializers.SerializerMethodField(read_only=True)
+
+    def get_full_name(self, obj):
+        group_admin = Group.objects.get(name="Admin").user_set.all()
+        group_user = Group.objects.get(name="BuyerOrSeller").user_set.all()
+        if obj.posted_by in group_admin:
+            full_name = AdminProfile.objects.get(user=obj.posted_by).full_name
+            return full_name
+        elif obj.posted_by in group_user:
+            full_name = UserProfile.objects.get(user=obj.posted_by).full_name
+            return full_name
+        else:
+            pass
+        
+
+    def get_phone(self, obj):
+        group_admin = Group.objects.get(name="Admin").user_set.all()
+        group_user = Group.objects.get(name="BuyerOrSeller").user_set.all()
+        if obj.posted_by in group_admin:
+            phone = AdminProfile.objects.get(user=obj.posted_by).phone
+            return phone
+        elif obj.posted_by in group_user:
+            phone = UserProfile.objects.get(user=obj.posted_by).phone_number
+            return phone
+        else:
+            pass
+      
 
     class Meta:
         model = BasicDetails
@@ -217,6 +246,8 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
             "listing_type_value",
             "membership_plan_value",
             "condition_type_value",
+            "full_name",
+            "phone"
         )
 
 
@@ -494,6 +525,9 @@ class PropertyRequestSerializer(serializers.ModelSerializer):
 
 
 class PropertyDiscussionSerializer(serializers.ModelSerializer):
+    discussion_value = serializers.CharField(
+        source="get_discussion_display", read_only=True
+    )
     tags = serializers.ListField(child=serializers.CharField(), required=False)
     user_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), source="user", write_only=True
@@ -508,6 +542,7 @@ class PropertyDiscussionSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "discussion",
+            "discussion_value",
             "title",
             "tags",
             "comments",
@@ -756,24 +791,34 @@ class PendingPropertySerializer(serializers.ModelSerializer):
     amenities = AmenitiesSerializer(many=True, read_only=True)
     floorplan = FloorPlanSerializer(many=True, read_only=True)
 
-    full_name = serializers.SerializerMethodField(read_only=True)
-    phone_number = serializers.SerializerMethodField(read_only=True)
+    full_name = serializers.SerializerMethodField(read_only=True)   
+    phone = serializers.SerializerMethodField(read_only=True)
 
     def get_full_name(self, obj):
-        try:
+        group_admin = Group.objects.get(name="Admin").user_set.all()
+        group_user = Group.objects.get(name="BuyerOrSeller").user_set.all()
+        if obj.posted_by in group_admin:
+            full_name = AdminProfile.objects.get(user=obj.posted_by).full_name
+            return full_name
+        elif obj.posted_by in group_user:
             full_name = UserProfile.objects.get(user=obj.posted_by).full_name
             return full_name
-        except UserProfile.DoesNotExist:
-            full_name = None
-        return full_name
+        else:
+            pass
+        
 
-    def get_phone_number(self, obj):
-        try:
-            phone_number = UserProfile.objects.get(user=obj.posted_by).phone_number
-            return phone_number
-        except UserProfile.DoesNotExist:
-            phone_number = None
-        return phone_number
+    def get_phone(self, obj):
+        group_admin = Group.objects.get(name="Admin").user_set.all()
+        group_user = Group.objects.get(name="BuyerOrSeller").user_set.all()
+        if obj.posted_by in group_admin:
+            phone = AdminProfile.objects.get(user=obj.posted_by).phone
+            return phone
+        elif obj.posted_by in group_user:
+            phone = UserProfile.objects.get(user=obj.posted_by).phone_number
+            return phone
+        else:
+            pass
+      
 
     class Meta:
         # list_serializer_class = FilteredListSerializer
@@ -802,12 +847,12 @@ class PendingPropertySerializer(serializers.ModelSerializer):
             "membership_plan_value",
             "condition_type_value",
             "rent_property",
-            "full_name",
-            "phone_number",
             "rental_details",
             "gallery",
             "sell_property_details",
             "resale_details",
             "amenities",
             "floorplan",
+            "full_name",
+            "phone",
         )
