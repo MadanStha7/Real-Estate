@@ -65,7 +65,7 @@ class Locality(CommonInfo):
     city = models.ForeignKey(
         City, on_delete=models.CASCADE, related_name="locality", null=True, blank=True
     )
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
 
     def __str__(self):
         return f"property types of {self.name}, {self.id}"
