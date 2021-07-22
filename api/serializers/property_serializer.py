@@ -451,7 +451,6 @@ class AmenitiesSerializer(serializers.ModelSerializer):
             "security",
             "lift",
             "gym",
-            "hot_water",
             "cctv",
             "fire_safety",
             "car_parking",
