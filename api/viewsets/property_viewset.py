@@ -140,16 +140,42 @@ class PropertyFilter(viewsets.ModelViewSet):
         property_categories = self.request.query_params.get("property_categories", None)
         property_types = self.request.query_params.get("property_types", None)
         city = self.request.query_params.get("city", None)
-        if property_categories:
+
+        if (property_categories and city and property_types):
+            queryset = verified_property.filter(
+                property_categories__name=property_categories,
+                city__name=city,
+                property_types__name=property_types
+            )
+            return queryset
+        elif (property_categories and city):
+            queryset = verified_property.filter(
+                property_categories__name=property_categories,
+                city__name=city
+            )
+            return queryset
+        elif (property_categories and property_types):
+            queryset = verified_property.filter(
+                property_categories__name=property_categories,
+                property_types__name=property_types
+            )
+            return queryset
+        elif (city and property_types):
+            queryset = verified_property.filter(
+                property_types__name=property_types,
+                city__name=city
+            )
+            return queryset
+        elif property_categories:
             queryset = verified_property.filter(
                 property_categories__name=property_categories
             )
             return queryset
 
-        if property_types:
+        elif property_types:
             queryset = verified_property.filter(property_types__name=property_types)
             return queryset
-        if city:
+        elif city:
             queryset = verified_property.filter(city__name=city)
             return queryset
         else:
