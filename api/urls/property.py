@@ -34,7 +34,9 @@ from api.viewsets.property_viewset import (
     ReplyViewSet,
     NameSuggestions,
     LocalityFilter,
-    PropertyFilterView
+    PropertyFilterView,
+    PendingPropertyListview,
+    ListedPropertyListview,
 )
 
 router = routers.DefaultRouter()
@@ -82,4 +84,6 @@ urlpatterns = [
     path("basic-details/property/<int:pk>/", BasicDetailRetrieveView.as_view()),
     path("namesuggestion/", NameSuggestions.as_view()),
     path("locality-filter/", LocalityFilter.as_view()),
+    path("pending-property/list", PendingPropertyListview.as_view()),
+    path("listed-property/list", ListedPropertyListview.as_view()),
 ]
