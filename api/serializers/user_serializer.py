@@ -356,6 +356,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "phone_number", instance.phone_number
         )
         instance.address = validated_data.get("address", instance.address)
+        instance.full_name = validated_data.get("full_name", instance.full_name)
         instance.save()
         return instance
 
