@@ -282,6 +282,7 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 
     def validate_old_password(self, value):
         user = self.context["request"].user
+        print("user", user)
         if not user.check_password(value):
             raise serializers.ValidationError(
                 {"old_password": "Old password is not correct"}
@@ -328,7 +329,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         send_mail(
             "Please Confirm Your Account",
             "Here is the message. {}".format(
-                "Your 4 Digit Verification Pin" + str(ran_num_upper)
+                "Your 4 Digit Verification Pin is" + " " + (str(ran_num_upper))
             ),
             EMAIL_HOST_USER,
             [user_data["email"]],
