@@ -290,10 +290,11 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         return value
 
     def update(self, instance, validated_data):
-        instance.set_password(validated_data["password"])
-        instance.save()
+        user = User.objects.get(username=self.context["request"].user)
+        user.set_password(validated_data["password"])
+        user.save()
 
-        return instance
+        return user
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
