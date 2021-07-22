@@ -136,9 +136,8 @@ class PropertyFilter(viewsets.ModelViewSet):
 
     def get_queryset(self):
         verified_property = BasicDetails.objects.filter(publish=True)
-        print("verified_property", verified_property)
         property_categories = self.request.query_params.get("property_categories", None)
-        property_type = self.request.query_params.get("property_types", None)
+        property_types = self.request.query_params.get("property_types", None)
         city = self.request.query_params.get("city", None)
         if property_categories:
             queryset = verified_property.filter(
@@ -146,8 +145,8 @@ class PropertyFilter(viewsets.ModelViewSet):
             )
             return queryset
 
-        if property_type:
-            queryset = verified_property.filter(property_types__name=property_type)
+        if property_types:
+            queryset = verified_property.filter(property_types__name=property_types)
             return queryset
         if city:
             queryset = verified_property.filter(city__name=city)
@@ -179,6 +178,47 @@ class PropertySearchViewSet(viewsets.ModelViewSet):
         #     return queryset
         else:
             return BasicDetails.objects.filter(publish=True)
+
+class PropertyFilterView(viewsets.ModelViewSet):
+    """
+    This views returns filtered property
+    """
+
+    queryset = BasicDetails.objects.all()
+    serializer_class = BasicDetailRetrieveSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+    filterset_fields = ["advertisement_type"]
+    ordering_fields = ["created_on"]
+    search_fields = ["city",  "property_size", "bhk_type", "facing_direction", "property_age"]
+
+    def get_queryset(self):
+        verified_property = BasicDetails.objects.filter(publish=True)
+        city = self.request.query_params.get("city", None)
+        bhk_type = self.request.query_params.get("bhk_type", None)
+        facing = self.request.query_params.get("facing", None)
+        property_size = self.request.query_params.get("property_size", None)
+        facing_direction = self.request.query_params.get("facing_direction", None)
+        property_age = self.request.query_params.get("property_age", None)
+        if city:
+            queryset = verified_property.filter(city__name=city)
+            return queryset
+        if bhk_type:
+            queryset = verified_property.filter(sell_property_details__bhk_type=bhk_type) | verified_property.filter(rent_property__bhk_type=bhk_type)
+            return queryset
+        if facing_direction:
+            queryset = verified_property.filter(sell_property_details__facing_direction=facing_direction)| verified_property.filter(rent_property__facing_direction=facing_direction)
+            return queryset
+        elif property_size:
+            queryset = verified_property.filter(sell_property_details__property_size=property_size)|verified_property.filter(rent_property__property_size=property_size)
+            return queryset
+        elif property_age:
+            queryset = verified_property.filter(sell_property_details__property_agee=property_age)|verified_property.filter(rent_property__property_age=property_age)
+            return queryset
+       
+        else:
+            pass
+        return super().get_queryset()
+
 
 
 class PropertyTypesViewSet(viewsets.ModelViewSet):

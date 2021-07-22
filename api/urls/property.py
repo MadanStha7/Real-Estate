@@ -34,6 +34,7 @@ from api.viewsets.property_viewset import (
     ReplyViewSet,
     NameSuggestions,
     LocalityFilter,
+    PropertyFilterView
 )
 
 router = routers.DefaultRouter()
@@ -62,6 +63,7 @@ router.register(r"floor-plan", FloorPlanViewset)  # for both sale and rent
 router.register(r"comment", CommentViewSet)
 router.register(r"reply", ReplyViewSet)
 router.register(r"property-search", PropertySearchViewSet)
+router.register(r"property-filter-client", PropertyFilterView)
 
 
 urlpatterns = [
