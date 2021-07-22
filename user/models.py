@@ -61,12 +61,12 @@ class UserProfile(CommonInfo):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="buyer_seller_profile"
     )
-    full_name = models.CharField(max_length=60, blank=True)
+    full_name = models.CharField(max_length=60)
     profile_picture = models.ImageField(
         upload_to="user/buyerseller", blank=True, null=True
     )
-    phone_number = models.CharField(max_length=15, blank=True)
-    address = models.TextField(blank=True)
+    phone_number = models.CharField(max_length=15)
+    address = models.TextField()
     added_at = models.DateTimeField(auto_now_add=True)
     otp_code = models.CharField(max_length=6, blank=True, null=True)
     count = models.PositiveBigIntegerField(default=0)
