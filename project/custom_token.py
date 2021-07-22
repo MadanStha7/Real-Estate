@@ -61,6 +61,7 @@ class CustomAuthToken(ObtainAuthToken):
         group_name = Group.objects.filter(user=user).values()
         return Response(
             {
+                "id":user_details.id,
                 "token": token.key,
                 "user_id": user.pk,
                 "email": user.email,
