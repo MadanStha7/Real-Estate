@@ -68,6 +68,7 @@ from api.serializers.property_serializer import (
     CommentSerializer,
     ReplySerializer,
     SuggestionSerializer,
+    BasicDetailListSerializer,
 )
 from django.contrib.auth import get_user_model
 
@@ -179,6 +180,7 @@ class PropertySearchViewSet(viewsets.ModelViewSet):
         else:
             return BasicDetails.objects.filter(publish=True)
 
+
 class PropertyFilterView(viewsets.ModelViewSet):
     """
     This views returns filtered property
@@ -186,16 +188,25 @@ class PropertyFilterView(viewsets.ModelViewSet):
 
     queryset = BasicDetails.objects.all()
     serializer_class = BasicDetailRetrieveSerializer
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+    filter_backends = [
+        filters.SearchFilter,
+        filters.OrderingFilter,
+        DjangoFilterBackend,
+    ]
     filterset_fields = ["advertisement_type"]
     ordering_fields = ["created_on"]
-    search_fields = ["city",  "property_size", "bhk_type", "facing_direction", "property_age"]
+    search_fields = [
+        "city",
+        "property_size",
+        "bhk_type",
+        "facing_direction",
+        "property_age",
+    ]
 
     def get_queryset(self):
         verified_property = BasicDetails.objects.filter(publish=True)
         city = self.request.query_params.get("city", None)
         bhk_type = self.request.query_params.get("bhk_type", None)
-        facing = self.request.query_params.get("facing", None)
         property_size = self.request.query_params.get("property_size", None)
         facing_direction = self.request.query_params.get("facing_direction", None)
         property_age = self.request.query_params.get("property_age", None)
@@ -203,22 +214,31 @@ class PropertyFilterView(viewsets.ModelViewSet):
             queryset = verified_property.filter(city__name=city)
             return queryset
         if bhk_type:
-            queryset = verified_property.filter(sell_property_details__bhk_type=bhk_type) | verified_property.filter(rent_property__bhk_type=bhk_type)
+            queryset = verified_property.filter(
+                sell_property_details__bhk_type=bhk_type
+            ) | verified_property.filter(rent_property__bhk_type=bhk_type)
             return queryset
         if facing_direction:
-            queryset = verified_property.filter(sell_property_details__facing_direction=facing_direction)| verified_property.filter(rent_property__facing_direction=facing_direction)
+            queryset = verified_property.filter(
+                sell_property_details__facing_direction=facing_direction
+            ) | verified_property.filter(
+                rent_property__facing_direction=facing_direction
+            )
             return queryset
         elif property_size:
-            queryset = verified_property.filter(sell_property_details__property_size=property_size)|verified_property.filter(rent_property__property_size=property_size)
+            queryset = verified_property.filter(
+                sell_property_details__property_size=property_size
+            ) | verified_property.filter(rent_property__property_size=property_size)
             return queryset
         elif property_age:
-            queryset = verified_property.filter(sell_property_details__property_agee=property_age)|verified_property.filter(rent_property__property_age=property_age)
+            queryset = verified_property.filter(
+                sell_property_details__property_agee=property_age
+            ) | verified_property.filter(rent_property__property_age=property_age)
             return queryset
-       
+
         else:
             pass
         return super().get_queryset()
-
 
 
 class PropertyTypesViewSet(viewsets.ModelViewSet):
@@ -669,3 +689,17 @@ class LocalityFilter(APIView):
         if city:
             localitys = Locality.objects.filter(city__name=city).values("id", "name")
             return Response(localitys)
+
+
+class PendingPropertyListview(generics.ListAPIView):
+    """API to displays list of pending property"""
+
+    queryset = BasicDetails.objects.filter(publish=False)
+    serializer_class = BasicDetailListSerializer
+
+
+class ListedPropertyListview(generics.ListAPIView):
+    """API to displays list of listed property"""
+
+    queryset = BasicDetails.objects.filter(publish=False)
+    serializer_class = BasicDetailListSerializer
