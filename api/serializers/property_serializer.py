@@ -790,7 +790,6 @@ class PendingPropertySerializer(serializers.ModelSerializer):
     posted_by = UserSerializer(read_only=True)
     rent_property = RentPropertyDetailsSerializer(many=True, read_only=True)
     location = LocalityDetailsSerializer(read_only=True)
-    location = LocalityDetailsSerializer(read_only=True)
     rental_details = RentalDetailsSerializer(many=True, read_only=True)
     gallery = GallerySerializer(many=True, read_only=True)
     sell_property_details = SellPropertyDetailsSerializer(many=True, read_only=True)
@@ -858,6 +857,48 @@ class PendingPropertySerializer(serializers.ModelSerializer):
             "resale_details",
             "amenities",
             "floorplan",
+            "full_name",
+            "phone",
+        )
+
+
+class BasicDetailListSerializer(serializers.ModelSerializer):
+    city_value = CitySerializer(read_only=True, source="city")
+    location = LocalityDetailsSerializer(read_only=True)
+    full_name = serializers.SerializerMethodField(read_only=True)
+    phone = serializers.SerializerMethodField(read_only=True)
+
+    def get_full_name(self, obj):
+        group_admin = Group.objects.get(name="Admin").user_set.all()
+        group_user = Group.objects.get(name="BuyerOrSeller").user_set.all()
+        if obj.posted_by in group_admin:
+            full_name = AdminProfile.objects.get(user=obj.posted_by).full_name
+            return full_name
+        elif obj.posted_by in group_user:
+            full_name = UserProfile.objects.get(user=obj.posted_by).full_name
+            return full_name
+        else:
+            pass
+
+    def get_phone(self, obj):
+        group_admin = Group.objects.get(name="Admin").user_set.all()
+        group_user = Group.objects.get(name="BuyerOrSeller").user_set.all()
+        if obj.posted_by in group_admin:
+            phone = AdminProfile.objects.get(user=obj.posted_by).phone
+            return phone
+        elif obj.posted_by in group_user:
+            phone = UserProfile.objects.get(user=obj.posted_by).phone_number
+            return phone
+        else:
+            pass
+
+    class Meta:
+        # list_serializer_class = FilteredListSerializer
+        model = BasicDetails
+        fields = (
+            "id",
+            "location",
+            "city_value",
             "full_name",
             "phone",
         )
