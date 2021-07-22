@@ -491,7 +491,6 @@ class Amenities(CommonInfo):
     security = models.BooleanField(default=False)
     lift = models.BooleanField(default=False)
     gym = models.BooleanField(default=False)
-    hot_water = models.BooleanField(default=False)
     cctv = models.BooleanField(default=False)
     fire_safety = models.BooleanField(default=False)
     car_parking = models.BooleanField(default=False)
