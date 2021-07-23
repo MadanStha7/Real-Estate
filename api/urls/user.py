@@ -42,4 +42,8 @@ urlpatterns = [
     # contact page for sending email
     path("send-mail/", SendMailView.as_view(), name="send-mail"),
     path("logout/", LogoutView.as_view(), name="logout"),
+    path(
+        "api/password_reset/",
+        include("django_rest_passwordreset.urls", namespace="password_reset"),
+    ),
 ]
