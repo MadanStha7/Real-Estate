@@ -2,15 +2,22 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth import get_user_model
 from common.models import CommonInfo
-from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.contrib.auth.models import Group
+from django.dispatch import receiver
+from django.urls import reverse
+from django_rest_passwordreset.signals import reset_password_token_created
+from django.core.mail import send_mail
+from project.settings import EMAIL_HOST_USER
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 
 # from colossus.apps.notifications.constants import Actions
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
 User = get_user_model()
+
 
 IDENTIFICATION_TYPE = (
     ("citizenship", "Citizenship"),
@@ -233,3 +240,21 @@ class Contact(models.Model):
 
     def __name__(self):
         return self.email
+
+
+@receiver(reset_password_token_created)
+def password_reset_token_created(
+    sender, instance, reset_password_token, *args, **kwargs
+):
+    """Function to send the password reset link"""
+    context = {"token": reset_password_token.key}
+    html = render_to_string("mail/password-reset.html", context=context)
+    text = render_to_string("mail/password-reset.html", context=context)
+    msg = EmailMultiAlternatives(
+        "Password reset link",
+        text,
+        EMAIL_HOST_USER,
+        [reset_password_token.user.email],  # to
+    )
+    msg.attach_alternative(html, "text/html")
+    msg.send(fail_silently=False)
