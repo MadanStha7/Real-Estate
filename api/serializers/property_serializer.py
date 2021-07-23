@@ -255,6 +255,7 @@ class BasicDetailsSerializer(serializers.ModelSerializer):
             "condition_type_value",
             "full_name",
             "phone",
+            "created_on"
         )
 
 
@@ -269,7 +270,7 @@ class RentPropertyDetailsSerializer(serializers.ModelSerializer):
         source="get_property_size_choice_display", read_only=True
     )
     property_age_value = serializers.CharField(
-        source="get_property_property_age_display", read_only=True
+        source="get_property_age_display", read_only=True
     )
 
     class Meta:
@@ -617,6 +618,20 @@ class BasicDetailRetrieveSerializer(serializers.ModelSerializer):
     floorplan = FloorPlanSerializer(many=True, read_only=True)
     no_of_days = serializers.SerializerMethodField(read_only=True)
     full_name = serializers.SerializerMethodField(read_only=True)
+    price = serializers.SerializerMethodField(read_only=True)
+
+    def get_price(self, obj):
+        try:
+            if obj.advertisement_type == "R":
+                price = RentalDetails.objects.get(basic_details=obj.id).expected_rent
+                print(type(price))
+                return price
+            elif obj.advertisement_type == "S":
+                price = ResaleDetails.objects.get(basic_details=obj.id).expected_price
+                print(type(price))
+                return price
+        except:
+            pass
 
     def get_full_name(self, obj):
         try:
@@ -658,6 +673,7 @@ class BasicDetailRetrieveSerializer(serializers.ModelSerializer):
             "amenities",
             "floorplan",
             "full_name",
+            "price"
         )
 
 
