@@ -223,7 +223,6 @@ class PropertyFilterView(viewsets.ModelViewSet):
     ordering_fields = ["created_on"]
     search_fields = [
         "city",
-        "property_size",
         "bhk_type",
         "facing_direction",
         "property_age",
@@ -233,7 +232,6 @@ class PropertyFilterView(viewsets.ModelViewSet):
         verified_property = BasicDetails.objects.filter(publish=True)
         city = self.request.query_params.get("city", None)
         bhk_type = self.request.query_params.get("bhk_type", None)
-        property_size = self.request.query_params.get("property_size", None)
         facing_direction = self.request.query_params.get("facing_direction", None)
         property_age = self.request.query_params.get("property_age", None)
         if city:
@@ -251,17 +249,12 @@ class PropertyFilterView(viewsets.ModelViewSet):
                 rent_property__facing_direction=facing_direction
             )
             return queryset
-        elif property_size:
-            queryset = verified_property.filter(
-                sell_property_details__property_size=property_size
-            ) | verified_property.filter(rent_property__property_size=property_size)
-            return queryset
         elif property_age:
             queryset = verified_property.filter(
-                sell_property_details__property_agee=property_age
+                sell_property_details__property_age=property_age
             ) | verified_property.filter(rent_property__property_age=property_age)
             return queryset
-
+        
         else:
             pass
         return super().get_queryset()
