@@ -71,6 +71,7 @@ from api.serializers.property_serializer import (
     BasicDetailListSerializer,
 )
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -141,29 +142,27 @@ class PropertyFilter(viewsets.ModelViewSet):
         property_types = self.request.query_params.get("property_types", None)
         city = self.request.query_params.get("city", None)
 
-        if (property_categories and city and property_types):
+        if property_categories and city and property_types:
             queryset = verified_property.filter(
                 property_categories__name=property_categories,
                 city__name=city,
-                property_types__name=property_types
-            )
-            return queryset
-        elif (property_categories and city):
-            queryset = verified_property.filter(
-                property_categories__name=property_categories,
-                city__name=city
-            )
-            return queryset
-        elif (property_categories and property_types):
-            queryset = verified_property.filter(
-                property_categories__name=property_categories,
-                property_types__name=property_types
-            )
-            return queryset
-        elif (city and property_types):
-            queryset = verified_property.filter(
                 property_types__name=property_types,
-                city__name=city
+            )
+            return queryset
+        elif property_categories and city:
+            queryset = verified_property.filter(
+                property_categories__name=property_categories, city__name=city
+            )
+            return queryset
+        elif property_categories and property_types:
+            queryset = verified_property.filter(
+                property_categories__name=property_categories,
+                property_types__name=property_types,
+            )
+            return queryset
+        elif city and property_types:
+            queryset = verified_property.filter(
+                property_types__name=property_types, city__name=city
             )
             return queryset
         elif property_categories:
@@ -254,7 +253,7 @@ class PropertyFilterView(viewsets.ModelViewSet):
                 sell_property_details__property_age=property_age
             ) | verified_property.filter(rent_property__property_age=property_age)
             return queryset
-        
+
         else:
             pass
         return super().get_queryset()
@@ -359,6 +358,60 @@ class BasicDetailsViewset(viewsets.ModelViewSet):
                 )
         else:
             raise ValidationError({"error": "property is required"})
+
+    @action(detail=False, methods=["get"], url_path="property-price-list")
+    def property_price_list_display(self, request, *args, **kwargs):
+        """"api to filter the price list from low to high"""
+        low_to_high = self.request.query_params.get("low_to_high", None)
+        high_to_low = self.request.query_params.get("high_to_low", None)
+
+        # get the price from both rental details and resale details
+        rental_details = RentalDetails.objects.filter(
+            basic_details__publish=True
+        ).values("expected_rent")
+        resale_details = ResaleDetails.objects.filter(
+            basic_details__publish=True
+        ).values("expected_price")
+
+        price_list = []
+        for price in rental_details:
+            price_list.append(price["expected_rent"])
+
+        for price in resale_details:
+            price_list.append(price["expected_price"])
+
+        # sorted in ascending order
+        if low_to_high:
+            price_data = sorted(price_list, key=lambda x: float(x))
+        # sorted in descending order
+        if high_to_low:
+            price_data = sorted(price_list, key=lambda x: float(x), reverse=True)
+
+        # get all the data of rental and resale details
+        overall_data = []
+        for price in price_data:
+            all_price_rent = RentalDetails.objects.filter(
+                basic_details__publish=True, expected_rent=price
+            )
+            if all_price_rent:
+                overall_data.append(all_price_rent)
+            else:
+                all_price_resale = ResaleDetails.objects.filter(
+                    basic_details__publish=True, expected_price=price
+                )
+                overall_data.append(all_price_resale)
+
+        # get all the data in basic detail serialzers
+        main_data = []
+        for element in overall_data:
+            for item in element:
+                try:
+                    basic_details = BasicDetails.objects.get(id=item.basic_details.id)
+                except BasicDetails.DoesNotExist:
+                    pass
+                results = BasicDetailsSerializer(basic_details).data
+                main_data.append(results)
+        return Response(main_data, status=status.HTTP_200_OK)
 
 
 class RentPropertyDetailsViewset(viewsets.ModelViewSet):
