@@ -36,7 +36,7 @@ from api.viewsets.property_viewset import (
     LocalityFilter,
     PropertyFilterView,
     PendingPropertyListview,
-    ListedPropertyListview,
+    ListedPropertyListview, MyPropertyViewset,
 )
 
 router = routers.DefaultRouter()
@@ -66,6 +66,7 @@ router.register(r"comment", CommentViewSet)
 router.register(r"reply", ReplyViewSet)
 router.register(r"property-search", PropertySearchViewSet)
 router.register(r"property-filter-client", PropertyFilterView)
+router.register(r"my_property", MyPropertyViewset)
 
 
 urlpatterns = [
