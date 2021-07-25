@@ -775,3 +775,19 @@ class ListedPropertyListview(generics.ListAPIView):
 
     queryset = BasicDetails.objects.filter(publish=False)
     serializer_class = BasicDetailListSerializer
+
+
+class MyPropertyViewset(viewsets.ModelViewSet):
+    """
+    Viewsets to show property of login user
+    """
+
+    queryset = BasicDetails.objects.all()
+    serializer_class = BasicDetailRetrieveSerializer
+
+    def get_queryset(self):
+        queryset = BasicDetails.objects.filter(posted_by=self.request.user.id)
+        if queryset is not None:
+            return queryset
+        else:
+            return Response({"message": "Please login to view profile."})
